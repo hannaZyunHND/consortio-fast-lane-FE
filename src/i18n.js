@@ -1,0 +1,128 @@
+import { createI18n } from 'vue-i18n'; // Import từ Vue I18n
+
+const localeMessages = {
+    en: {
+        home: {
+            slogan: "A different experience at the airport",
+            enter_guests: "Enter number of guests",
+            group: "Group",
+            service: "Service",
+            name: "Name",
+            full_name: "Full name",
+            autofill_passport_photo: "Autofill if providing the passport photo",
+            passport_number: "Passport Number",
+            nationality: "Nationality",
+            service_time: "Service Time",
+            flight_number: "Flight Number",
+            airport: "Airport",
+            service_location: "Where the service will be held",
+            email: "Email",
+            international_airport: "International Airport",
+            phone_number: "Phone Number",
+            note: "Note",
+            select_airport: "Please airt",
+            upload_documents: "Upload Documents",
+            upload_passport_here: "Upload passport at here",
+            upload_visa_here: "Upload visa at here",
+            upload_portrait_here: "Upload portrait at here",
+            mandatory_marks: "Marks field are mandatory to fill up",
+            button: "Submit"
+        },
+    },
+    vi: {
+        home: {
+            slogan: "Một trải nghiệm khác biệt tại sân bay",
+            enter_guests: "Nhập số lượng khách",
+            group: "Nhóm",
+            service: "Dịch vụ",
+            name: "Tên",
+            full_name: "Tên đầy đủ",
+            autofill_passport_photo: "Tự động điền nếu cung cấp ảnh hộ chiếu",
+            passport_number: "Số hộ chiếu",
+            nationality: "Quốc tịch",
+            service_time: "Thời gian dịch vụ",
+            flight_number: "Số hiệu chuyến bay",
+            airport: "Sân bay",
+            service_location: "Nơi diễn ra dịch vụ",
+            email: "Email",
+            phone_number: "Số điện thoại",
+            note: "Ghi chú",
+            international_airport: "Sân bay quốc tế",
+            select_airport: "Chọn sân bay",
+            service_here: "Nơi dịch vụ sẽ được tổ chức",
+            upload_documents: "Tải tài liệu lên",
+            upload_passport_here: "Tải hộ chiếu lên ở đây",
+            upload_visa_here: "Tải visa lên ở đây",
+            upload_portrait_here: "Tải ảnh chân dung lên ở đây",
+            mandatory_marks: "Các mục đánh dấu là bắt buộc điền",
+            submit: "Gửi"
+        },
+    },
+    zh: {
+        home: {
+            slogan: "机场的不同体验",
+            enter_guests: "输入客人数量",
+            group: "群组",
+            service: "服务",
+            name: "姓名",
+            full_name: "全名",
+            autofill_passport_photo: "提供护照照片时自动填充",
+            passport_number: "护照号码",
+            nationality: "国籍",
+            service_time: "服务时间",
+            flight_number: "航班号码",
+            airport: "机场",
+            service_location: "服务地点",
+            email: "邮箱",
+            phone_number: "电话号码",
+            note: "备注",
+            international_airport: "国际机场",
+            select_airport: "选择机场",
+            service_here: "举行仪式的地点",
+            upload_documents: "上传文件",
+            upload_passport_here: "在此上传护照",
+            upload_visa_here: "在此上传签证",
+            upload_portrait_here: "在此上传肖像",
+            mandatory_marks: "标记字段为必填项",
+            submit: "提交"
+        },
+    },
+    ko: {
+        home: {
+            slogan: "공항에서의 색다른 경험",
+            enter_guests: "손님 수를 입력하세요",
+            group: "그룹",
+            service: "서비스",
+            name: "십",
+            full_name: "이름",
+            autofill_passport_photo: "여권 사진 제공 시 자동 완성",
+            passport_number: "여권 번호",
+            nationality: "국적",
+            service_time: "서비스 시간",
+            flight_number: "항공편 번호",
+            airport: "공항",
+            service_location: "서비스가 진행되는 곳",
+            email: "이메일",
+            phone_number: "전화 번호",
+            note: "메모",
+            international_airport: "국제 공항",
+            select_airport: "공항 선택",
+            service_here: "서비스가 진행되는 곳",
+            upload_documents: "문서 업로드",
+            upload_passport_here: "여기에 여권을 업로드하세요.",
+            upload_visa_here: "여기에 비자를 업로드하세요.",
+            upload_portrait_here: "여기에 초상화를 업로드하세요.",
+            mandatory_marks: "마크 필드는 필수로 작성해야 합니다.",
+            submit: "제출하다",
+        }
+    }
+};
+
+const i18n = createI18n({
+    legacy: false, // Sử dụng chế độ hiện đại
+    locale: 'en',
+    fallbackLocale: 'en',
+    messages: localeMessages
+});
+
+export default i18n;

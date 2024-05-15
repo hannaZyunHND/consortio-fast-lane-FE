@@ -63,7 +63,7 @@
                         <span class="title-notification" style="visibility: hidden">*</span>
                     </div>
                     <div class="row">
-                        <label for="phone">Phone Number</label>
+                        <label for="phone">Phone Number*</label>
                         <input type="text" v-model="formData.phone" required />
                         <span class="title-notification" style="visibility: hidden">*</span>
                     </div>

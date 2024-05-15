@@ -180,6 +180,9 @@ import {
 import PopupWrapper from "@/components/PopupWrapper.vue";
 import ImagePopup from "@/views/admin/order/ImagePopup.vue";
 import Pagination from "@/components/PaginationPage.vue";
+import VueDatePicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
+
 export default {
   name: "SchedulePage",
   components: {
@@ -190,9 +193,12 @@ export default {
     UserIcon,
     EnvelopeIcon,
     PopupWrapper,
+    VueDatePicker
   },
   data() {
     return {
+      toDate: null,
+      fromDate: null,
       currentPage: 1,
       pageSize: 6,
       totalItems: 0,
@@ -284,10 +290,21 @@ export default {
       }
     },
 
+    resetFilters() {
+      this.status = null;
+      this.toDate = null;
+      this.fromDate = null;
+      this.airport = "";
+      this.searchTerm = "";
+      this.currentPage = 1;
+      this.pageSize = 6;
+    },
+
     refreshOrders() {
       this.resetFilters();
       this.fetchSchedule();
     },
+
     async fetchEmployee() {
       const apiUrl = process.env.VUE_APP_API_URL;
       const user_id = parseInt(localStorage.getItem("user_id"));

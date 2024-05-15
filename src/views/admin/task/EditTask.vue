@@ -175,7 +175,7 @@ export default {
             const user_id = parseInt(localStorage.getItem("user_id"));
             let isOperator = false;
 
-            if (localStorage.getItem("roles") === "Operator") {
+            if (localStorage.getItem("roles") === "Chief Rep") {
                 isOperator = true;
             }
             const url = `${apiUrl}/employee?index=${this.currentPage}&pageSize=${this.pageSize}&user_id=${user_id}&isOperator=${isOperator}`;

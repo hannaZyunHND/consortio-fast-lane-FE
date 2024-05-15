@@ -56,10 +56,11 @@
 
       <!-- Agency -->
       <li v-if="showAgencyMenu">
+        <div class="layout-menuitem-root-text">Agency</div>
         <router-link class="nav-link" to="/agency/order">
           <div class="item-content">
             <square-2-stack-icon class="navbar-icon" />
-            <span>Agency</span>
+            <span>Booking</span>
           </div>
         </router-link>
       </li>
@@ -127,6 +128,24 @@
       <!-- Logout -->
       <div>
         <li style="margin-top: 100px">
+          <div class="item-content">
+            <user-icon class="navbar-icon" />
+            <PopupWrapper>
+              <template #header>
+                <div class="popover">
+                  <pencil-square-icon class="user-icon" />
+                  <span>Change password</span>
+                </div>
+              </template>
+              <template #content>
+                <div class="popover-content">
+                  <Change_Password />
+                </div>
+              </template>
+            </PopupWrapper>
+          </div>
+        </li>
+        <li>
           <div class="nav-link" @click="logout">
             <div class="item-content">
               <power-icon class="navbar-icon" />
@@ -142,6 +161,8 @@
 
 <script>
 import router from "@/router";
+import Change_Password from "@/views/admin/user/Change_Password.vue";
+import PopupWrapper from "@/components/PopupWrapper.vue";
 
 import {
   UserIcon,
@@ -170,12 +191,15 @@ export default {
     CalendarDaysIcon,
     Bars3Icon,
     Square2StackIcon,
+    Change_Password,
+    PopupWrapper
   },
   data() {
     return {
       isSubMenuOpen: {
         data: false,
       },
+      item: [],
       showEmployeeMenu: false,
       showBookingsMenu: false,
       showTaskMenu: false,
@@ -186,7 +210,58 @@ export default {
       showAgencyMenu: false
     };
   },
+
+  mounted() {
+    const roles = localStorage.getItem("roles");
+
+    //Authorize permission for each role
+    this.showBookingsMenu =
+      roles == "Admin" ||
+      roles == "Sales Management" ||
+      roles == "Sales Admin";
+
+    //Only operator each airport - admin
+    this.showAssignMenu =
+      roles == "Admin" ||
+      roles == "Sales Management" ||
+      roles == "Sales Admin" ||
+      roles == "Chief Rep"
+
+    this.showScheduleMenu =
+      roles == "Admin" ||
+      roles == "Employee" ||
+      roles == "Chief Rep"
+
+    //Only agency-admin-sales
+    this.showAgencyMenu =
+      roles == "Agency" ||
+      roles == "Admin" ||
+      roles == "Sales Management"
+
+
+    //Only admin-sales-agency-operator
+    this.showHomeMenu =
+      roles == "Admin" ||
+      roles == "Sales Admin" ||
+      roles == "Agency" ||
+      roles == "Sales Management" ||
+      roles == "Chief Rep"
+
+    //Only Admin
+    this.showEmployeeMenu = roles == "Admin"
+    this.showRoleMenu = roles == "Admin"
+    this.showAccountMenu = roles == "Admin"
+    this.showServicesMenu = roles == "Admin"
+    this.showStatusMenu = roles == "Admin"
+  },
   methods: {
+    // openChangPassword() {
+    //   console.log('user_id_token', user_id);
+    //   this.selectedUserId = user_id;
+
+    //   console.log("dây là id: " + this.selectedUserId);
+    // },
+
     toggleSubMenu(subMenu) {
       this.isSubMenuOpen[subMenu] = !this.isSubMenuOpen[subMenu];
     },
@@ -202,54 +277,7 @@ export default {
         console.error("Đã xảy ra lỗi khi đăng xuất:", error);
       }
     },
-  },
-  mounted() {
-    const roles = localStorage.getItem("roles");
-
-    //Authorize permission for each role
-    this.showBookingsMenu =
-      roles== "Admin"||
-      roles== "Sales" ||
-      roles == "Management"
-      roles == "Sales Admin";
-
-    //Only operator each airport - admin
-    this.showAssignMenu =
-      roles== "Admin"||
-      roles== "Operator"||
-      roles== "Sales" ||
-      roles == "Chief Rep"
-
-    this.showScheduleMenu =
-      roles== "Admin"||
-      roles== "Operator"||
-      roles== "Employee" ||
-      roles == "Chief Rep" ||
-      roles == "Employee"
-
-    //Only agency-admin-sales
-    this.showAgencyMenu =
-      roles== "Agency"||
-      roles== "Admin"||
-      roles== "Sales"
-
-
-    //Only admin-sales-agency-operator
-    this.showHomeMenu =
-      roles== "Admin"||
-      roles== "Sales"||
-      roles== "Operator" ||
-      roles == "Agency" ||
-      roles == "Management" ||
-      roles == "Sales Admin" ||
-      roles == "Chief Rep"
-    //Only Admin
-    this.showEmployeeMenu = roles== "Admin"
-    this.showRoleMenu = roles== "Admin"
-    this.showAccountMenu = roles== "Admin"
-    this.showServicesMenu = roles== "Admin"
-    this.showStatusMenu = roles== "Admin"
-  },
+  }
 };
 </script>
 

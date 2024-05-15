@@ -72,6 +72,7 @@
               <th>Passport</th>
               <th>Airport</th>
               <th>Note</th>
+              <th>Create At</th>
               <!-- <th class="order-actions">Actions</th> -->
             </tr>
           </thead>
@@ -155,6 +156,10 @@
               <td>
                 <span class="item" :data-id="item.id">{{ item.note }}</span>
               </td>
+              <td>
+                <span class="item" :data-id="item.id">{{ formatTime(item.created_at) }}</span>
+                <span class="item" :data-id="item.id">{{ formatDate(item.created_at) }} </span>
+              </td>
               <!-- <td>
                 <div class="action-buttons">
                   <PopupWrapper>
@@ -225,7 +230,7 @@ export default {
       selectedOrderId: "",
       totalYear: [],
       isPopupVisible: false,
-      datePickerConfig: {
+      atePickerConfig: {
         format: "yyyy-MM-dd HH:mm",
         showSeconds: false,
       },

@@ -43,70 +43,87 @@ export default {
   },
   setup() {
     const success = () => {
-      toast("Update user successfully !", {
+      toast("login account successfully !", {
         autoClose: 3000,
         type: "success",
       });
     };
-    return { success };
+
+    const error = () => {
+      toast("Login account unsuccessfully !", {
+        autoClose: 3000,
+        type: "error",
+      });
+    };
+
+    return { success, error };
   },
+
   methods: {
     async login() {
-      const apiUrl = process.env.VUE_APP_API_URL;
-      const response = await axios.post(`${apiUrl}/auth/login`, this.formData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      try {
+        const apiUrl = process.env.VUE_APP_API_URL;
+        const response = await axios.post(`${apiUrl}/auth/login`, this.formData, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-      if (response.data.token) {
-        const token = response.data.token;
-        localStorage.setItem("token", token);
-        localStorage.setItem("isLoggedIn", "true");
-        this.success();
+        if (response.data.token) {
+          const token = response.data.token;
+          localStorage.setItem("token", token);
+          localStorage.setItem("isLoggedIn", "true");
+          this.success();
 
-        // Giải mã token để trích xuất thông tin từ payload
-        const decodedToken = jwtDecode(token);
+          // Giải mã token để trích xuất thông tin từ payload
+          const decodedToken = jwtDecode(token);
 
-        // Truy xuất thông tin về vai trò từ payload
-        const roles =
-          decodedToken[
-          "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-          ];
+          // Truy xuất thông tin về vai trò từ payload
+          const roles =
+            decodedToken[
+            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+            ];
 
-        localStorage.setItem("roles", roles);
-        console.log(roles);
-        // Truy xuất thông tin về user từ payload
-        const userId = decodedToken["UserId"];
-        const userName = decodedToken["Name"];
+          localStorage.setItem("roles", roles);
+          // Truy xuất thông tin về user từ payload
+          const userId = decodedToken["UserId"];
+          const userName = decodedToken["Name"];
 
-        localStorage.setItem("user_name", userName)
-        localStorage.setItem("user_id", userId);
+          localStorage.setItem("user_name", userName)
+          localStorage.setItem("user_id", userId);
 
-        // Redirect người dùng đến trang tương ứng với vai trò của họ
-        if (roles == "Admin") {
-          router.push("/agency/dashboard");
-        } else if (roles == "Sales") {
-          router.push("/dashboard/order");
-        } else if (roles == "Management") {
-          router.push("/agency/dashboard");
-        } else if (roles == "Sales Admin") {
-          router.push("/agency/dashboard");
-        } else if (roles == "Employee") {
-          router.push("/dashboard/schedule");
-        } else if (roles == "Agency") {
-          router.push("/agency/dashboard");
-        } 
-        else {
-          router.push("/dashboard/Task");
+          // Redirect người dùng đến trang tương ứng với vai trò của họ
+          if (roles == "Admin") {
+            router.push("/agency/dashboard");
+          } else if (roles == "Sales") {
+            router.push("/dashboard/order");
+          } else if (roles == "Management") {
+            router.push("/agency/dashboard");
+          } else if (roles == "Sales Admin") {
+            router.push("/agency/dashboard");
+          } else if (roles == "Employee") {
+            router.push("/dashboard/schedule");
+          } else if (roles == "Agency") {
+            router.push("/agency/dashboard");
+          }
+          else {
+            router.push("/dashboard/Task");
+          }
+          console.log("Response from backend:", token);
+        } else {
+          console.error("No token found in response:", response.data);
         }
-
-        console.log("Response from backend:", token);
-      } else {
-        console.error("No token found in response:", response.data);
+      } catch (error) {
+        if (error.response.status === 401 || error.response.status === 403) {
+          router.push("/login");
+          this.error();
+        } else {
+          this.error();
+        }
       }
+
     },
-  },
+  }
 };
 </script>
 

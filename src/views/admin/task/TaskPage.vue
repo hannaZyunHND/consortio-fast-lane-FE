@@ -206,6 +206,8 @@ import PopupWrapper from "@/components/PopupWrapper.vue";
 import EditTask from "@/views/admin/task/EditTask.vue";
 import Pagination from "@/components/PaginationPage.vue";
 import ImagePopup from "@/views/admin/order/ImagePopup.vue";
+import VueDatePicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
 export default {
   name: "TaskPage",
   components: {
@@ -217,10 +219,13 @@ export default {
     UserIcon,
     EnvelopeIcon,
     EditTask,
-    ImagePopup
+    ImagePopup,
+    VueDatePicker
   },
   data() {
     return {
+      toDate: null,
+      fromDate: null,
       currentPage: 1,
       pageSize: 4,
       totalItems: 0,
@@ -229,6 +234,7 @@ export default {
       selectedScheduleId: "",
       showModalStatus: false,
       employees: [],
+      isOperator: false,
     };
   },
   mounted() {
@@ -280,6 +286,8 @@ export default {
     async search() {
       try {
         const apiUrl = process.env.VUE_APP_API_URL;
+        const user_id = localStorage.getItem("user_id");
+
         const requestData = {
           status: this.status,
           airport: document.getElementById("airport").value,
@@ -288,6 +296,7 @@ export default {
           keyword: this.searchTerm,
           index: this.currentPage,
           pageSize: this.pageSize,
+          agency_Id: user_id,
         };
 
         const response = await axios.post(
@@ -317,12 +326,13 @@ export default {
     async fetchEmployee() {
       const apiUrl = process.env.VUE_APP_API_URL;
       const user_id = parseInt(localStorage.getItem("user_id"));
-      let isOperator = false;
 
-      if (localStorage.getItem("roles") === "Operator") {
-        isOperator = true;
+      console.log(localStorage.getItem("roles"))
+      if (localStorage.getItem("roles") == "Chief Rep") {
+        this.isOperator = true;
       }
-      const url = `${apiUrl}/employee?index=${this.currentPage}&pageSize=${this.pageSize}&user_id=${user_id}&isOperator=${isOperator}`;
+
+      const url = `${apiUrl}/employee?index=${this.currentPage}&pageSize=${this.pageSize}&user_id=${user_id}&isOperator=${this.isOperator}`;
       try {
         const response = await axios.get(url);
         this.employees = response.data.employees;

@@ -102,7 +102,7 @@
                   <div class="item" :data-id="item.id">
                     <user-icon class="primary-icon" />
                     <span style="font-size: 14px">
-                       {{ item.name }}
+                      {{ item.name }}
                     </span>
                   </div>
                   <div class="item" :data-id="item.id">
@@ -318,6 +318,8 @@ export default {
     async search() {
       try {
         const apiUrl = process.env.VUE_APP_API_URL;
+        const user_id = localStorage.getItem("user_id");
+
         const requestData = {
           status: this.status,
           airport: document.getElementById("airport").value,
@@ -326,7 +328,7 @@ export default {
           keyword: this.searchTerm,
           index: this.currentPage,
           pageSize: this.pageSize,
-          agency_Id: "",
+          agency_Id: user_id,
         };
 
         const response = await axios.post(

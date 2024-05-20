@@ -18,8 +18,8 @@
       <div class="order-search">
         <div class="menu-search">
           <div class="search-filter">
-            <select id="airport" class="form-select" v-model="airport" placeholder="Select Cities">
-              <option selected>Airport</option>
+            <select id="airport" class="form-select" placeholder="Select Cities">
+              <option value="" disabled selected>Airport</option>
               <option value="Da Nang">Da Nang</option>
               <option value="Tan Son Nhat">Tan Son Nhat</option>
               <option value="Noi Bai">Noi Bai</option>
@@ -29,18 +29,18 @@
           </div>
           <div class="search-filter">
             <select id="status-filter" v-model="status">
-              <option value="status" disabled selected hidden>Status</option>
+              <option value="" disabled selected>Status</option>
               <option v-for="(status, index) in statuses" :key="index" :value="status.id">
                 {{ status.name }}
               </option>
             </select>
           </div>
           <div class="search-filter">
-            <VueDatePicker v-model="fromDate" :config="datePickerConfig" placeholder="From">
+            <VueDatePicker v-model="fromDate" :config="datePickerConfig" placeholder="Booking Start Date">
             </VueDatePicker>
           </div>
           <div class="search-filter">
-            <VueDatePicker v-model="toDate" :config="datePickerConfig" placeholder="To">
+            <VueDatePicker v-model="toDate" :config="datePickerConfig" placeholder="Booking End Date">
             </VueDatePicker>
           </div>
           <div>
@@ -250,7 +250,8 @@ export default {
   },
   data() {
     return {
-      status: null,
+      airport: "",
+      status: "",
       toDate: null,
       fromDate: null,
       currentPage: 1,
@@ -412,7 +413,7 @@ export default {
     fetchStatus() {
       const apiUrl = process.env.VUE_APP_API_URL;
       axios
-        .get(`${apiUrl}/status`)
+        .get(`${apiUrl}/status/`)
         .then((response) => {
           this.statuses = response.data;
         })
@@ -595,7 +596,7 @@ export default {
 
 #airport,
 #status-filter {
-  border-radius: 7px;
+  border-radius: 5px;
   padding: 10px;
   border: none;
   background: none;

@@ -118,16 +118,17 @@
       </li>
 
       <!-- personal -->
-      <!-- <li>
-        <div class="item-content">
-          <user-icon class="navbar-icon" />
-          <span>Account</span>
-        </div>
-      </li> -->
-
-      <!-- Logout -->
       <div>
         <li style="margin-top: 100px">
+          <div class="layout-menuitem-root-text">Information</div>
+          <div class="item-content">
+            <user-icon class="navbar-icon" />
+            <span id="account-information"></span>
+          </div>
+        </li>
+
+        <!-- Logout -->
+        <li>
           <div class="item-content">
             <user-icon class="navbar-icon" />
             <PopupWrapper>
@@ -253,14 +254,15 @@ export default {
     this.showAccountMenu = roles == "Admin"
     this.showServicesMenu = roles == "Admin"
     this.showStatusMenu = roles == "Admin"
+
+    this.showAccount();
   },
   methods: {
-    // openChangPassword() {
-    //   console.log('user_id_token', user_id);
-    //   this.selectedUserId = user_id;
-
-    //   console.log("dây là id: " + this.selectedUserId);
-    // },
+    showAccount() {
+      const nameValue = document.getElementById('account-information');
+      const userName = localStorage.getItem("user_name");
+      nameValue.innerText = userName;
+    },
 
     toggleSubMenu(subMenu) {
       this.isSubMenuOpen[subMenu] = !this.isSubMenuOpen[subMenu];

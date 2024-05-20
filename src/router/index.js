@@ -53,7 +53,7 @@ const routes = [
         component: LoginPage,
         beforeEnter: (to, from, next) => {
             if (isAuthenticated()) {
-                next('/dashboard/admin');
+                next('/agency/dashboard');
             } else {
                 next();
             }
@@ -65,7 +65,7 @@ const routes = [
         component: RegisterPage,
         beforeEnter: (to, from, next) => {
             if (isAuthenticated()) {
-                next('/dashboard/admin');
+                next('/agency/dashboard');
             } else {
                 next();
             }
@@ -82,7 +82,7 @@ const routes = [
         component: DashboardPage,
         children: [
             {
-                path: 'admin',
+                path: 'agency',
                 name: 'ReportPage',
                 component: ReportPage
             },

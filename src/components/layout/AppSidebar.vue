@@ -287,7 +287,7 @@ export default {
 .navbar {
   /* position: fixed; */
   width: 300px;
-  height: calc(115vh - 9rem);
+  height: 100%;
   /* z-index: 999; */
   overflow-y: auto;
   user-select: none;

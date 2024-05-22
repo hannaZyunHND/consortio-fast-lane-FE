@@ -5,7 +5,7 @@
           <div class="menu-search">
             <div class="search-filter">
               <select id="airport" class="form-select" v-model="airport" placeholder="Select Cities">
-                <option selected>Airport</option>
+                <option value="" disabled selected>Airport</option>
                 <option value="Da Nang">Da Nang</option>
                 <option value="Tan Son Nhat">Tan Son Nhat</option>
                 <option value="Noi Bai">Noi Bai</option>
@@ -15,7 +15,7 @@
             </div>
             <div class="search-filter">
               <select id="status-filter" v-model="status">
-                <option value="status" disabled selected hidden>Status</option>
+                <option value="" disabled selected>Status</option>
                 <option v-for="(status, index) in statuses" :key="index" :value="status.id">
                   {{ status.name }}
                 </option>
@@ -203,6 +203,8 @@ export default {
       pageSize: 6,
       totalItems: 0,
       items: [],
+      status: '',
+      airport: '',
       statuses: [],
       services: [],
       employees: [],
@@ -261,7 +263,7 @@ export default {
       try {
         const apiUrl = process.env.VUE_APP_API_URL;
         const requestData = {
-          status: this.status,
+          status: this.status || 0,
           airport: document.getElementById("airport").value,
           toDate: this.toDate,
           fromDate: this.fromDate,
@@ -291,7 +293,7 @@ export default {
     },
 
     resetFilters() {
-      this.status = null;
+      this.status = "";
       this.toDate = null;
       this.fromDate = null;
       this.airport = "";
@@ -452,6 +454,7 @@ export default {
 <style scoped>
 .order {
   gap: 15px;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -538,6 +541,7 @@ select {
 .order-container {
   padding: 15px;
   overflow-y: auto;
+  height: 100%;
   border-radius: 10px;
   background: #fff;
   box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;

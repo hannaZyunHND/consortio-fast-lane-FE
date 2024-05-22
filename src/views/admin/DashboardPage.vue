@@ -29,7 +29,7 @@ export default {
 .content {
     flex: 1;
     width: 80%;
-    padding: 20px;
+    padding: 20px 20px 0px 20px;
     font-size: 14px;
     font-family: "Inter var", sans-serif;
     color: #334155;

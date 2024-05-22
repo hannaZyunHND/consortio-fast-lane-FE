@@ -19,7 +19,7 @@
         <div class="menu-search">
           <div class="search-filter">
             <select id="airport" class="form-select" v-model="airport" placeholder="Select Cities">
-              <option selected disabled>Airport</option>
+              <option value="" disabled selected>Airport</option>
               <option value="Da Nang">Da Nang</option>
               <option value="Tan Son Nhat">Tan Son Nhat</option>
               <option value="Noi Bai">Noi Bai</option>
@@ -29,7 +29,7 @@
           </div>
           <div class="search-filter">
             <select id="status-filter" v-model="status">
-              <option value="status" disabled selected hidden>Status</option>
+              <option value="" disabled selected>Status</option>
               <option value="4">Pending</option>
               <option value="5">Confirmed</option>
               <option value="9">Completed</option>
@@ -73,7 +73,7 @@
               <th>Airport</th>
               <th>Note</th>
               <th>Create At</th>
-              <!-- <th class="order-actions">Actions</th> -->
+              <th class="order-actions">Actions</th>
             </tr>
           </thead>
           <tbody class="order-info">
@@ -160,7 +160,7 @@
                 <span class="item" :data-id="item.id">{{ formatTime(item.created_at) }}</span>
                 <span class="item" :data-id="item.id">{{ formatDate(item.created_at) }} </span>
               </td>
-              <!-- <td>
+              <td>
                 <div class="action-buttons">
                   <PopupWrapper>
                     <template #header>
@@ -175,7 +175,7 @@
                     </template>
                   </PopupWrapper>
                 </div>
-              </td> -->
+              </td>
             </tr>
           </tbody>
         </table>
@@ -184,12 +184,13 @@
       </div>
     </div>
   </div>
+  <Loading :loading="isLoading" />
 </template>
 
 <script>
 import axios from "axios";
 import {
-  // PencilSquareIcon,
+  PencilSquareIcon,
   PhoneIcon,
   UserIcon,
   Bars2Icon,
@@ -197,15 +198,17 @@ import {
 } from "@heroicons/vue/24/solid";
 import PopupWrapper from "@/components/PopupWrapper.vue";
 import AddOrder from "@/views/admin/agency/AddOrder.vue";
-// import EditOrder from "@/views/admin/agency/EditOrder.vue";
+import EditOrder from "@/views/admin/agency/EditOrder.vue";
 import Pagination from "@/components/PaginationPage.vue";
 import ImagePopup from "@/views/admin/order/ImagePopup.vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+import Loading from '@/views/LoadingPage.vue';
+
 export default {
   name: "AgencyPage",
   components: {
-    // PencilSquareIcon,
+    PencilSquareIcon,
     PopupWrapper,
     Pagination,
     PhoneIcon,
@@ -213,18 +216,23 @@ export default {
     UserIcon,
     EnvelopeIcon,
     AddOrder,
-    // EditOrder,
+    EditOrder,
     ImagePopup,
     VueDatePicker,
+    Loading
   },
   data() {
     return {
-      status: null,
-      date: null,
+      isLoading: false,
+      status: "",
+      date: "",
+      airport: "",
       currentPage: 1,
       pageSize: 6,
       totalItems: 0,
       items: [],
+      toDate: "",
+      fromDate: "",
       services: [],
       statuses: [],
       selectedOrderId: "",
@@ -267,10 +275,11 @@ export default {
 
     async search() {
       try {
+        this.isLoading = true;
         const apiUrl = process.env.VUE_APP_API_URL;
         const user_id = localStorage.getItem("user_id");
         const requestData = {
-          status: this.status,
+          status: this.status || 0,
           airport: document.getElementById("airport").value,
           date: this.date,
           keyword: this.searchTerm,
@@ -296,6 +305,8 @@ export default {
         }
       } catch (error) {
         console.error("There was a problem with the delete operation:", error);
+      } finally {
+        this.isLoading = false;
       }
     },
 
@@ -304,7 +315,7 @@ export default {
       this.fetchOrder();
     },
     resetFilters() {
-      this.status = null;
+      this.status = "";
       this.date = null;
       this.airport = "";
       this.searchTerm = "";
@@ -471,6 +482,7 @@ export default {
 .order {
   gap: 30px;
   display: flex;
+  height: 100%;
   flex-direction: column;
 }
 
@@ -600,6 +612,7 @@ select {
 /* order-container */
 .order-container {
   padding: 15px;
+  height: 100%;
   overflow-y: auto;
   border-radius: 10px;
   background: #fff;

@@ -51,8 +51,8 @@
               <div class="form-col">
                 <div class="row">
                   <label for="departure_time">{{ $t('home.service_time') }}*</label>
-                  <VueDatePicker v-model="orderData.formData[0].service_Time" :config="datePickerConfig"
-                    :min-date="minDate" @input="updateServiceTime($event)" required>
+                  <VueDatePicker v-model="formData.service_Time" :config="datePickerConfig" :min-date="minDate"
+                    @input="updateServiceTime(orderData.formData[0].service_Time)" required utc>
                   </VueDatePicker>
                   <span class="title-notification" style="visibility: hidden">*</span>
                 </div>
@@ -106,7 +106,7 @@
                     <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
                     <span class="title-header">{{ $t('home.upload_passport_here') }}*</span>
                   </div>
-                  <img v-if="passportFile" :src="formData.imagePreview" class="uploaded-image" />
+                  <img v-if="formData.passport_File" :src="formData.imagePreview" class="uploaded-image" />
                 </label>
                 <input :id="`passport-${index}`" type="file" @change="handlePassportUpload($event, index, formData)" />
               </div>
@@ -116,7 +116,7 @@
                     <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
                     <span class="title-header">{{ $t('home.upload_visa_here') }}</span>
                   </div>
-                  <img v-if="uploadedVisa" :src="formData.imageVisaPreview" class="uploaded-image" />
+                  <img v-if="formData.visa_File" :src="formData.imageVisaPreview" class="uploaded-image" />
                 </label>
                 <input :id="`visa-${index}`" type="file" @change="handleVisaUpload($event, index, formData)" />
               </div>
@@ -126,7 +126,7 @@
                     <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
                     <span class="title-header">{{ $t('home.upload_portrait_here') }}</span>
                   </div>
-                  <img v-if="uploadedPortrait" :src="formData.imagePortraitPreview" class="uploaded-image" />
+                  <img v-if="formData.portrait_File" :src="formData.imagePortraitPreview" class="uploaded-image" />
                 </label>
                 <input :id="`portrait-${index}`" type="file" @change="handlePortraitUpload($event, index, formData)" />
               </div>
@@ -154,7 +154,7 @@ import moment from "moment";
 
 export default {
   components: {
-    Header, VueDatePicker, Loading
+    Header, Loading, VueDatePicker
   },
   data() {
     return {
@@ -167,6 +167,7 @@ export default {
         passport_File: '',
         visa_File: '',
         portrait_File: '',
+        service_Time: '',
       },
       portrait_file: "",
       passportFiles: [],
@@ -201,6 +202,7 @@ export default {
       return new Date();
     }
   },
+
   methods: {
     updateLanguage(language) {
       console.log(language);
@@ -231,9 +233,15 @@ export default {
 
         const responseData = response.data.data[0];
         if (responseData) {
-          fd.name = responseData.name;
-          fd.nationality = responseData.nationality;
-          fd.passport_Number = responseData.passport_number;
+          if (responseData.name && responseData.nationality && responseData.passport_number) {
+            fd.name = responseData.name;
+            fd.nationality = responseData.nationality;
+            fd.passport_Number = responseData.passport_number;
+          } else {
+            this.showAlert("Passport information is insufficient to autofill. Please try again or fill manually.");
+          }
+        } else {
+          this.showAlert("Could not scan passport information. Please try again.");
         }
       } catch (error) {
         console.error("Error uploading and scanning image:", error);
@@ -258,6 +266,13 @@ export default {
       }
     },
 
+    showAlert(message) {
+      toast(message, {
+        autoClose: 1000,
+        type: "error",
+      });
+    },
+
     success() {
       toast("Add order successfully!", {
         autoClose: 800,
@@ -271,8 +286,11 @@ export default {
       this.orderData.is_Group = false;
       this.orderData.formData = [];
     },
+
     updateServiceTime(service_Time) {
       var is_Group = this.checkGroupAndDataGroup();
+      console.log('there is a vale of the is_group', is_Group);
+      console.log(service_Time);
       if (is_Group) {
         this.orderData.formData.forEach((data) => {
           data.service_Time = service_Time;
@@ -282,7 +300,6 @@ export default {
 
     updateAirport(airport) {
       var is_Group = this.checkGroupAndDataGroup();
-      console.log(is_Group);
       if (is_Group) {
         this.orderData.formData.forEach((data) => {
           data.airport = airport;
@@ -359,10 +376,14 @@ export default {
         for (let i = 0; i < this.orderData.guest_number; i++) {
           ordersToSend.push(this.orderData.formData[i]);
         }
-        var serviceTimeFirst = this.orderData.formData[0].service_Time;
-        ordersToSend.forEach(v => {
-          v.service_Time = serviceTimeFirst
-        })
+
+        var is_Group = this.checkGroupAndDataGroup();
+        if (is_Group) {
+          var serviceTimeFirst = this.orderData.formData[0].service_Time;
+          ordersToSend.forEach(v => {
+            v.service_Time = serviceTimeFirst
+          })
+        }
 
         const dataToSend = {
           is_group_order: this.orderData.is_Group ? 1 : 0,

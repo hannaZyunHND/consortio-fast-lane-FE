@@ -36,11 +36,11 @@
             </select>
           </div>
           <div class="search-filter">
-            <VueDatePicker v-model="fromDate" :config="datePickerConfig" placeholder="Booking Start Date">
+            <VueDatePicker v-model="fromDate" :config="datePickerConfig" placeholder="Created start date">
             </VueDatePicker>
           </div>
           <div class="search-filter">
-            <VueDatePicker v-model="toDate" :config="datePickerConfig" placeholder="Booking End Date">
+            <VueDatePicker v-model="toDate" :config="datePickerConfig" placeholder="Created end date">
             </VueDatePicker>
           </div>
           <div>
@@ -50,9 +50,9 @@
           <button class="btn-search-primary">
             <i class="pi pi-search" style="font-size: 1rem" @click="search"></i>
           </button>
-          <button class="btn-export-primary">
+          <!-- <button class="btn-export-primary">
             <i class="pi pi-download" style="font-size: 1rem" @click="handleExport"></i>
-          </button>
+          </button> -->
         </div>
         <button @click="refreshOrders" class="btn-reset-primary">
           <i class="pi pi-refresh" style="font-size: 1rem"></i>
@@ -115,7 +115,7 @@
                   </div>
                   <div class="item" :data-id="item.id">
                     <envelope-icon class="primary-icon" />
-                    Created By: {{ item.createdName ? item.createdName : "INDIVIDUAL" }}
+                    Created By: {{ item.createBy ? item.createBy : "INDIVIDUAL" }}
                   </div>
                 </div>
               </td>
@@ -210,6 +210,8 @@
       </div>
     </div>
   </div>
+  <Loading :loading="isLoading" />
+
 </template>
 
 <script>
@@ -230,6 +232,7 @@ import ImagePopup from "@/views/admin/order/ImagePopup.vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { saveAs } from 'file-saver';
+import Loading from '@/views/LoadingPage.vue';
 
 
 export default {
@@ -247,15 +250,17 @@ export default {
     EditOrder,
     ImagePopup,
     VueDatePicker,
+    Loading
   },
   data() {
     return {
+      isLoading: false,
       airport: "",
       status: "",
       toDate: null,
       fromDate: null,
       currentPage: 1,
-      pageSize: 6,
+      pageSize: 3,
       totalItems: 0,
       items: [],
       services: [],
@@ -318,11 +323,12 @@ export default {
 
     async search() {
       try {
+        this.isLoading = true;
         const apiUrl = process.env.VUE_APP_API_URL;
         const user_id = localStorage.getItem("user_id");
 
         const requestData = {
-          status: this.status,
+          status: this.status || 0,
           airport: document.getElementById("airport").value,
           toDate: this.toDate,
           fromDate: this.fromDate,
@@ -331,6 +337,8 @@ export default {
           pageSize: this.pageSize,
           agency_Id: user_id,
         };
+        console.log(requestData)
+
 
         const response = await axios.post(
           `${apiUrl}/order/search`,
@@ -349,6 +357,8 @@ export default {
         }
       } catch (error) {
         console.error("There was a problem with the delete operation:", error);
+      } finally {
+        this.isLoading = false;
       }
     },
 
@@ -366,7 +376,6 @@ export default {
         };
 
 
-        console.log(requestData)
         const response = await axios.post(
           `${apiUrl}/order/export`,
           requestData,
@@ -401,10 +410,10 @@ export default {
     },
 
     resetFilters() {
-      this.status = null;
+      this.status = 0;
       this.toDate = null;
       this.fromDate = null;
-      this.airport = "";
+      this.airport = 0;
       this.searchTerm = "";
       this.currentPage = 1;
       this.pageSize = 6;
@@ -537,6 +546,7 @@ export default {
 <style scoped>
 .order {
   gap: 30px;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -653,9 +663,10 @@ select {
 
 /* order-container */
 .order-container {
-  padding: 15px;
+  padding: 0px 15px 0 15px;
   overflow-y: auto;
   border-radius: 10px;
+  height: 100%;
   background: #fff;
   box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
 }

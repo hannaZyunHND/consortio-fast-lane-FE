@@ -18,7 +18,7 @@
           <div class="menu-search">
             <div class="search-filter">
               <select id="airport" class="form-select" v-model="airport" placeholder="Select Cities">
-                <option selected>Airport</option>
+                <option value="" disabled selected>Airport</option>
                 <option value="Da Nang">Da Nang</option>
                 <option value="Tan Son Nhat">Tan Son Nhat</option>
                 <option value="Noi Bai">Noi Bai</option>
@@ -28,7 +28,7 @@
             </div>
             <div class="search-filter">
               <select id="status-filter" v-model="status">
-                <option value="status" disabled selected hidden>Status</option>
+                <option value="" disabled selected>Status</option>
                 <option v-for="(status, index) in statuses" :key="index" :value="status.id">
                   {{ status.name }}
                 </option>
@@ -224,6 +224,8 @@ export default {
   },
   data() {
     return {
+      status: '',
+      airport: '',
       toDate: null,
       fromDate: null,
       currentPage: 1,
@@ -289,7 +291,7 @@ export default {
         const user_id = localStorage.getItem("user_id");
 
         const requestData = {
-          status: this.status,
+          status: this.status || 0,
           airport: document.getElementById("airport").value,
           toDate: this.toDate,
           fromDate: this.fromDate,
@@ -447,6 +449,7 @@ export default {
 <style scoped>
 .order {
   gap: 30px;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -529,6 +532,7 @@ select {
   padding: 15px;
   overflow-y: auto;
   border-radius: 10px;
+  height: 100%;
   background: #fff;
   box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
 }

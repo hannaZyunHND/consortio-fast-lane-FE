@@ -52,7 +52,7 @@
                 <div class="row">
                   <label for="departure_time">{{ $t('home.service_time') }}*</label>
                   <VueDatePicker v-model="formData.service_Time" :config="datePickerConfig" :min-date="minDate"
-                    @input="updateServiceTime(orderData.formData[0].service_Time)" required utc>
+                    @date-update="dateSelected" required utc>
                   </VueDatePicker>
                   <span class="title-notification" style="visibility: hidden">*</span>
                 </div>
@@ -151,6 +151,7 @@ import axios from "axios";
 import Loading from './LoadingPage.vue';
 import moment from "moment";
 // import i18n from "@/i18n";
+import Swal from 'sweetalert2';
 
 export default {
   components: {
@@ -287,13 +288,11 @@ export default {
       this.orderData.formData = [];
     },
 
-    updateServiceTime(service_Time) {
+    dateSelected(date) {
       var is_Group = this.checkGroupAndDataGroup();
-      console.log('there is a vale of the is_group', is_Group);
-      console.log(service_Time);
       if (is_Group) {
         this.orderData.formData.forEach((data) => {
-          data.service_Time = service_Time;
+          data.service_Time = date;
         });
       }
     },
@@ -392,13 +391,25 @@ export default {
 
         const apiUrl = process.env.VUE_APP_API_URL;
         const response = await axios.post(`${apiUrl}/order/create`, dataToSend);
-        this.success();
-        console.log(response.data);
+
+        // this.success();
+        if (response.status === 200) {
+          this.isLoading = false;
+
+          // Hiển thị swal modal
+          await Swal.fire({
+            icon: 'success',
+            title: 'Đã thêm booking mới thành công',
+            text: 'Vui lòng chờ xác nhận.'
+          });
+        }
       } catch (error) {
         console.error("Error submitting order:", error);
-      } finally {
         this.isLoading = false;
       }
+      // finally {
+      //   this.isLoading = false;
+      // }
     },
 
     async convertFileToBase64(file) {

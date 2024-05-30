@@ -140,7 +140,8 @@
                     <div class="item" :data-id="item.id">
                       {{ item.passport_Number }}
                     </div>
-                    <div class="item" :data-id="item.id">
+                    <div class="item" :data-id="item.id"
+                      style="overflow-wrap: break-word;width: 200px;text-align: justify;">
                       {{ item.nationality }}
                     </div>
                   </div>

@@ -16,6 +16,7 @@ import CalendarPage from '@/views/CalendarPage.vue';
 import AgencyPage from '@/views/admin/agency/AgencyPage.vue';
 import AgencyDashboard from '@/views/admin/AgencyDashboard.vue';
 import AgencyReport from '@/views/admin/AgencyReport.vue';
+import AddMultiplePage from '@/views/admin/agency/AddMultiplePage.vue';
 
 //Authenicate Page
 import LoginPage from '@/views/auth/LoginPage.vue';
@@ -147,6 +148,11 @@ const routes = [
                 name: 'AgencyPage',
                 component: AgencyPage,
             },
+            {
+                path:'multiple',
+                name:'MultiplePage',
+                component:AddMultiplePage,
+            }
         ]
     },
 ]

@@ -64,6 +64,14 @@
           </div>
         </router-link>
       </li>
+      <li v-if="showNewBookingMenu">
+        <router-link class="nav-link" to="/agency/multiple">
+          <div class="item-content">
+            <square-2-stack-icon class="navbar-icon" />
+            <span>New Booking</span>
+          </div>
+        </router-link>
+      </li>
 
       <!-- Settings -->
       <li v-if="showServicesMenu">
@@ -239,6 +247,11 @@ export default {
       roles == "Admin" ||
       roles == "Sales Management"
 
+    //Only agency-admin-sales
+    this.showNewBookingMenu =
+      roles == "Agency" ||
+      roles == "Admin" ||
+      roles == "Sales Management"
 
     //Only admin-sales-agency-operator
     this.showHomeMenu =

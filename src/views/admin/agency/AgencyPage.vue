@@ -5,7 +5,7 @@
         <span>Order List</span>
         <PopupWrapper>
           <template #header>
-            <div class="popover">Add new +</div>
+            <!-- <div class="popover">Add new +</div> -->
           </template>
           <template #content>
             <div class="popover-content">
@@ -44,6 +44,23 @@
             <VueDatePicker v-model="toDate" :config="datePickerConfig" placeholder="To">
             </VueDatePicker>
           </div>
+          <div class="search-filter">
+            <select id="status-filter" v-model="Is_ServiceTime">
+              <option value="" disabled selected>Time Options</option>
+              <option value="true">Service-Time</option>
+              <option value="false">Booking-Time</option>ư
+            </select>
+          </div>
+          <!-- <div class="time-option">
+            <button class="input-time">
+              <input type="checkbox" name="service_Time">
+              <span>Service Time</span>
+            </button>
+            <button class="input-time">
+              <input type="checkbox" name="booking_Time">
+              <span>Booking Time</span>
+            </button>
+          </div> -->
           <div>
             <input type="text" name="search" id="search" v-model="searchTerm" placeholder="Search"
               @keyup.enter="search" />
@@ -145,7 +162,8 @@
                   <div class="item" :data-id="item.id">
                     {{ item.passport_Number }}
                   </div>
-                  <div class="item" :data-id="item.id">
+                  <div class="item" :data-id="item.id"
+                    style="overflow-wrap: break-word;width: 200px;text-align: justify;">
                     {{ item.nationality }}
                   </div>
                 </div>
@@ -227,6 +245,7 @@ export default {
       status: "",
       date: "",
       airport: "",
+      Is_ServiceTime: "",
       currentPage: 1,
       pageSize: 6,
       totalItems: 0,
@@ -286,6 +305,7 @@ export default {
           index: this.currentPage,
           pageSize: this.pageSize,
           agency_Id: user_id,
+          Is_ServiceTime: this.Is_ServiceTime,
         };
 
         const response = await axios.post(
@@ -319,6 +339,7 @@ export default {
       this.date = null;
       this.airport = "";
       this.searchTerm = "";
+      this.Is_ServiceTime = "";
       this.currentPage = 1;
       this.pageSize = 6;
     },
@@ -570,6 +591,21 @@ export default {
   align-items: center;
 }
 
+.time-option {
+  display: flex;
+  gap: 1px;
+  flex-direction: column;
+}
+
+.input-time {
+  border: none;
+  display: flex;
+  box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
+  background: none;
+  align-items: center;
+  justify-content: flex-start;
+}
+
 select {
   border: 1px solid #e6eae9;
   margin: 10px 0px;
@@ -611,7 +647,7 @@ select {
 
 /* order-container */
 .order-container {
-  padding: 15px;
+  padding: 0 15px;
   height: 100%;
   overflow-y: auto;
   border-radius: 10px;

@@ -38,6 +38,7 @@ import "vue3-toastify/dist/index.css";
 import { toast } from "vue3-toastify";
 import Form from "@/components/form/DepartureForm.vue";
 import Header from "@/components/partials/HeaderPartial.vue";
+import Swal from 'sweetalert2';
 
 export default {
   components: {
@@ -77,7 +78,7 @@ export default {
         this.orderDataForm = ordersToSend;
         const apiUrl = process.env.VUE_APP_API_URL;
         const response = await axios.post(`${apiUrl}/order/create`, dataToSend);
-        this.success();
+        // this.success();
         // this.reload();
         console.log("Phản hồi từ backend:", response.data);
       } catch (error) {

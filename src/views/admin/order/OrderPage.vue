@@ -43,6 +43,13 @@
             <VueDatePicker v-model="toDate" :config="datePickerConfig" placeholder="Created end date">
             </VueDatePicker>
           </div>
+          <div class="search-filter">
+            <select id="status-filter" v-model="Is_ServiceTime">
+              <option value="" disabled selected>Time Options</option>
+              <option value="true">Service-Time</option>
+              <option value="false">Booking-Time</option>ư
+            </select>
+          </div>
           <div>
             <input type="text" name="search" id="search" v-model="searchTerm" placeholder="Search"
               @keyup.enter="search" />
@@ -164,7 +171,8 @@
                   <div class="item" :data-id="item.id">
                     {{ item.passport_Number }}
                   </div>
-                  <div class="item" :data-id="item.id">
+                  <div class="item" :data-id="item.id"
+                    style="overflow-wrap: break-word;width: 200px;text-align: justify;">
                     {{ item.nationality }}
                   </div>
                 </div>
@@ -257,6 +265,7 @@ export default {
       isLoading: false,
       airport: "",
       status: "",
+      Is_ServiceTime: "",
       toDate: null,
       fromDate: null,
       currentPage: 1,
@@ -336,6 +345,7 @@ export default {
           index: this.currentPage,
           pageSize: this.pageSize,
           agency_Id: user_id,
+          Is_ServiceTime: this.Is_ServiceTime,
         };
         console.log(requestData)
 
@@ -414,6 +424,7 @@ export default {
       this.toDate = null;
       this.fromDate = null;
       this.airport = 0;
+      this.Is_ServiceTime = false;
       this.searchTerm = "";
       this.currentPage = 1;
       this.pageSize = 6;

@@ -5,7 +5,7 @@
         <span>Order List</span>
         <PopupWrapper>
           <template #header>
-            <div class="popover">Add new +</div>
+            <!-- <div class="popover">Add new +</div> -->
           </template>
           <template #content>
             <div class="popover-content">
@@ -36,16 +36,16 @@
             </select>
           </div>
           <div class="search-filter">
-            <VueDatePicker v-model="fromDate" :config="datePickerConfig" placeholder="Created start date">
+            <VueDatePicker v-model="fromDate" :config="datePickerConfig" placeholder="From">
             </VueDatePicker>
           </div>
           <div class="search-filter">
-            <VueDatePicker v-model="toDate" :config="datePickerConfig" placeholder="Created end date">
+            <VueDatePicker v-model="toDate" :config="datePickerConfig" placeholder="To">
             </VueDatePicker>
           </div>
           <div class="search-filter">
             <select id="status-filter" v-model="Is_ServiceTime">
-              <option value="" disabled selected>Time Options</option>
+              <option value="" disabled selected>Type</option>
               <option value="true">Service-Time</option>
               <option value="false">Booking-Time</option>ư
             </select>
@@ -181,7 +181,7 @@
                 <div class="item" :data-id="item.id">{{ item.airPort }}</div>
               </td>
               <td>
-                <span class="item" :data-id="item.id">{{
+                <span class="item" :data-id="item.id" style="width: 200px;overflow-wrap:break-word">{{
                   item.note
                 }}</span>
               </td>
@@ -345,7 +345,7 @@ export default {
           index: this.currentPage,
           pageSize: this.pageSize,
           agency_Id: user_id,
-          Is_ServiceTime: this.Is_ServiceTime,
+          Is_ServiceTime: this.Is_ServiceTime || true,
         };
         console.log(requestData)
 

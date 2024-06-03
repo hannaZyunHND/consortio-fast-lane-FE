@@ -25,7 +25,7 @@
                 <select v-model="formData.service_ID" id="service"
                   @change="updateService(orderData.formData[0].service_ID)">
                   <option v-for="(service, index) in services" :key="index" :value="service.id.toString()">
-                    {{ service.name }}
+                    {{ $t(`services.${service.name}`) }}
                   </option>
                 </select>
               </div>
@@ -95,6 +95,40 @@
                 </div>
                 <span class="title-notification" style="visibility: hidden">*</span>
               </div>
+            </div>
+          </div>
+          <div class="option-note-input">
+            <div class="input-option">
+              <input type="checkbox" v-model="isChecked[0]" @change="handleCheckboxChange(0, formData)">
+              <span class="input-option-content" id="0">{{ $t('options.change_visa') }}</span>
+            </div>
+            <div class="input-option">
+              <input type="checkbox" v-model="isChecked[1]" @change="handleCheckboxChange(1, formData)">
+              <span class="input-option-content" id="1">{{ $t('options.exchange_currency') }}</span>
+            </div>
+            <div class="input-option">
+              <input type="checkbox" v-model="isChecked[2]" @change="handleCheckboxChange(2, formData)">
+              <span class="input-option-content" id="2">{{ $t('options.buy_sim_card') }}</span>
+            </div>
+            <div class="input-option">
+              <input type="checkbox" v-model="isChecked[3]" @change="handleCheckboxChange(3, formData)">
+              <span class="input-option-content" id="3">{{ $t('options.wheelchair_service') }}</span>
+            </div>
+            <div class="input-option">
+              <input type="checkbox" v-model="isChecked[4]" @change="handleCheckboxChange(4, formData)">
+              <span class="input-option-content" id="4">{{ $t('options.poor_health_support') }}</span>
+            </div>
+            <div class="input-option">
+              <input type="checkbox" v-model="isChecked[5]" @change="handleCheckboxChange(5, formData)">
+              <span class="input-option-content" id="5">{{ $t('options.customs_declaration_support') }}</span>
+            </div>
+            <div class="input-option">
+              <input type="checkbox" v-model="isChecked[6]" @change="handleCheckboxChange(6, formData)">
+              <span class="input-option-content" id="6">{{ $t('options.luggage_assistance') }}</span>
+            </div>
+            <div class="input-option">
+              <input type="checkbox" v-model="isChecked[7]" @change="handleCheckboxChange(7, formData)">
+              <span class="input-option-content" id="7">{{ $t('options.see_off_choose_staff') }}</span>
             </div>
           </div>
           <div class="form-col" id="form-file">
@@ -169,6 +203,7 @@ export default {
         visa_File: '',
         portrait_File: '',
         service_Time: '',
+        note: [],
       },
       portrait_file: "",
       passportFiles: [],
@@ -193,6 +228,7 @@ export default {
       previousFlightNumber: '',
       formIndexCounter: 0,
       isLoading: false,
+      isChecked: [false, false, false, false, false, false, false, false],
     };
   },
   mounted() {
@@ -201,10 +237,30 @@ export default {
   computed: {
     minDate() {
       return new Date();
-    }
+    },
   },
 
   methods: {
+    handleCheckboxChange(index, fd) {
+      const value = document.getElementById(index).innerHTML;
+      if (this.isChecked[index]) {
+        if (!fd.note) {
+          fd.note = value + ', ';
+        } else {
+          if (!fd.note.includes(value)) {
+            fd.note += value + ', ';
+          }
+        }
+      } else {
+        if (fd.note) {
+          if (fd.note.includes(value)) {
+            fd.note = fd.note.replace(value + ', ', '');
+          }
+        }
+      }
+    },
+
+
     updateLanguage(language) {
       console.log(language);
       this.$i18n.locale = language;
@@ -340,6 +396,8 @@ export default {
     checkGroupAndDataGroup() {
       return this.orderData.is_Group;
     },
+
+
 
 
     updateFormCount() {
@@ -725,6 +783,37 @@ input[type="file"] {
 
 #name ::placeholder {
   font-size: 8px;
+}
+
+span.input-option-content {
+  font-size: 15px;
+}
+
+.option-note-input {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.input-option {
+  flex: 0 0 calc(33.333% - 10px);
+  /* 33.333% để hiển thị 3 cột, -10px để tạo khoảng cách giữa các cột */
+  margin-right: 10px;
+  /* Khoảng cách giữa các cột */
+  margin-bottom: 10px;
+  /* Khoảng cách giữa các hàng */
+  display: flex;
+  align-items: center;
+  /* Căn chỉnh nội dung theo chiều dọc */
+}
+
+.input-option input[type="checkbox"] {
+  margin-right: 5px;
+  /* Khoảng cách giữa checkbox và nội dung */
+}
+
+.input-option-content {
+  flex: 1;
+  /* Nội dung sẽ chiếm phần còn lại của cột */
 }
 
 @media (max-width: 768px) {

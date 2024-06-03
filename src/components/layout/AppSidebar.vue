@@ -12,6 +12,15 @@
         </router-link>
       </li>
 
+      <li v-if="showHomeMenu">
+        <router-link class="nav-link" to="/dashboard/calendar">
+          <div class="item-content">
+            <squares-2X2-icon class="navbar-icon" />
+            <span>Calendar</span>
+          </div>
+        </router-link>
+      </li>
+
       <!-- Sales -->
       <li v-if="showBookingsMenu">
         <div class="layout-menuitem-root-text">Sales</div>
@@ -19,6 +28,24 @@
           <div class="item-content">
             <wallet-icon class="navbar-icon" />
             <span>Booking</span>
+          </div>
+        </router-link>
+      </li>
+      <li v-if="showNewBookingMenuForSale">
+        <router-link class="nav-link" to="/agency/multiple">
+          <div class="item-content">
+            <square-2-stack-icon class="navbar-icon" />
+            <span>New Booking</span>
+          </div>
+        </router-link>
+      </li>
+
+      <!-- Report -->
+      <li v-if="showStatisticsAgencyMenu">
+        <router-link class="nav-link" to="/dashboard/allOfAgency">
+          <div class="item-content">
+            <flag-icon class="navbar-icon" />
+            <span>Report</span>
           </div>
         </router-link>
       </li>
@@ -182,7 +209,7 @@ import {
   EllipsisHorizontalCircleIcon,
   RectangleStackIcon,
   CalendarDaysIcon,
-  Bars3Icon,
+  Bars3Icon, FlagIcon,
   Square2StackIcon,
 } from "@heroicons/vue/24/solid";
 import axios from "axios";
@@ -190,7 +217,7 @@ import axios from "axios";
 export default {
   name: "AppSidebar",
   components: {
-    UserIcon,
+    UserIcon, FlagIcon,
     WalletIcon,
     Squares2X2Icon,
     SquaresPlusIcon,
@@ -216,7 +243,11 @@ export default {
       showServicesMenu: false,
       showRoleMenu: false,
       showAccountMenu: false,
-      showAgencyMenu: false
+      showAgencyMenu: false,
+      showStatisticsAgencyMenu: false,
+      showNewBookingMenuForSale: false,
+      showNewBookingMenu: false,
+
     };
   },
 
@@ -229,11 +260,16 @@ export default {
       roles == "Sales Management" ||
       roles == "Sales Admin";
 
+    this.showStatisticsAgencyMenu =
+      roles == "Admin" ||
+      roles == "Sales Management" ||
+      roles == "Sales Admin";
+
     //Only operator each airport - admin
     this.showAssignMenu =
       roles == "Admin" ||
-      roles == "Sales Management" ||
-      roles == "Sales Admin" ||
+      // roles == "Sales Management" ||
+      // roles == "Sales Admin" ||
       roles == "Chief Rep"
 
     this.showScheduleMenu =
@@ -250,7 +286,11 @@ export default {
     //Only agency-admin-sales
     this.showNewBookingMenu =
       roles == "Agency" ||
+      roles == "Admin"
+
+    this.showNewBookingMenuForSale =
       roles == "Admin" ||
+      roles == "Sales Admin" ||
       roles == "Sales Management"
 
     //Only admin-sales-agency-operator

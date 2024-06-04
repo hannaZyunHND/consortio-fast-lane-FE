@@ -1,13 +1,13 @@
 <template>
-    <Qalendar :selected-date="new Date(2022, 0, 8)" :events="events" :config="config" />
+    <Qalendar :events="events" :config="config" />
 </template>
 
 <script>
 import { Qalendar } from "qalendar";
 import "qalendar/dist/style.css";
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid'; // Import uuid function
-import moment from 'moment'; // Import moment library
+import moment from 'moment';
+import { v4 as uuidv4 } from 'uuid';
 
 export default {
     components: {
@@ -16,24 +16,34 @@ export default {
 
     data() {
         return {
-            events: [],
             config: {
-                locale: "en-US",
-                defaultMode: "month",
                 style: {
                     colorSchemes: {
-                        meetings: {
-                            color: "#2e2e2e",
-                            backgroundColor: "#131313",
+                        pending: {
+                            color: '#fff',
+                            backgroundColor: '#FFFF00',
                         },
-                        sports: {
-                            color: "#2e2e2e",
-                            backgroundColor: "#ff4081",
+                        confirmed: {
+                            color: '#fff',
+                            backgroundColor: '#0000FF',
+                        },
+                        canceled: {
+                            color: '#fff',
+                            backgroundColor: '#FF0000',
+                        },
+                        completed: {
+                            color: '#fff',
+                            backgroundColor: '#00FF00',
+                        },
+                        uncompleted: {
+                            color: '#fff',
+                            backgroundColor: '#FFA500',
                         },
                     },
                 },
             },
-        };
+            events: []
+        }
     },
 
     mounted() {
@@ -43,34 +53,47 @@ export default {
     methods: {
         async fetchEvents() {
             const apiUrl = process.env.VUE_APP_API_URL;
+            const fromDate = moment().startOf('month').format('YYYY-MM-DD');
+            const toDate = moment().endOf('month').format('YYYY-MM-DD');
+
             try {
-                const response = await axios.get(`${apiUrl}/order`);
+                const response = await axios.get(`${apiUrl}/orders?fromDate=${fromDate}&toDate=${toDate}`);
                 const dataOrder = response.data;
-                console.log("data of order", dataOrder);
 
                 this.events = dataOrder.map(item => ({
-                    title: item.name,
-                    with: item.email,
+                    title: item.Name,
                     time: {
-                        start: this.formatDate(item.departure_Time),
-                        end: this.formatDate(item.departure_Time)
+                        start: this.formatDate(item.Service_Time),
+                        end: this.formatDate(item.Service_Time)
                     },
-                    group: item.groupPreference,
-                    description: item.note,
-                    color: item.status === 'Pending' ? 'yellow' : (item.status === 'Success' ? 'green' : 'red'), // Màu sự kiện dựa trên status
-                    isEditable: true,
+                    colorScheme: this.getColorScheme(item.Status),
                     id: uuidv4(),
                 }));
-
             } catch (error) {
                 console.error('Error fetching events:', error);
             }
         },
 
         formatDate(dateString) {
-            return moment(dateString).format('YYYY-MM-DD HH:mm'); // Format date using moment.js
+            return moment(dateString).format('YYYY-MM-DD HH:mm');
         },
 
+        getColorScheme(status) {
+            switch (status) {
+                case 'Pending':
+                    return 'pending';
+                case 'Confirmed':
+                    return 'confirmed';
+                case 'Canceled':
+                    return 'canceled';
+                case 'Completed':
+                    return 'completed';
+                case 'Uncompleted':
+                    return 'uncompleted';
+                default:
+                    return 'pending';
+            }
+        },
     },
 };
 </script>
@@ -84,7 +107,7 @@ export default {
     }
 }
 
-.calendar-month__event is-event is-draggable {
+.calendar-month__event.is-event.is-draggable {
     top: 0px;
     background-color: rgb(165, 215, 167);
     color: rgb(255, 255, 255);

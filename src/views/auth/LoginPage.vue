@@ -87,7 +87,7 @@ export default {
           localStorage.setItem("roles", roles);
           // Truy xuất thông tin về user từ payload
           const userId = decodedToken["UserId"];
-          const userName = decodedToken["Name"];
+          const userName = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
 
           localStorage.setItem("user_name", userName)
           localStorage.setItem("user_id", userId);

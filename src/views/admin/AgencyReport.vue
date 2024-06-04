@@ -1,7 +1,7 @@
 <template>
     <div class="report-container">
         <span class="report-title">
-            Order Static
+            Order Statistics
         </span>
         <div class="data-report-month">
             <span class="total-data">

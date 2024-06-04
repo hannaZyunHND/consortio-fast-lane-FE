@@ -18,7 +18,7 @@
           <div class="menu-search">
             <div class="search-filter">
               <select id="airport" class="form-select" v-model="airport" placeholder="Select Cities">
-                <option selected>Airport</option>
+                <option value="" disabled selected>Airport</option>
                 <option value="Da Nang">Da Nang</option>
                 <option value="Tan Son Nhat">Tan Son Nhat</option>
                 <option value="Noi Bai">Noi Bai</option>
@@ -28,7 +28,7 @@
             </div>
             <div class="search-filter">
               <select id="status-filter" v-model="status">
-                <option value="status" disabled selected hidden>Status</option>
+                <option value="" disabled selected>Status</option>
                 <option v-for="(status, index) in statuses" :key="index" :value="status.id">
                   {{ status.name }}
                 </option>
@@ -60,6 +60,7 @@
           <table>
             <thead>
               <tr class="data-table-tilte">
+                <th><i class="pi pi-check-circle" style="font-size: 1rem"></i></th>
                 <th><bars-2-icon class="order-icon" /></th>
                 <th>Customer</th>
                 <th>BK.STAT</th>
@@ -77,6 +78,10 @@
             </thead>
             <tbody class="order-info">
               <tr v-for="item in items" :key="item.id" class="order-information">
+                <td>
+                  <input type="checkbox" name="" :id="'check-complete-status-' + item.id"
+                    @change="checkBookingStatus(item.id)">
+                </td>
                 <td>
                   <PopupWrapper>
                     <template #header>
@@ -154,7 +159,8 @@
                     <div class="item" :data-id="item.id">
                       {{ item.passport_Number }}
                     </div>
-                    <div class="item" :data-id="item.id">
+                    <div class="item" :data-id="item.id"
+                      style="overflow-wrap: break-word;width: 200px;text-align: justify;">
                       {{ item.nationality }}
                     </div>
                   </div>
@@ -164,7 +170,7 @@
                 </td>
                 <td>
                   <div class="item" :data-id="item.employee">
-                    {{ getEmployeeName(item.employee) }}
+                    {{ item.employee || "Unassigned" }}
                   </div>
                 </td>
                 <td>
@@ -208,6 +214,8 @@ import Pagination from "@/components/PaginationPage.vue";
 import ImagePopup from "@/views/admin/order/ImagePopup.vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+import Swal from 'sweetalert2';
+
 export default {
   name: "TaskPage",
   components: {
@@ -224,6 +232,28 @@ export default {
   },
   data() {
     return {
+      scheduleData: {
+        name: '',
+        email: '',
+        phone: '',
+        airPort: '',
+        service_ID: '',
+        status_ID: '',
+        nationality: '',
+        employee_Id: null,
+        status_Sales_Id: null,
+        status_Operator_ID: '',
+        note: '',
+        passport_Number: '',
+        flight_Number: '',
+        service_Time: '',
+        passport_File: null,
+        visa_File: null,
+        operator_Note: null,
+        portrait_File: null,
+      },
+      status: '',
+      airport: '',
       toDate: null,
       fromDate: null,
       currentPage: 1,
@@ -289,7 +319,7 @@ export default {
         const user_id = localStorage.getItem("user_id");
 
         const requestData = {
-          status: this.status,
+          status: this.status || 0,
           airport: document.getElementById("airport").value,
           toDate: this.toDate,
           fromDate: this.fromDate,
@@ -340,6 +370,80 @@ export default {
         console.error('Error fetching data:', error);
       }
     },
+
+    //Check the completed status of booking
+    async checkBookingStatus(bookingId) {
+      const apiUrl = process.env.VUE_APP_API_URL;
+      try {
+        const checkbox = document.getElementById(`check-complete-status-${bookingId}`);
+        const isChecked = checkbox.checked;
+
+        const response = await axios.get(`${apiUrl}/order/${bookingId}`);
+        const responseData = response.data;
+        if (responseData) {
+          this.scheduleData.name = responseData.name;
+          this.scheduleData.phone = responseData.phone;
+          this.scheduleData.email = responseData.email;
+          this.scheduleData.passport_Number = responseData.passport_Number;
+          this.scheduleData.nationality = responseData.nationality;
+          this.scheduleData.airPort = responseData.airPort;
+          this.scheduleData.flight_Number = responseData.flight_Number;
+          this.scheduleData.guest_Number = responseData.guest_Number;
+          this.scheduleData.service_ID = responseData.service;
+          this.scheduleData.status_ID = responseData.status;
+          this.scheduleData.operator_Note = responseData.operator_note;
+          this.scheduleData.service_Time = responseData.service_Time;
+          this.scheduleData.note = responseData.note;
+          this.scheduleData.groupReference = responseData.groupReference;
+          this.scheduleData.status_Sales_Id = responseData.status_Sales;
+          this.scheduleData.status_Operator_ID = responseData.status_Operator;
+          this.scheduleData.employee_Id = responseData.employee;
+          this.scheduleData.passport_File = responseData.passport_File;
+          this.scheduleData.visa_File = responseData.visa_File;
+          this.scheduleData.portrait_File = responseData.portrait_File;
+        }
+
+        if (isChecked) {
+          const confirmResult = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to complete this booking?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No'
+          });
+          if (confirmResult.isConfirmed) {
+            this.scheduleData.status_Operator_ID = 9;
+          }
+          else {
+            this.scheduleData.status_Operator_ID = 8;
+          }
+
+          //Call api 
+          const res = await axios.post(`${apiUrl}/order/update/${bookingId}`, this.scheduleData);
+          if (res.data.error) {
+            await Swal.fire({
+              title: "Error!",
+              text: "Booking have not been completed successfully.",
+              icon: "error",
+              button: "OK",
+            });
+          }
+          else {
+            this.fetchSchedule();
+            await Swal.fire({
+              title: "Success!",
+              text: "Booking has been completed successfully.",
+              icon: "success",
+              button: "OK",
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    },
+
 
     getEmployeeName(employeeId) {
       const employeeIdInt = parseInt(employeeId);
@@ -447,6 +551,7 @@ export default {
 <style scoped>
 .order {
   gap: 30px;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -529,6 +634,7 @@ select {
   padding: 15px;
   overflow-y: auto;
   border-radius: 10px;
+  height: 100%;
   background: #fff;
   box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
 }
@@ -568,7 +674,6 @@ select {
   width: 24px;
   height: 24px;
   color: #222;
-  margin-left: 12px;
 }
 
 .customer-infomation {

@@ -1,18 +1,18 @@
 <template>
-    <div class="popup-content">
+    <div class="popup-content" v-if="orderDetail">
         <form enctype="multipart/form-data" @submit.prevent="submitSchedule" id="edit-order-form">
             <div class="form-col">
                 <div class="row">
                     <label for="status_sales">Operator_Status</label>
-                    <select v-model="scheduleData.status_Operator_ID" id="status">
-                        <option v-for="(status, index) in statuses" :key="index" :value="status.id">{{ status.name }}
+                    <select v-model="orderDetail.status_Operator_ID" id="status">
+                        <option v-for="(status, index) in maintainOperatorStatus" :key="index" :value="status.Key">{{ status.Value }}
                         </option>
                     </select>
                 </div>
                 <div class="row">
                     <label for="employee">Assign</label>
-                    <select v-model="scheduleData.employee_Id" id="employee">
-                        <option v-for="(employee, index) in employees" :key="index" :value="employee.id">{{
+                    <select v-model="orderDetail.employee_Id" id="employee">
+                        <option v-for="(employee, index) in maintainEmployee" :key="index" :value="employee.id">{{
                             employee.name }}
                         </option>
                     </select>
@@ -72,6 +72,11 @@ export default {
             statuses: [],
             pageSize: 10,
             currentPage: 1,
+            maintainOperatorStatus: [],
+            maintainEmployee: [],
+            selectedOperatorStatus : 0,
+            selectedEmployeeId : 0,
+            orderDetail: null
         };
     },
     setup() {
@@ -84,9 +89,12 @@ export default {
         return { success };
     },
     mounted() {
-        this.fetchSchedule(this.orderId);
-        this.fetchStatus();
-        this.fetchEmployee();
+        // this.fetchSchedule(this.orderId);
+        // this.fetchStatus();
+        // this.fetchEmployee();
+        this.maintainGetEmployeeSameAirport();
+        this.maintainGetOperatorStatus();
+        this.maintainFetchOrder();
     },
 
     watch: {
@@ -105,26 +113,49 @@ export default {
     },
 
     methods: {
+        maintainGetOperatorStatus() {
+            axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/StatusOperatorType`).then((response) => {
+                this.maintainOperatorStatus = response.data;
+            })
+        },
+        maintainGetEmployeeSameAirport(){
+            const user_id = parseInt(localStorage.getItem("user_id"));
+            axios.get(`${process.env.VUE_APP_API_URL}/MaintainUsers/GetEmployeeSameAirport/userId/${user_id}/orderId/${this.orderId}`).then((response) => {
+                this.maintainEmployee = response.data;
+            })
+        },
+
+        maintainFetchOrder() {
+            axios.get(`${process.env.VUE_APP_API_URL}/MaintainOrderDetails/GetById/${this.orderId}`).then((response) => {
+                console.log(response.data)
+                this.orderDetail = response.data;
+                
+
+            })
+        },
         submitSchedule() {
+            this.isLoading = true;
+            const user_Id = localStorage.getItem("user_id");
             const apiUrl = process.env.VUE_APP_API_URL;
-            this.scheduleData.service_ID = this.scheduleData.service_ID.toString();
-            console.log(this.scheduleData);
-            axios.post(`${apiUrl}/order/update/${this.orderId}`, this.scheduleData)
+            this.orderDetail.updatedBy = user_Id;
+
+            axios.post(`${apiUrl}/MaintainOrderDetails/Update`, this.orderDetail)
                 .then(() => {
                     this.success();
-                    //-----------này sa
                     const clickEvent = new MouseEvent('click', {
                         bubbles: true,
                         cancelable: true,
                         view: window
                     });
-
                     // Phát ra sự kiện click trên document
                     document.dispatchEvent(clickEvent);
-                    this.$emit("reloadPage")
+                    this.$emit("reloadPage");
                 })
                 .catch(error => {
-                    console.error('Error updating Schedule:', error);
+                    console.error('Error updating Order:', error);
+                })
+                .finally(() => {
+                    this.isLoading = false;
                 });
         },
         fetchSchedule(item) {

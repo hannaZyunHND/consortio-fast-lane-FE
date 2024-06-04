@@ -231,6 +231,7 @@ export default {
       formIndexCounter: 0,
       isLoading: false,
       isChecked: [false, false, false, false, false, false, false, false],
+      maintainAirports: []
     };
   },
   mounted() {
@@ -243,6 +244,11 @@ export default {
   },
 
   methods: {
+    maintainGetAllAirport(){
+      axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/GetAirports`).then((response) => {
+        this.maintainAirports = response.data;
+      })
+    },
     handleCheckboxChange(index, fd) {
       const value = document.getElementById(index).innerHTML;
       if (this.isChecked[index]) {
@@ -451,7 +457,7 @@ export default {
         console.log(dataToSend);
         
         const apiUrl = process.env.VUE_APP_API_URL;
-        const response = await axios.post(`${apiUrl}/order/create`, dataToSend);
+        const response = await axios.post(`${apiUrl}/MaintainOrderDetails`, dataToSend);
 
         // this.success();
         if (response.status === 200) {

@@ -2,7 +2,7 @@
   <div class="navbar">
     <ul class="menu-page">
       <!-- Home -->
-      <li v-if="showHomeMenu">
+      <li>
         <div class="layout-menuitem-root-text">Home</div>
         <router-link class="nav-link" to="/agency/dashboard">
           <div class="item-content">
@@ -12,7 +12,7 @@
         </router-link>
       </li>
 
-      <li v-if="showHomeMenu">
+      <li v-if="roleChecker(['Operator', 'Operator_Ref'])">
         <router-link class="nav-link" to="/dashboard/calendar">
           <div class="item-content">
             <squares-2X2-icon class="navbar-icon" />
@@ -22,7 +22,7 @@
       </li>
 
       <!-- Sales -->
-      <li v-if="showBookingsMenu">
+      <li>
         <div class="layout-menuitem-root-text">Sales</div>
         <router-link class="nav-link" to="/dashboard/order">
           <div class="item-content">
@@ -31,7 +31,7 @@
           </div>
         </router-link>
       </li>
-      <li v-if="showNewBookingMenuForSale">
+      <li v-if="roleChecker(['Admin','Sale', 'Sale_Admin', 'Agency'])">
         <router-link class="nav-link" to="/agency/multiple">
           <div class="item-content">
             <square-2-stack-icon class="navbar-icon" />
@@ -41,7 +41,7 @@
       </li>
 
       <!-- Report -->
-      <li v-if="showStatisticsAgencyMenu">
+      <li v-if="roleChecker(['Admin','Sale','Sale_Admin'])">
         <router-link class="nav-link" to="/dashboard/allOfAgency">
           <div class="item-content">
             <flag-icon class="navbar-icon" />
@@ -50,100 +50,9 @@
         </router-link>
       </li>
 
-      <!-- Calendar -->
-      <li v-if="showCalendarMenu">
-        <router-link class="nav-link" to="/dashboard/calendar">
-          <div class="item-content">
-            <calendar-days-icon class="navbar-icon" />
-            <span>Calendar</span>
-          </div>
-        </router-link>
-      </li>
-
-      <!-- Operation -->
-      <li v-if="showScheduleMenu">
-        <div class="layout-menuitem-root-text">Operation</div>
-        <router-link class="nav-link" to="/dashboard/schedule">
-          <div class="item-content">
-            <rectangle-stack-icon class="navbar-icon" />
-            <span>Schedule</span>
-          </div>
-        </router-link>
-      </li>
-      <!-- Task -->
-      <li v-if="showAssignMenu">
-        <router-link class="nav-link" to="/dashboard/task">
-          <div class="item-content">
-            <rectangle-stack-icon class="navbar-icon" />
-            <span>Assignment</span>
-          </div>
-        </router-link>
-      </li>
-      <!--  -->
-
-      <!-- Agency -->
-      <li v-if="showAgencyMenu">
-        <div class="layout-menuitem-root-text">Agency</div>
-        <router-link class="nav-link" to="/agency/order">
-          <div class="item-content">
-            <square-2-stack-icon class="navbar-icon" />
-            <span>Booking</span>
-          </div>
-        </router-link>
-      </li>
-      <li v-if="showNewBookingMenu">
-        <router-link class="nav-link" to="/agency/multiple">
-          <div class="item-content">
-            <square-2-stack-icon class="navbar-icon" />
-            <span>New Booking</span>
-          </div>
-        </router-link>
-      </li>
-
-      <!-- Settings -->
-      <li v-if="showServicesMenu">
-        <div class="layout-menuitem-root-text">Settings</div>
-        <router-link class="nav-link" to="/dashboard/service">
-          <div class="item-content">
-            <square-2-stack-icon class="navbar-icon" />
-            <span>Service</span>
-          </div>
-        </router-link>
-      </li>
-
-      <!-- Status -->
-      <li v-if="showStatusMenu">
-        <router-link class="nav-link" to="/dashboard/status">
-          <div class="item-content">
-            <bars-3-icon class="navbar-icon" />
-            <span>Status</span>
-          </div>
-        </router-link>
-      </li>
-
-      <!-- Manage -->
-      <li v-if="showRoleMenu">
-        <div class="layout-menuitem-root-text">Manage</div>
-        <router-link class="nav-link" to="/dashboard/role">
-          <div class="item-content">
-            <ellipsis-horizontal-circle-icon class="navbar-icon" />
-            <span>Role</span>
-          </div>
-        </router-link>
-      </li>
-
-      <!-- Employee -->
-      <li v-if="showEmployeeMenu">
-        <router-link class="nav-link" to="/dashboard/employee">
-          <div class="item-content">
-            <squares-plus-icon class="navbar-icon" />
-            <span>Employee</span>
-          </div>
-        </router-link>
-      </li>
-
       <!-- Account -->
-      <li v-if="showAccountMenu">
+      <li v-if="roleChecker(['Admin'])">
+        <div class="layout-menuitem-root-text">Account</div>
         <router-link class="nav-link" to="/dashboard/manage">
           <div class="item-content">
             <user-icon class="navbar-icon" />
@@ -170,7 +79,7 @@
               <template #header>
                 <div class="popover">
                   <pencil-square-icon class="user-icon" />
-                  <span>Change password</span>
+                  <span>Change password (Processing)</span>
                 </div>
               </template>
               <template #content>
@@ -203,29 +112,31 @@ import PopupWrapper from "@/components/PopupWrapper.vue";
 import {
   UserIcon,
   WalletIcon,
-  SquaresPlusIcon,
+  // SquaresPlusIcon,
   Squares2X2Icon,
   PowerIcon,
-  EllipsisHorizontalCircleIcon,
-  RectangleStackIcon,
-  CalendarDaysIcon,
-  Bars3Icon, FlagIcon,
+  // EllipsisHorizontalCircleIcon,
+  // RectangleStackIcon,
+  // CalendarDaysIcon,
+  // Bars3Icon, 
+  FlagIcon,
   Square2StackIcon,
 } from "@heroicons/vue/24/solid";
-import axios from "axios";
+// import axios from "axios";
 
 export default {
   name: "AppSidebar",
   components: {
-    UserIcon, FlagIcon,
+    UserIcon, 
+    FlagIcon,
     WalletIcon,
     Squares2X2Icon,
-    SquaresPlusIcon,
+    // SquaresPlusIcon,
     PowerIcon,
-    EllipsisHorizontalCircleIcon,
-    RectangleStackIcon,
-    CalendarDaysIcon,
-    Bars3Icon,
+    // EllipsisHorizontalCircleIcon,
+    // RectangleStackIcon,
+    // CalendarDaysIcon,
+    // Bars3Icon,
     Square2StackIcon,
     Change_Password,
     PopupWrapper
@@ -311,6 +222,21 @@ export default {
     this.showAccount();
   },
   methods: {
+    //#region maintain
+    roleChecker(accepedRoles){
+      let checker = false;
+      
+      let role = localStorage.getItem('roles');
+      if(role == "Admin"){
+        checker = true;
+      }
+      accepedRoles.forEach((element) => {
+        if(element == role){
+          checker = true;
+        }
+      })
+      return checker;
+    },
     showAccount() {
       const nameValue = document.getElementById('account-information');
       const userName = localStorage.getItem("user_name");
@@ -323,9 +249,10 @@ export default {
 
     async logout() {
       try {
-        const apiUrl = process.env.VUE_APP_API_URL;
-        await axios.post(`${apiUrl}/auth/logout`);
+        
         localStorage.removeItem("token");
+        localStorage.removeItem('roles');
+        localStorage.removeItem('user_id');
         localStorage.setItem("isLoggedIn", "false");
         router.push("/login");
       } catch (error) {

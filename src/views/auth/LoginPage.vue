@@ -88,28 +88,30 @@ export default {
           // Truy xuất thông tin về user từ payload
           const userId = decodedToken["UserId"];
           const userName = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+          const airportId = decodedToken["AirportId"];
 
           localStorage.setItem("user_name", userName)
           localStorage.setItem("user_id", userId);
-
-          // Redirect người dùng đến trang tương ứng với vai trò của họ
-          if (roles == "Admin") {
-            router.push("/agency/dashboard");
-          } else if (roles == "Sales") {
-            router.push("/dashboard/order");
-          } else if (roles == "Management") {
-            router.push("/agency/dashboard");
-          } else if (roles == "Sales Admin") {
-            router.push("/agency/dashboard");
-          } else if (roles == "Employee") {
-            router.push("/dashboard/schedule");
-          } else if (roles == "Agency") {
-            router.push("/agency/dashboard");
-          }
-          else {
-            router.push("/dashboard/Task");
-          }
-          console.log("Response from backend:", token);
+          localStorage.setItem("airportId", airportId);
+          router.push("/dashboard/order");
+          // // Redirect người dùng đến trang tương ứng với vai trò của họ
+          // if (roles == "Admin") {
+          //   router.push("/agency/dashboard");
+          // } else if (roles == "Sales") {
+          //   router.push("/dashboard/order");
+          // } else if (roles == "Management") {
+          //   router.push("/agency/dashboard");
+          // } else if (roles == "Sales Admin") {
+          //   router.push("/agency/dashboard");
+          // } else if (roles == "Employee") {
+          //   router.push("/dashboard/schedule");
+          // } else if (roles == "Agency") {
+          //   router.push("/agency/dashboard");
+          // }
+          // else {
+          //   router.push("/dashboard/Task");
+          // }
+          // console.log("Response from backend:", token);
         } else {
           console.error("No token found in response:", response.data);
         }

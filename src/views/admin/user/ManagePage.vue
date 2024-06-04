@@ -5,11 +5,11 @@
         <h3>Team Member</h3>
         <PopupWrapper>
           <template #header>
-            <span class="popover">Add new +</span>
+            <span class="popover" @click="onAddNew()">Add new +</span>
           </template>
           <template #content>
             <div class="popover-content">
-              <AddUser @reloadPage="fetchUser()" />
+              <EditUser :userId="selectedUserId" @reloadPage="maintainFetchUser()" />
             </div>
           </template>
         </PopupWrapper>
@@ -18,29 +18,24 @@
       <div class="user-search">
         <div class="menu-search">
           <div class="search-filter">
-            <select id="airport" required>
-              <option value="" disabled selected hidden>Select Airport</option>
-              <option value="Da Nang">Da Nang</option>
-              <option value="Tan Son Nhat">Tan Son Nhat</option>
-              <option value="Noi Bai">Noi Bai</option>
-              <option value="Phu Quoc">Phu Quoc</option>
-              <option value="Vinh">Vinh</option>
+            <select id="airport" v-model="filter.airportId">
+              <option value="0">ALL Airport</option>
+              <option v-for="a in maintainAirports" :value="a.id" :key="a.id">{{ a.name }}</option>
             </select>
           </div>
           <div class="search-filter">
-            <select required>
-              <option value="" disabled selected hidden>Sort</option>
-              <option value="Desc">Desc</option>
-              <option value="Asc">Asc</option>
+            <select required v-model="filter.role">
+              <option value="">ALL Roles</option>
+              <option v-for="r in maintainRoles" :key="r.Key" :value="r.Value">{{ r.Value }}</option>
             </select>
           </div>
-          <div class="search-filter">
-            <i class="pi pi-filter" style="font-size: 1rem"></i>
-            <span>Filter</span>
+          <div>
+            <input type="text" name="search" id="search" v-model="filter.keyword" placeholder="Search Keyword"
+              @keyup.enter="search" />
           </div>
         </div>
         <button class="btn-search-primary">
-          <i class="pi pi-search" style="font-size: 1rem"></i>
+          <i class="pi pi-search" style="font-size: 1rem" @click="maintainFetchUser()"></i>
         </button>
       </div>
     </div>
@@ -59,7 +54,7 @@
             </tr>
           </thead>
           <tbody class="user-info">
-            <tr v-for="item in items" :key="item.id" class="user-information">
+            <tr v-for="item in users" :key="item.id" class="user-information">
               <td><input type="checkbox" /></td>
               <td>
                 <div class="item" data-id="{{item.id}}">{{ item.name }}</div>
@@ -77,7 +72,7 @@
               </td>
               <td>
                 <div class="item" data-id="{{item.id}}">
-                  {{ formatDate(item.updated_at) }}
+                  {{ getUserAirport(item) }}
                 </div>
               </td>
               <td>
@@ -90,11 +85,11 @@
                     </template>
                     <template #content>
                       <div class="popover-content">
-                        <EditUser :userId="selectedUserId" @reloadPage="fetchUser()" />
+                        <EditUser :userId="selectedUserId" @reloadPage="maintainFetchUser()" />
                       </div>
                     </template>
                   </PopupWrapper>
-                  <button @click="deleteItem(item.id)" class="btn-delete-primary">
+                  <button @click="maintainDeleteUser(item.id)" class="btn-delete-primary">
                     <trash-icon class="user-icon" />
                   </button>
                 </div>
@@ -102,7 +97,7 @@
             </tr>
           </tbody>
         </table>
-        <Pagination :currentPage="currentPage" :totalPages="totalPages" @nextPage="nextPage" @prevPage="prevPage"
+        <Pagination :currentPage="filter.pageIndex" :totalPages="totalPage" @nextPage="nextPage" @prevPage="prevPage"
           @goToPage="goToPage" />
       </div>
     </div>
@@ -117,11 +112,12 @@ import {
   Bars2Icon,
 } from "@heroicons/vue/24/solid";
 import PopupWrapper from "@/components/PopupWrapper.vue";
-import AddUser from "@/views/admin/user/AddUser.vue";
+// import AddUser from "@/views/admin/user/AddUser.vue";
 import EditUser from "@/views/admin/user/EditUser.vue";
 import Pagination from "@/components/PaginationPage.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+import Swal from 'sweetalert2';
 
 export default {
   name: "userPage",
@@ -130,7 +126,7 @@ export default {
     PopupWrapper,
     Bars2Icon,
     TrashIcon,
-    AddUser,
+    // AddUser,
     EditUser,
     Pagination,
   },
@@ -138,9 +134,22 @@ export default {
     return {
       currentPage: 1,
       pageSize: 6,
-      items: [],
+      totalPage: 0,
+      users: [],
       showModalStatus: false,
       selectedUserId: "",
+      selectedUser: null,
+      maintainAirports: [],
+      maintainRoles: [],
+      newUser: null,
+      filter: {
+        airportId: 0,
+        role: "",
+        keyword: "",
+        pageIndex: 1,
+        pageSize: 10
+      }
+
     };
   },
   setup() {
@@ -153,9 +162,72 @@ export default {
     return { success };
   },
   mounted() {
-    this.fetchUser();
+    this.maintainFetchUser();
+    this.maintainGetAllAirport();
+    this.maintainGetAllRole();
   },
   methods: {
+    async maintainDeleteUser(id) {
+      const confirmResult = await Swal.fire({
+        title: 'Delete User',
+        text: 'Do you want to delete this user?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'No'
+      });
+      if (confirmResult.isConfirmed) {
+        axios.get(`${process.env.VUE_APP_API_URL}/MaintainUsers/Delete/${id}`).then(() => {
+          this.success();
+          this.maintainFetchUser();
+        })
+      }
+
+    },
+    onAddNew() {
+      this.selectedUserId = 0;
+    },
+    //region maintaine
+    maintainFetchUser() {
+      axios.post(`${process.env.VUE_APP_API_URL}/MaintainUsers/FilterUsers`, this.filter).then((response) => {
+        console.log(response.data);
+        this.users = response.data.users;
+        this.totalPage = response.data.totalPage;
+
+      })
+
+    },
+
+    maintainGetAllAirport() {
+      axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/GetAirports`).then((response) => {
+        this.maintainAirports = response.data;
+        console.log(response.data)
+      })
+    },
+
+    maintainGetAllRole() {
+      axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/RoleType`).then((response) => {
+        this.maintainRoles = response.data;
+        console.log(response.data)
+      })
+    },
+
+    getUserAirport(user) {
+      if (user.airportId == 0) {
+        return "OFFICE";
+      } else {
+        var ap = ""
+        this.maintainAirports.forEach((element) => {
+          if (element.id == user.airportId) {
+            ap = element.name
+          }
+        })
+        return ap
+      }
+    },
+
+    //endregion
+
     fetchUser() {
       const apiUrl = process.env.VUE_APP_API_URL;
       axios
@@ -217,26 +289,22 @@ export default {
       return formattedTime;
     },
 
-    openEditUser(userId) {
-      this.selectedUserId = userId;
-      console.log("dây là id: " + this.selectedUserId);
+    openEditUser(id) {
+      this.selectedUserId = id;
+
     },
 
     nextPage() {
-      if (this.currentPage < Math.ceil(this.totalItems / this.pageSize)) {
-        this.currentPage++;
-        this.fetchUser();
-      }
+      this.filter.pageIndex++;
+      this.maintainFetchUser();
     },
     prevPage() {
-      if (this.currentPage > 1) {
-        this.currentPage--;
-        this.fetchUser();
-      }
+      this.filter.pageIndex--
+      this.maintainFetchUser();
     },
     goToPage(page) {
-      this.currentPage = page;
-      this.fetchUser();
+      this.filter.pageIndex = page;
+      this.maintainFetchUser();
     },
   },
 };
@@ -334,6 +402,21 @@ select {
 }
 
 .btn-delete-primary {
+  border: none;
+  background: none;
+}
+
+#search {
+  border: none;
+  width: 185px;
+  padding: 10px;
+  background: none;
+  border-radius: 8px;
+  box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
+}
+
+#search:focus {
+  outline: none;
   border: none;
   background: none;
 }

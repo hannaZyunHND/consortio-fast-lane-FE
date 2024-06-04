@@ -18,40 +18,35 @@
       <div class="order-search">
         <div class="menu-search">
           <div class="search-filter">
-            <select id="airport" class="form-select" placeholder="Select Cities">
-              <option value="" disabled selected>Airport</option>
-              <option value="Da Nang">Da Nang</option>
-              <option value="Tan Son Nhat">Tan Son Nhat</option>
-              <option value="Noi Bai">Noi Bai</option>
-              <option value="Phu Quoc">Phu Quoc</option>
-              <option value="Cam Ranh">Cam Ranh</option>
+            <select id="airport" class="form-select" placeholder="Select Cities" v-model="filter.airportId" v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Agency'])">
+              <option value="0" selected>ALL</option>
+              <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}</option>
             </select>
           </div>
           <div class="search-filter">
-            <select id="status-filter" v-model="status">
-              <option value="" disabled selected>Status</option>
-              <option v-for="(status, index) in statuses" :key="index" :value="status.id">
-                {{ status.name }}
+            <select id="status-filter" v-model="filter.bookingStatusId" v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin','Operator_Ref', 'Agency'])">
+              <option value="0">ALL</option>
+              <option v-for="(status, index) in maintainBookingStatus" :key="index" :value="status.Key">
+                {{ status.Value }}
               </option>
             </select>
           </div>
           <div class="search-filter">
-            <VueDatePicker v-model="fromDate" :config="datePickerConfig" placeholder="From">
+            <VueDatePicker v-model="filter.fromDate" :config="datePickerConfig" placeholder="From">
             </VueDatePicker>
           </div>
           <div class="search-filter">
-            <VueDatePicker v-model="toDate" :config="datePickerConfig" placeholder="To">
+            <VueDatePicker v-model="filter.toDate" :config="datePickerConfig" placeholder="To">
             </VueDatePicker>
           </div>
           <div class="search-filter">
-            <select id="status-filter" v-model="Is_ServiceTime">
-              <option value="" disabled selected>Type</option>
-              <option value="true">Service-Time</option>
-              <option value="false">Booking-Time</option>ư
+            <select id="status-filter" v-model="filter.orderBy">
+              <option value="service-time">Sort by Service-Time</option>
+              <option value="booking-time">Sort by Booking-Time</option>
             </select>
           </div>
           <div>
-            <input type="text" name="search" id="search" v-model="searchTerm" placeholder="Search"
+            <input type="text" name="search" id="search" v-model="filter.keyword" placeholder="Search"
               @keyup.enter="search" />
           </div>
           <button class="btn-search-primary">
@@ -71,7 +66,7 @@
         <table>
           <thead>
             <tr class="data-table-tilte">
-              <th><bars-2-icon class="order-icon" /></th>
+              <th v-if="roleChecker(['Operator_Ref', 'Operator'])"><bars-2-icon class="order-icon" /></th>
               <th>Customer</th>
               <th>BK.STAT</th>
               <th>SLS.STAT</th>
@@ -84,26 +79,18 @@
               <th>Airport</th>
               <th>Note</th>
               <th>Remark</th>
+              <th>Employee</th>
               <th v-if="roles === 'Admin'">UpdatedBy</th>
               <th class="order-actions">Actions</th>
             </tr>
           </thead>
           <tbody class="order-info">
             <tr v-for="item in items" :key="item.id" class="order-information">
-              <td>
-                <PopupWrapper>
-                  <template #header>
-                    <div class="popover">
-                      <i class="pi pi-image" style="font-size: 1rem" @click="openEditOrder(item.id)"></i>
-                    </div>
-                  </template>
-                  <template #content>
-                    <div class="popover-content">
-                      <ImagePopup :orderId="selectedOrderId" />
-                    </div>
-                  </template>
-                </PopupWrapper>
+              <td v-if="roleChecker(['Operator_Ref', 'Operator'])">
+                <input type="checkbox" name="" :id="'check-complete-status-' + item.id"
+                  @change="maintainChangeBookingStatus(item.id)" v-if="(item.status == 'B_Pending')">
               </td>
+
               <td>
                 <div class="customer-infomation">
                   <div class="item" :data-id="item.id">
@@ -124,6 +111,20 @@
                     <envelope-icon class="primary-icon" />
                     Created By: {{ item.createBy ? item.createBy : "INDIVIDUAL" }}
                   </div>
+                  <div class="item">
+                    <PopupWrapper>
+                      <template #header>
+                        <div class="popover">
+                          <i class="pi pi-image" style="font-size: 1rem" @click="openEditOrder(item.id)"></i>
+                        </div>
+                      </template>
+                      <template #content>
+                        <div class="popover-content">
+                          <ImagePopup :orderId="selectedOrderId" />
+                        </div>
+                      </template>
+                    </PopupWrapper>
+                  </div>
                 </div>
               </td>
               <td>
@@ -143,7 +144,7 @@
               </td>
               <td>
                 <div class="item" :data-id="item.id">
-                  {{ DisplayServices(item.service) }}
+                  {{ item.service }}
                 </div>
               </td>
               <td>
@@ -188,12 +189,15 @@
               <td>
                 <span class="item" :data-id="item.id">{{ item.operator_Note }}</span>
               </td>
-              <td v-if="roles === 'Admin'">
+              <td>
+                <span class="item" :data-id="item.id">{{ item.employee }}</span>
+              </td>
+              <td v-if="roleChecker(['Admin'])">
                 <span class="item" :data-id="item.id">{{ item.updatedBy }}</span>
               </td>
               <td>
                 <div class="action-buttons">
-                  <PopupWrapper>
+                  <PopupWrapper v-if="roleChecker(['Agency', 'Sale_Admin'])">
                     <template #header>
                       <div class="popover">
                         <pencil-square-icon class="order-icon" @click="openEditOrder(item.id)" />
@@ -201,11 +205,23 @@
                     </template>
                     <template #content>
                       <div class="popover-content">
-                        <EditOrder :orderId="selectedOrderId" @reloadPage="fetchOrder()" />
+                        <EditOrder :orderId="selectedOrderId" @reloadPage="maintainFetchOrders()" />
                       </div>
                     </template>
                   </PopupWrapper>
-                  <button @click="deleteItem(item.id)" class="btn-delete-primary">
+                  <PopupWrapper v-if="roleChecker(['Operator_Ref'])">
+                    <template #header>
+                      <div class="popover">
+                        <chat-bubble-bottom-center-icon class="order-icon" @click="openEditTask(item.id)" />
+                      </div>
+                    </template>
+                    <template #content>
+                      <div class="popover-content">
+                        <EditTask :orderId="selectedOrderTask" @reloadPage="maintainFetchOrders()" />
+                      </div>
+                    </template>
+                  </PopupWrapper>
+                  <button v-if="roleChecker(['Sale_Admin'])" @click="deleteItem(item.id)" class="btn-delete-primary">
                     <trash-icon class="order-icon" />
                   </button>
                 </div>
@@ -213,7 +229,7 @@
             </tr>
           </tbody>
         </table>
-        <Pagination :currentPage="currentPage" :totalPages="totalPages" @nextPage="nextPage" @prevPage="prevPage"
+        <Pagination :currentPage="filter.pageIndex" :totalPages="totalPages" @nextPage="nextPage" @prevPage="prevPage"
           @goToPage="goToPage" />
       </div>
     </div>
@@ -231,6 +247,7 @@ import {
   Bars2Icon,
   EnvelopeIcon,
   TrashIcon,
+  ChatBubbleBottomCenterIcon,
 } from "@heroicons/vue/24/solid";
 import PopupWrapper from "@/components/PopupWrapper.vue";
 import AddOrder from "@/views/admin/order/AddOrder.vue";
@@ -241,7 +258,8 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { saveAs } from 'file-saver';
 import Loading from '@/views/LoadingPage.vue';
-
+import EditTask from "../task/EditTask.vue";
+import Swal from 'sweetalert2';
 
 export default {
   name: "OrderPage",
@@ -258,7 +276,9 @@ export default {
     EditOrder,
     ImagePopup,
     VueDatePicker,
-    Loading
+    Loading,
+    EditTask,
+    ChatBubbleBottomCenterIcon
   },
   data() {
     return {
@@ -280,14 +300,127 @@ export default {
         format: "yyyy-MM-dd HH:mm",
         showSeconds: false,
       },
-      roles: localStorage.getItem('roles')
+      roles: "",
+      maintainAirports: [],
+      maintainBookingStatus: [],
+      filter: {
+        airportId: 0,
+        bookingStatusId: 0,
+        fromDate: null,
+        toDate: null,
+        keyword: "",
+        orderBy: "booking-time",
+        createdBy: 0,
+        employeeId: 0,
+        pageIndex: 1,
+        pageSize: 10
+      },
+      selectedOrderTask: 0
     };
   },
   mounted() {
-    this.fetchOrder();
-    this.fetchStatus();
+    // this.fetchOrder();
+    // this.fetchStatus();
+    let airportId = localStorage.getItem('airportId');
+    if(airportId){
+      this.filter.airportId = airportId;
+    }
+    //Chi role agency nhin thay data cua no
+    let roles = localStorage.getItem('roles');
+    let userId = localStorage.getItem('user_id');
+    if(roles == "Agency"){
+      this.filter.createdBy = userId
+    }
+    this.roles = localStorage.getItem('roles');
+
+    //Chi role Operator chi nhin thay cac tour ma no duoc phan quyen
+
+    this.maintainGetAllAirport();
+    this.maintainGetAllStatus();
+
+    //Kiem tra cac dieu kien va set tim kiem mac dinh
+    this.maintainFetchOrders();
+
   },
   methods: {
+    //#region maintain
+    roleChecker(accepedRoles){
+      let checker = false;
+      
+      let role = localStorage.getItem('roles');
+      if(role == "Admin"){
+        checker = true;
+      }
+      accepedRoles.forEach((element) => {
+        if(element == role){
+          checker = true;
+        }
+      })
+      return checker;
+    },
+    async maintainChangeBookingStatus(orderId) {
+      const confirmResult = await Swal.fire({
+        title: 'Complete Booking',
+        text: 'Do you want to complete this booking?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'No'
+      });
+      if (confirmResult.isConfirmed) {
+        axios.get(`${process.env.VUE_APP_API_URL}/MaintainOrderDetails/GetById/${orderId}`).then((response) => {
+          let _detail = response.data;
+          if (_detail) {
+            _detail.status_Operator_ID = 3;
+            this.isLoading = true;
+            const user_Id = localStorage.getItem("user_id");
+            const apiUrl = process.env.VUE_APP_API_URL;
+            _detail.updatedBy = user_Id;
+
+            axios.post(`${apiUrl}/MaintainOrderDetails/Update`, _detail)
+              .then(() => {
+                this.maintainFetchOrders();
+              })
+              .catch(error => {
+                console.error('Error updating Order:', error);
+              })
+              .finally(() => {
+                this.isLoading = false;
+              });
+          }
+
+        })
+      }
+      else {
+        this.scheduleData.status_Operator_ID = 8;
+      }
+    },
+    openEditTask(id) {
+      this.selectedOrderTask = id;
+    },
+    maintainFetchOrders() {
+      axios.post(`${process.env.VUE_APP_API_URL}/MaintainOrderDetails/FilterOrder`, this.filter).then((response) => {
+        console.log(response.data);
+
+        this.items = response.data.orders;
+        this.totalItems = response.data.totalCount;
+        this.totalPages = Math.ceil(this.totalItems / this.filter.pageSize);
+      })
+    },
+
+    maintainGetAllStatus() {
+      axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/StatusBookingType`).then((response) => {
+        this.maintainBookingStatus = response.data;
+      })
+    },
+
+    maintainGetAllAirport() {
+      axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/GetAirports`).then((response) => {
+        this.maintainAirports = response.data;
+      })
+    },
+    //#endregion
+
     async fetchOrder() {
       const apiUrl = process.env.VUE_APP_API_URL;
       const user_id = localStorage.getItem("user_id")
@@ -331,45 +464,7 @@ export default {
     },
 
     async search() {
-      try {
-        this.isLoading = true;
-        const apiUrl = process.env.VUE_APP_API_URL;
-        const user_id = localStorage.getItem("user_id");
-
-        const requestData = {
-          status: this.status || 0,
-          airport: document.getElementById("airport").value,
-          toDate: this.toDate,
-          fromDate: this.fromDate,
-          keyword: this.searchTerm,
-          index: this.currentPage,
-          pageSize: this.pageSize,
-          agency_Id: user_id,
-          Is_ServiceTime: this.Is_ServiceTime || true,
-        };
-        console.log(requestData)
-
-
-        const response = await axios.post(
-          `${apiUrl}/order/search`,
-          requestData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        if (response.data) {
-          this.items = response.data.orders;
-          this.totalItems = response.data.totalCount;
-          this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-        }
-      } catch (error) {
-        console.error("There was a problem with the delete operation:", error);
-      } finally {
-        this.isLoading = false;
-      }
+      this.maintainFetchOrders();
     },
 
     refreshOrders() {
@@ -488,12 +583,9 @@ export default {
     },
 
     goToPage(page) {
-      this.currentPage = page;
-      if (this.hasSearchParams()) {
-        this.search();
-      } else {
-        this.fetchOrder();
-      }
+      this.filter.pageIndex = page;
+
+      this.maintainFetchOrders();
     },
 
     hasSearchParams() {
@@ -551,6 +643,15 @@ export default {
     }
 
   },
+  // watch: {
+  //   // whenever question changes, this function will run
+  //   filter(newVal, oldVal) {
+  //     console.log(newVal, oldVal)
+  //     this.maintainFetchOrders();
+  //   }
+  // },
+
+
 };
 </script>
 

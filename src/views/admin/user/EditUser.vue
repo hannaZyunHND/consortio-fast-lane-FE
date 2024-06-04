@@ -1,23 +1,32 @@
 <template>
-  <div class="popup-content">
+  <div class="popup-content" v-if="userItem">
     <h2>Edit service</h2>
     <form enctype="multipart/form-data" @submit.prevent="submitForm" id="edit-service-form">
       <div class="row">
         <label for="name">Name</label>
-        <input type="text" v-model="formData.name" placeholder="Your name" />
+        <input type="text" v-model="userItem.name" placeholder="Your name" />
       </div>
       <div class="row">
         <label for="email">Email</label>
-        <input type="text" v-model="formData.email" placeholder="Your email" />
+        <input type="text" v-model="userItem.email" placeholder="Your email" />
       </div>
       <div class="row">
         <label for="password">Password</label>
-        <input type="text" v-model="formData.password" placeholder="Your password" />
+        <input type="text" v-model="userItem.password" placeholder="Your password" />
       </div>
       <div class="row">
         <label for="role">Role:</label>
-        <select v-model="formData.role_ID" id="service">
-          <option v-for="(role, index) in roles" :key="index" :value="role.id">
+        <select v-model="userItem.role" id="service">
+          <option v-for="(role, index) in maintainRoles" :key="index" :value="role.Value">
+            {{ role.Value }}
+          </option>
+        </select>
+      </div>
+      <div class="row">
+        <label for="role">Airport :</label>
+        <select v-model="userItem.airportId" id="service">
+          <option value="0">OFFICE</option>
+          <option v-for="(role, index) in maintainAirports" :key="index" :value="role.id">
             {{ role.name }}
           </option>
         </select>
@@ -39,7 +48,7 @@ export default {
     userId: {
       type: Number,
       required: true,
-    },
+    }
   },
   data() {
     return {
@@ -50,6 +59,9 @@ export default {
         role_ID: null,
       },
       roles: [],
+      maintainAirports: [],
+      maintainRoles: [],
+      userItem : null,
     };
   },
   setup() {
@@ -62,16 +74,35 @@ export default {
     return { success };
   },
   mounted() {
-    this.fetchUser(this.userId);
-    this.fetchRoles();
+    this.maintainGetAllAirport();
+    this.maintainGetAllRole();
+    this.maintainGetUserById();
   },
   methods: {
+    maintainGetUserById(){
+      axios.get(`${process.env.VUE_APP_API_URL}/MaintainUsers/GetById/${this.userId}`).then((response) => {
+        this.userItem = response.data;
+      })
+
+    },
+    maintainGetAllAirport(){
+      axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/GetAirports`).then((response) => {
+        this.maintainAirports = response.data;
+        console.log(response.data)
+      })
+    },
+
+    maintainGetAllRole(){
+      axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/RoleType`).then((response) => {
+        this.maintainRoles = response.data;
+        console.log(response.data)
+      })
+    },
     submitForm() {
-      const apiUrl = process.env.VUE_APP_API_URL;
-      axios
-        .put(`${apiUrl}/user/update/${this.userId}`, this.formData)
-        .then(() => {
-          this.success();
+
+      axios.post(`${process.env.VUE_APP_API_URL}/MaintainUsers/Update`, this.userItem).then((response) => {
+        console.log(response)
+        this.success();
           //-----------
           const clickEvent = new MouseEvent('click', {
             bubbles: true,
@@ -82,10 +113,7 @@ export default {
           // Phát ra sự kiện click trên document
           document.dispatchEvent(clickEvent);
           this.$emit("reloadPage");
-        })
-        .catch((error) => {
-          console.error("Error updating service:", error);
-        });
+      })
     },
 
     fetchUser(item) {

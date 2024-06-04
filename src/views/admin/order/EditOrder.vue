@@ -1,5 +1,5 @@
     <template>
-        <div class="popup-content">
+        <div class="popup-content" v-if="orderDetail">
             <span class="title-header">Updated Order</span>
             <form enctype="multipart/form-data" @submit.prevent="submitOrder" id="edit-order-form">
                 <div class="form-col" id="form-file">
@@ -9,7 +9,7 @@
                                 <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
                                 <span class="title-header">Upload passport at here*</span>
                             </div>
-                            <img :src="orderData.passport_Image" alt="Uploaded Image" class="uploaded-image" />
+                            <img :src="`${orderDetail.passportImage}`" alt="Uploaded Image" class="uploaded-image" />
                         </label>
                         <input :id="`passport ${numberKey}`" type="file" @change="handlePassportUpload" />
                     </div>
@@ -19,7 +19,7 @@
                                 <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
                                 <span class="title-header">Upload visa at here</span>
                             </div>
-                            <img :src="orderData.visa_Image" alt="Uploaded Image" class="uploaded-image" />
+                            <img :src="`${orderDetail.visaImage}`" alt="Uploaded Image" class="uploaded-image" />
                         </label>
                         <input :id="`visa ${numberKey}`" type="file" @change="handleVisaUpload" />
                     </div>
@@ -29,7 +29,7 @@
                                 <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
                                 <span class="title-header">Upload portrait at here</span>
                             </div>
-                            <img :src="orderData.portrait_Image" alt="Uploaded Image" class="uploaded-image" />
+                            <img :src="`${orderDetail.portraitImage}`" alt="Uploaded Image" class="uploaded-image" />
                         </label>
                         <input :id="`portrait ${numberKey}`" type="file" @change="handlePortraitUpload($event)" />
                     </div>
@@ -38,72 +38,70 @@
                     <div class="form-col">
                         <div class="row">
                             <label for="name">Name</label>
-                            <input type="text" v-model="orderData.name" required placeholder="Your name">
+                            <input type="text" v-model="orderDetail.name" required placeholder="Your name">
                         </div>
                         <div class="row">
                             <label for="email">Email</label>
-                            <input type="email" v-model="orderData.email" placeholder="you@gmail.com" required>
+                            <input type="email" v-model="orderDetail.email" placeholder="you@gmail.com" required>
                         </div>
                         <div class="row">
                             <label for="phone">Phone Number</label>
-                            <input type="text" v-model="orderData.phone" placeholder="phone" required>
+                            <input type="text" v-model="orderDetail.phone" placeholder="phone" required>
                         </div>
                         <div class="row">
                             <label for="passport_number">Passport Number</label>
-                            <input type="text" v-model="orderData.passport_Number" required placeholder="your passport">
+                            <input type="text" v-model="orderDetail.passport_Number" required
+                                placeholder="your passport">
                         </div>
                     </div>
                     <div class="form-col">
                         <div class="row">
                             <label for="nationality">Nationality</label>
-                            <input type="text" v-model="orderData.nationality" placeholder="nationality" required>
+                            <input type="text" v-model="orderDetail.nationality" placeholder="nationality" required>
                         </div>
                         <div class="row">
                             <label for="flight_number">Flight Number</label>
-                            <input type="text" v-model="orderData.flight_Number" required>
+                            <input type="text" v-model="orderDetail.flight_Number" required>
                         </div>
                         <div class="row" style="display: flex;flex-direction: column">
                             <label for="airPort">Airport</label>
-                            <select id="airPort" v-model="orderData.airPort" required>
-                                <option value="" disabled selected hidden>Select Airport</option>
-                                <option value="Da Nang">Da Nang</option>
-                                <option value="Tan Son Nhat">Tan Son Nhat</option>
-                                <option value="Noi Bai">Noi Bai</option>
-                                <option value="Phu Quoc">Phu Quoc</option>
-                                <option value="Cam Ranh">Cam Ranh</option>
+                            <select id="airPort" v-model="orderDetail.airportId" required>
+                                <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}</option>
+
                             </select>
                         </div>
                         <div class="row">
                             <label for="departure_time">Order Time</label>
-                            <input type="text" v-model="orderData.service_Time" required>
+                            <input type="text" v-model="orderDetail.service_Time" required>
                         </div>
                     </div>
                     <div class="form-col">
                         <div class="row">
                             <label for="status_sales">Sales Status</label>
-                            <select v-model="orderData.status_Sales_Id" id="status">
-                                <option v-for="(status, index) in statuses" :key="index" :value="status.id">{{
-                                    status.name
-                                }}
+                            <select v-model="orderDetail.status_Sales_Id" id="status">
+                                <option v-for="(status, index) in maintainSaleStatus" :key="index" :value="status.Key">
+                                    {{
+                                        status.Value
+                                    }}
                                 </option>
                             </select>
                         </div>
                         <div class="row">
                             <label>Service</label>
-                            <select v-model="orderData.service_ID" id="service">
+                            <select v-model="orderDetail.service_ID" id="service">
                                 <option value="" disabled selected hidden>Select Service</option>
-                                <option v-for="(service, index) in services" :key="index" :value="service.id">{{
+                                <option v-for="(service, index) in maintainServices" :key="index" :value="service.id">{{
                                     service.name }}
                                 </option>
                             </select>
                         </div>
                         <div class="row">
                             <label for="note">Note</label>
-                            <textarea type="text" v-model="orderData.note"></textarea>
+                            <textarea type="text" v-model="orderDetail.note"></textarea>
                         </div>
                         <div class="row">
                             <label for="operator_note">Remark to Operation</label>
-                            <textarea type="text" v-model="orderData.operator_Note"></textarea>
+                            <textarea type="text" v-model="orderDetail.operator_Note"></textarea>
                         </div>
                     </div>
                 </div>
@@ -134,6 +132,7 @@ export default {
     },
     data() {
         return {
+            baseImage: process.env.VUE_APP_API_URL.replace('/api', ''),
             orderData: {
                 name: '',
                 email: '',
@@ -154,6 +153,7 @@ export default {
                 visa_File: null,
                 operator_Note: null,
             },
+            orderDetail: null,
             selectedStatus_Operator: [],
             passportFiles: [],
             visaFiles: [],
@@ -172,6 +172,9 @@ export default {
             services: [],
             statuses: [],
             isLoading: false,
+            maintainAirports: [],
+            maintainServices: [],
+            maintainSaleStatus: [],
         };
     },
     setup() {
@@ -184,12 +187,42 @@ export default {
         return { success };
     },
     mounted() {
-        this.fetchOrder(this.orderId);
-        this.fetchService();
-        this.fetchStatus();
+        // this.fetchOrder(this.orderId);
+        console.log(this.baseImage)
+        this.maintainFetchOrder();
+        this.maintainGetAllAirport();
+        this.maintainGetAllServices();
+        this.maintainGetAllSaleStatus();
+        // this.fetchService();
+        // this.fetchStatus();
     },
 
     methods: {
+        maintainGetAllSaleStatus() {
+            axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/StatusSaleType`).then((response) => {
+                this.maintainSaleStatus = response.data;
+            })
+        },
+        maintainGetAllServices() {
+            axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/GetServices`).then((response) => {
+                this.maintainServices = response.data;
+            })
+        },
+        maintainGetAllAirport() {
+            axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/GetAirports`).then((response) => {
+                this.maintainAirports = response.data;
+            })
+        },
+        maintainFetchOrder() {
+            axios.get(`${process.env.VUE_APP_API_URL}/MaintainOrderDetails/GetById/${this.orderId}`).then((response) => {
+                console.log(response.data)
+                this.orderDetail = response.data;
+                this.orderDetail.passportImage = this.baseImage + "/" + this.orderDetail.passport_Path;
+                this.orderDetail.visaImage = this.baseImage + "/" + this.orderDetail.visa_Path;
+                this.orderDetail.portraitImage = this.baseImage + '/' + this.orderDetail.portrait_Path;
+
+            })
+        },
         async convertFileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -215,18 +248,11 @@ export default {
 
         submitOrder() {
             this.isLoading = true;
-
             const user_Id = localStorage.getItem("user_id");
             const apiUrl = process.env.VUE_APP_API_URL;
+            this.orderDetail.updatedBy = user_Id;
 
-            this.orderData.passport_File = this.trimFilePath(this.orderData.passport_File);
-            this.orderData.visa_File = this.trimFilePath(this.orderData.visa_File);
-            this.orderData.portrait_File = this.trimFilePath(this.orderData.portrait_File);
-
-            this.orderData.service_ID = this.orderData.service_ID.toString();
-            this.orderData.updatedBy = user_Id;
-
-            axios.post(`${apiUrl}/order/update/${this.orderId}`, this.orderData)
+            axios.post(`${apiUrl}/MaintainOrderDetails/Update`, this.orderDetail)
                 .then(() => {
                     this.success();
                     const clickEvent = new MouseEvent('click', {
@@ -294,8 +320,9 @@ export default {
         },
 
         async handlePassportUpload(event) {
+            
             this.passportFile = event.target.files[0];
-            this.orderData.passport_Image = URL.createObjectURL(this.passportFile);
+            this.orderDetail.passportImage = URL.createObjectURL(this.passportFile);
 
             //Scan passport to get all data from this
             this.uploadAndScanImage();
@@ -303,34 +330,35 @@ export default {
             //Assign image's base64 to passport_File
             const base64String = await this.convertFileToBase64(this.passportFile);
             if (base64String) {
-                this.orderData.passport_File = base64String;
+                this.orderDetail.passport_Path = base64String;
             }
         },
 
         async handleVisaUpload(event) {
             this.uploadedVisa = event.target.files[0];
-            this.orderData.visa_Image = URL.createObjectURL(this.uploadedVisa);
+            this.orderDetail.visaImage = URL.createObjectURL(this.uploadedVisa);
 
             //convert image to base64
             const base64String = await this.convertFileToBase64(this.uploadedVisa);
             if (base64String) {
-                this.orderData.visa_File = base64String;
+                this.orderDetail.visa_Path = base64String;
             }
         },
 
         async handlePortraitUpload(event) {
             const uploadedPortrait = event.target.files[0];
-            this.orderData.portrait_Image = await URL.createObjectURL(uploadedPortrait);
+            this.orderDetail.portraitImage = await URL.createObjectURL(uploadedPortrait);
 
             //assign value to portrait_File in order to send to server
             const base64String = await this.convertFileToBase64(uploadedPortrait);
             if (base64String) {
-                this.orderData.portrait_File = base64String;
+                this.orderDetail.portrait_Path = base64String;
             }
         },
 
         async uploadAndScanImage() {
             try {
+                this.isLoading = true;
                 const formData = new FormData();
                 formData.append('image', this.passportFile);
                 const response = await axios.post('https://way2go.hndedu.com/process_image_passport', formData, {
@@ -341,12 +369,14 @@ export default {
 
                 const responseData = response.data.data[0];
                 if (responseData) {
-                    this.orderData.name = responseData.name;
-                    this.orderData.nationality = responseData.nationality;
-                    this.orderData.passport_number = responseData.passport_number;
+                    this.orderDetail.name = responseData.name;
+                    this.orderDetail.nationality = responseData.nationality;
+                    this.orderDetail.passport_number = responseData.passport_number;
+                    this.isLoading = false;
                 }
             } catch (error) {
                 console.error('Error uploading and scanning image:', error);
+                this.loading = false;
             }
         },
 

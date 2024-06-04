@@ -24,7 +24,7 @@
                 <label for="service">{{ $t('home.service') }}*</label>
                 <select v-model="formData.service_ID" id="service"
                   @change="updateService(orderData.formData[0].service_ID)">
-                  <option v-for="(service, index) in services" :key="index" :value="service.id.toString()">
+                  <option v-for="(service, index) in services" :key="index" :value="service.id">
                     {{ service.name }}
                   </option>
                 </select>
@@ -66,12 +66,14 @@
                   <label for="airport">{{ $t('home.airport') }}*</label>
                   <select id="airport" v-model="formData.airport" @change="updateAirport(orderData.formData[0].airport)"
                     required>
-                    <!-- <option value="" disabled selected hidden>{{ $t('home.select_airport') }}</option> -->
+                  <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}</option>
+
+                    <!-- <option value="" disabled selected hidden>{{ $t('home.select_airport') }}</option>
                     <option value="Noi Bai">Noi Bai {{ $t('home.international_airport') }}, Ha Noi</option>
                     <option value="Da Nang">Da Nang {{ $t('home.international_airport') }}, Da Nang</option>
                     <option value="Cam Ranh">Cam Ranh {{ $t('home.international_airport') }}, Khanh Hoa</option>
                     <option value="Tan Son Nhat">Tan Son Nhat {{ $t('home.international_airport') }}, HCMC</option>
-                    <option value="Phu Quoc">Phu Quoc {{ $t('home.international_airport') }}, Kien Giang</option>
+                    <option value="Phu Quoc">Phu Quoc {{ $t('home.international_airport') }}, Kien Giang</option> -->
                   </select>
                   <span class="title-notification" style="visibility: hidden">* {{ $t('home.service_here') }}</span>
                 </div>
@@ -191,10 +193,12 @@ export default {
       previousFlightNumber: '',
       formIndexCounter: 0,
       isLoading: false,
+      maintainAirports: [],
+      maintainServices: []
     };
   },
   mounted() {
-    this.fetchServices();
+    
   },
   computed: {
     minDate() {
@@ -202,6 +206,25 @@ export default {
     }
   },
   methods: {
+    //#region maintain
+    async maintainGetAllAirport(){
+      try {
+        const response = await axios.get(
+          `${process.env.VUE_APP_API_URL}/MaintainCommons/GetAirports`,
+        );
+
+        const responseData = response.data;
+        
+        if (responseData) {
+          this.maintainAirports = response.data;
+        }
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    //#endregion
     updateLanguage(language) {
       console.log(language);
       this.$i18n.locale = language;
@@ -368,11 +391,16 @@ export default {
           is_group_order: this.orderData.is_Group ? 1 : 0,
           orders: ordersToSend,
         };
-
+        console.log(dataToSend);
+        
         const apiUrl = process.env.VUE_APP_API_URL;
-        const response = await axios.post(`${apiUrl}/order/create`, dataToSend);
-        this.success();
-        console.log(response.data);
+        axios.post(`${apiUrl}/MaintainOrderDetails`, dataToSend).then((response) => {
+          this.success();
+          console.log(response.data);
+        }).catch((error) => {
+          console.log(error)  
+        });
+        
       } catch (error) {
         console.error("Error submitting order:", error);
       } finally {
@@ -423,7 +451,7 @@ export default {
     async fetchServices() {
       const apiUrl = process.env.VUE_APP_API_URL;
       await axios
-        .get(`${apiUrl}/service`)
+        .get(`${apiUrl}/MaintainCommons/GetServices`)
         .then((response) => {
           this.services = response.data;
         })
@@ -445,6 +473,10 @@ export default {
     },
 
 
+  },
+  created(){
+   this.maintainGetAllAirport();
+   this.fetchServices();
   }
 }
 </script>

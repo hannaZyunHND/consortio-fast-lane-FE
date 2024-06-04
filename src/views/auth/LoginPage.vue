@@ -63,7 +63,7 @@ export default {
     async login() {
       try {
         const apiUrl = process.env.VUE_APP_API_URL;
-        const response = await axios.post(`${apiUrl}/auth/login`, this.formData, {
+        const response = await axios.post(`${apiUrl}/MaintainUsers/login`, this.formData, {
           headers: {
             "Content-Type": "application/json",
           },

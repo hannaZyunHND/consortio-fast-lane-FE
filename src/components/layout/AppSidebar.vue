@@ -12,6 +12,15 @@
         </router-link>
       </li>
 
+      <li v-if="showHomeMenu">
+        <router-link class="nav-link" to="/dashboard/calendar">
+          <div class="item-content">
+            <squares-2X2-icon class="navbar-icon" />
+            <span>Calendar</span>
+          </div>
+        </router-link>
+      </li>
+
       <!-- Sales -->
       <li v-if="showBookingsMenu">
         <div class="layout-menuitem-root-text">Sales</div>
@@ -19,6 +28,24 @@
           <div class="item-content">
             <wallet-icon class="navbar-icon" />
             <span>Booking</span>
+          </div>
+        </router-link>
+      </li>
+      <li v-if="showNewBookingMenuForSale">
+        <router-link class="nav-link" to="/agency/multiple">
+          <div class="item-content">
+            <square-2-stack-icon class="navbar-icon" />
+            <span>New Booking</span>
+          </div>
+        </router-link>
+      </li>
+
+      <!-- Report -->
+      <li v-if="showStatisticsAgencyMenu">
+        <router-link class="nav-link" to="/dashboard/allOfAgency">
+          <div class="item-content">
+            <flag-icon class="navbar-icon" />
+            <span>Report</span>
           </div>
         </router-link>
       </li>
@@ -61,6 +88,14 @@
           <div class="item-content">
             <square-2-stack-icon class="navbar-icon" />
             <span>Booking</span>
+          </div>
+        </router-link>
+      </li>
+      <li v-if="showNewBookingMenu">
+        <router-link class="nav-link" to="/agency/multiple">
+          <div class="item-content">
+            <square-2-stack-icon class="navbar-icon" />
+            <span>New Booking</span>
           </div>
         </router-link>
       </li>
@@ -118,16 +153,17 @@
       </li>
 
       <!-- personal -->
-      <!-- <li>
-        <div class="item-content">
-          <user-icon class="navbar-icon" />
-          <span>Account</span>
-        </div>
-      </li> -->
-
-      <!-- Logout -->
       <div>
         <li style="margin-top: 100px">
+          <div class="layout-menuitem-root-text">Information</div>
+          <div class="item-content">
+            <user-icon class="navbar-icon" />
+            <span id="account-information"></span>
+          </div>
+        </li>
+
+        <!-- Logout -->
+        <li>
           <div class="item-content">
             <user-icon class="navbar-icon" />
             <PopupWrapper>
@@ -173,7 +209,7 @@ import {
   EllipsisHorizontalCircleIcon,
   RectangleStackIcon,
   CalendarDaysIcon,
-  Bars3Icon,
+  Bars3Icon, FlagIcon,
   Square2StackIcon,
 } from "@heroicons/vue/24/solid";
 import axios from "axios";
@@ -181,7 +217,7 @@ import axios from "axios";
 export default {
   name: "AppSidebar",
   components: {
-    UserIcon,
+    UserIcon, FlagIcon,
     WalletIcon,
     Squares2X2Icon,
     SquaresPlusIcon,
@@ -207,7 +243,11 @@ export default {
       showServicesMenu: false,
       showRoleMenu: false,
       showAccountMenu: false,
-      showAgencyMenu: false
+      showAgencyMenu: false,
+      showStatisticsAgencyMenu: false,
+      showNewBookingMenuForSale: false,
+      showNewBookingMenu: false,
+
     };
   },
 
@@ -220,11 +260,16 @@ export default {
       roles == "Sales Management" ||
       roles == "Sales Admin";
 
+    this.showStatisticsAgencyMenu =
+      roles == "Admin" ||
+      roles == "Sales Management" ||
+      roles == "Sales Admin";
+
     //Only operator each airport - admin
     this.showAssignMenu =
       roles == "Admin" ||
-      roles == "Sales Management" ||
-      roles == "Sales Admin" ||
+      // roles == "Sales Management" ||
+      // roles == "Sales Admin" ||
       roles == "Chief Rep"
 
     this.showScheduleMenu =
@@ -238,6 +283,15 @@ export default {
       roles == "Admin" ||
       roles == "Sales Management"
 
+    //Only agency-admin-sales
+    this.showNewBookingMenu =
+      roles == "Agency" ||
+      roles == "Admin"
+
+    this.showNewBookingMenuForSale =
+      roles == "Admin" ||
+      roles == "Sales Admin" ||
+      roles == "Sales Management"
 
     //Only admin-sales-agency-operator
     this.showHomeMenu =
@@ -253,14 +307,15 @@ export default {
     this.showAccountMenu = roles == "Admin"
     this.showServicesMenu = roles == "Admin"
     this.showStatusMenu = roles == "Admin"
+
+    this.showAccount();
   },
   methods: {
-    // openChangPassword() {
-    //   console.log('user_id_token', user_id);
-    //   this.selectedUserId = user_id;
-
-    //   console.log("dây là id: " + this.selectedUserId);
-    // },
+    showAccount() {
+      const nameValue = document.getElementById('account-information');
+      const userName = localStorage.getItem("user_name");
+      nameValue.innerText = userName;
+    },
 
     toggleSubMenu(subMenu) {
       this.isSubMenuOpen[subMenu] = !this.isSubMenuOpen[subMenu];
@@ -285,7 +340,7 @@ export default {
 .navbar {
   /* position: fixed; */
   width: 300px;
-  height: calc(115vh - 9rem);
+  height: 100%;
   /* z-index: 999; */
   overflow-y: auto;
   user-select: none;

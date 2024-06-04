@@ -5,7 +5,7 @@
         <span>Order List</span>
         <PopupWrapper>
           <template #header>
-            <div class="popover">Add new +</div>
+            <!-- <div class="popover">Add new +</div> -->
           </template>
           <template #content>
             <div class="popover-content">
@@ -19,7 +19,7 @@
         <div class="menu-search">
           <div class="search-filter">
             <select id="airport" class="form-select" v-model="airport" placeholder="Select Cities">
-              <option selected disabled>Airport</option>
+              <option value="" disabled selected>Airport</option>
               <option value="Da Nang">Da Nang</option>
               <option value="Tan Son Nhat">Tan Son Nhat</option>
               <option value="Noi Bai">Noi Bai</option>
@@ -29,7 +29,7 @@
           </div>
           <div class="search-filter">
             <select id="status-filter" v-model="status">
-              <option value="status" disabled selected hidden>Status</option>
+              <option value="" disabled selected>Status</option>
               <option value="4">Pending</option>
               <option value="5">Confirmed</option>
               <option value="9">Completed</option>
@@ -44,6 +44,23 @@
             <VueDatePicker v-model="toDate" :config="datePickerConfig" placeholder="To">
             </VueDatePicker>
           </div>
+          <div class="search-filter">
+            <select id="status-filter" v-model="Is_ServiceTime">
+              <option value="" disabled selected>Time Options</option>
+              <option value="true">Service-Time</option>
+              <option value="false">Booking-Time</option>ư
+            </select>
+          </div>
+          <!-- <div class="time-option">
+            <button class="input-time">
+              <input type="checkbox" name="service_Time">
+              <span>Service Time</span>
+            </button>
+            <button class="input-time">
+              <input type="checkbox" name="booking_Time">
+              <span>Booking Time</span>
+            </button>
+          </div> -->
           <div>
             <input type="text" name="search" id="search" v-model="searchTerm" placeholder="Search"
               @keyup.enter="search" />
@@ -73,7 +90,7 @@
               <th>Airport</th>
               <th>Note</th>
               <th>Create At</th>
-              <!-- <th class="order-actions">Actions</th> -->
+              <th class="order-actions">Actions</th>
             </tr>
           </thead>
           <tbody class="order-info">
@@ -145,7 +162,8 @@
                   <div class="item" :data-id="item.id">
                     {{ item.passport_Number }}
                   </div>
-                  <div class="item" :data-id="item.id">
+                  <div class="item" :data-id="item.id"
+                    style="overflow-wrap: break-word;width: 200px;text-align: justify;">
                     {{ item.nationality }}
                   </div>
                 </div>
@@ -160,7 +178,7 @@
                 <span class="item" :data-id="item.id">{{ formatTime(item.created_at) }}</span>
                 <span class="item" :data-id="item.id">{{ formatDate(item.created_at) }} </span>
               </td>
-              <!-- <td>
+              <td>
                 <div class="action-buttons">
                   <PopupWrapper>
                     <template #header>
@@ -175,7 +193,7 @@
                     </template>
                   </PopupWrapper>
                 </div>
-              </td> -->
+              </td>
             </tr>
           </tbody>
         </table>
@@ -184,12 +202,13 @@
       </div>
     </div>
   </div>
+  <Loading :loading="isLoading" />
 </template>
 
 <script>
 import axios from "axios";
 import {
-  // PencilSquareIcon,
+  PencilSquareIcon,
   PhoneIcon,
   UserIcon,
   Bars2Icon,
@@ -197,15 +216,17 @@ import {
 } from "@heroicons/vue/24/solid";
 import PopupWrapper from "@/components/PopupWrapper.vue";
 import AddOrder from "@/views/admin/agency/AddOrder.vue";
-// import EditOrder from "@/views/admin/agency/EditOrder.vue";
+import EditOrder from "@/views/admin/agency/EditOrder.vue";
 import Pagination from "@/components/PaginationPage.vue";
 import ImagePopup from "@/views/admin/order/ImagePopup.vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+import Loading from '@/views/LoadingPage.vue';
+
 export default {
   name: "AgencyPage",
   components: {
-    // PencilSquareIcon,
+    PencilSquareIcon,
     PopupWrapper,
     Pagination,
     PhoneIcon,
@@ -213,18 +234,24 @@ export default {
     UserIcon,
     EnvelopeIcon,
     AddOrder,
-    // EditOrder,
+    EditOrder,
     ImagePopup,
     VueDatePicker,
+    Loading
   },
   data() {
     return {
-      status: null,
-      date: null,
+      isLoading: false,
+      status: "",
+      date: "",
+      airport: "",
+      Is_ServiceTime: "",
       currentPage: 1,
       pageSize: 6,
       totalItems: 0,
       items: [],
+      toDate: "",
+      fromDate: "",
       services: [],
       statuses: [],
       selectedOrderId: "",
@@ -267,16 +294,18 @@ export default {
 
     async search() {
       try {
+        this.isLoading = true;
         const apiUrl = process.env.VUE_APP_API_URL;
         const user_id = localStorage.getItem("user_id");
         const requestData = {
-          status: this.status,
+          status: this.status || 0,
           airport: document.getElementById("airport").value,
           date: this.date,
           keyword: this.searchTerm,
           index: this.currentPage,
           pageSize: this.pageSize,
           agency_Id: user_id,
+          Is_ServiceTime: this.Is_ServiceTime,
         };
 
         const response = await axios.post(
@@ -296,6 +325,8 @@ export default {
         }
       } catch (error) {
         console.error("There was a problem with the delete operation:", error);
+      } finally {
+        this.isLoading = false;
       }
     },
 
@@ -304,10 +335,11 @@ export default {
       this.fetchOrder();
     },
     resetFilters() {
-      this.status = null;
+      this.status = "";
       this.date = null;
       this.airport = "";
       this.searchTerm = "";
+      this.Is_ServiceTime = "";
       this.currentPage = 1;
       this.pageSize = 6;
     },
@@ -471,6 +503,7 @@ export default {
 .order {
   gap: 30px;
   display: flex;
+  height: 100%;
   flex-direction: column;
 }
 
@@ -558,6 +591,21 @@ export default {
   align-items: center;
 }
 
+.time-option {
+  display: flex;
+  gap: 1px;
+  flex-direction: column;
+}
+
+.input-time {
+  border: none;
+  display: flex;
+  box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
+  background: none;
+  align-items: center;
+  justify-content: flex-start;
+}
+
 select {
   border: 1px solid #e6eae9;
   margin: 10px 0px;
@@ -599,7 +647,8 @@ select {
 
 /* order-container */
 .order-container {
-  padding: 15px;
+  padding: 0 15px;
+  height: 100%;
   overflow-y: auto;
   border-radius: 10px;
   background: #fff;

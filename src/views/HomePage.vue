@@ -25,7 +25,7 @@
                 <select v-model="formData.service_ID" id="service"
                   @change="updateService(orderData.formData[0].service_ID)">
                   <option v-for="(service, index) in services" :key="index" :value="service.id.toString()">
-                    {{ service.name }}
+                    {{ $t(`services.${service.name}`) }}
                   </option>
                 </select>
               </div>
@@ -51,8 +51,8 @@
               <div class="form-col">
                 <div class="row">
                   <label for="departure_time">{{ $t('home.service_time') }}*</label>
-                  <VueDatePicker v-model="orderData.formData[0].service_Time" :config="datePickerConfig"
-                    :min-date="minDate" @input="updateServiceTime($event)" required>
+                  <VueDatePicker v-model="formData.service_Time" :config="datePickerConfig" :min-date="minDate"
+                    @date-update="dateSelected" required utc>
                   </VueDatePicker>
                   <span class="title-notification" style="visibility: hidden">*</span>
                 </div>
@@ -97,6 +97,40 @@
               </div>
             </div>
           </div>
+          <div class="option-note-input">
+            <div class="input-option">
+              <input type="checkbox" v-model="isChecked[0]" @change="handleCheckboxChange(0, formData)">
+              <span class="input-option-content" id="0">{{ $t('options.change_visa') }}</span>
+            </div>
+            <div class="input-option">
+              <input type="checkbox" v-model="isChecked[1]" @change="handleCheckboxChange(1, formData)">
+              <span class="input-option-content" id="1">{{ $t('options.exchange_currency') }}</span>
+            </div>
+            <div class="input-option">
+              <input type="checkbox" v-model="isChecked[2]" @change="handleCheckboxChange(2, formData)">
+              <span class="input-option-content" id="2">{{ $t('options.buy_sim_card') }}</span>
+            </div>
+            <div class="input-option">
+              <input type="checkbox" v-model="isChecked[3]" @change="handleCheckboxChange(3, formData)">
+              <span class="input-option-content" id="3">{{ $t('options.wheelchair_service') }}</span>
+            </div>
+            <div class="input-option">
+              <input type="checkbox" v-model="isChecked[4]" @change="handleCheckboxChange(4, formData)">
+              <span class="input-option-content" id="4">{{ $t('options.poor_health_support') }}</span>
+            </div>
+            <div class="input-option">
+              <input type="checkbox" v-model="isChecked[5]" @change="handleCheckboxChange(5, formData)">
+              <span class="input-option-content" id="5">{{ $t('options.customs_declaration_support') }}</span>
+            </div>
+            <div class="input-option">
+              <input type="checkbox" v-model="isChecked[6]" @change="handleCheckboxChange(6, formData)">
+              <span class="input-option-content" id="6">{{ $t('options.luggage_assistance') }}</span>
+            </div>
+            <div class="input-option">
+              <input type="checkbox" v-model="isChecked[7]" @change="handleCheckboxChange(7, formData)">
+              <span class="input-option-content" id="7">{{ $t('options.see_off_choose_staff') }}</span>
+            </div>
+          </div>
           <div class="form-col" id="form-file">
             <span>{{ $t('home.upload_documents') }}:</span>
             <div class="form-file-container">
@@ -106,7 +140,7 @@
                     <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
                     <span class="title-header">{{ $t('home.upload_passport_here') }}*</span>
                   </div>
-                  <img v-if="passportFile" :src="formData.imagePreview" class="uploaded-image" />
+                  <img v-if="formData.passport_File" :src="formData.imagePreview" class="uploaded-image" />
                 </label>
                 <input :id="`passport-${index}`" type="file" @change="handlePassportUpload($event, index, formData)" />
               </div>
@@ -116,7 +150,7 @@
                     <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
                     <span class="title-header">{{ $t('home.upload_visa_here') }}</span>
                   </div>
-                  <img v-if="uploadedVisa" :src="formData.imageVisaPreview" class="uploaded-image" />
+                  <img v-if="formData.visa_File" :src="formData.imageVisaPreview" class="uploaded-image" />
                 </label>
                 <input :id="`visa-${index}`" type="file" @change="handleVisaUpload($event, index, formData)" />
               </div>
@@ -126,7 +160,7 @@
                     <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
                     <span class="title-header">{{ $t('home.upload_portrait_here') }}</span>
                   </div>
-                  <img v-if="uploadedPortrait" :src="formData.imagePortraitPreview" class="uploaded-image" />
+                  <img v-if="formData.portrait_File" :src="formData.imagePortraitPreview" class="uploaded-image" />
                 </label>
                 <input :id="`portrait-${index}`" type="file" @change="handlePortraitUpload($event, index, formData)" />
               </div>
@@ -151,10 +185,11 @@ import axios from "axios";
 import Loading from './LoadingPage.vue';
 import moment from "moment";
 // import i18n from "@/i18n";
+import Swal from 'sweetalert2';
 
 export default {
   components: {
-    Header, VueDatePicker, Loading
+    Header, Loading, VueDatePicker
   },
   data() {
     return {
@@ -167,6 +202,8 @@ export default {
         passport_File: '',
         visa_File: '',
         portrait_File: '',
+        service_Time: '',
+        note: [],
       },
       portrait_file: "",
       passportFiles: [],
@@ -191,6 +228,7 @@ export default {
       previousFlightNumber: '',
       formIndexCounter: 0,
       isLoading: false,
+      isChecked: [false, false, false, false, false, false, false, false],
     };
   },
   mounted() {
@@ -199,9 +237,30 @@ export default {
   computed: {
     minDate() {
       return new Date();
-    }
+    },
   },
+
   methods: {
+    handleCheckboxChange(index, fd) {
+      const value = document.getElementById(index).innerHTML;
+      if (this.isChecked[index]) {
+        if (!fd.note) {
+          fd.note = value + ', ';
+        } else {
+          if (!fd.note.includes(value)) {
+            fd.note += value + ', ';
+          }
+        }
+      } else {
+        if (fd.note) {
+          if (fd.note.includes(value)) {
+            fd.note = fd.note.replace(value + ', ', '');
+          }
+        }
+      }
+    },
+
+
     updateLanguage(language) {
       console.log(language);
       this.$i18n.locale = language;
@@ -231,9 +290,15 @@ export default {
 
         const responseData = response.data.data[0];
         if (responseData) {
-          fd.name = responseData.name;
-          fd.nationality = responseData.nationality;
-          fd.passport_Number = responseData.passport_number;
+          if (responseData.name && responseData.nationality && responseData.passport_number) {
+            fd.name = responseData.name;
+            fd.nationality = responseData.nationality;
+            fd.passport_Number = responseData.passport_number;
+          } else {
+            this.showAlert("Passport information is insufficient to autofill. Please try again or fill manually.");
+          }
+        } else {
+          this.showAlert("Could not scan passport information. Please try again.");
         }
       } catch (error) {
         console.error("Error uploading and scanning image:", error);
@@ -258,6 +323,13 @@ export default {
       }
     },
 
+    showAlert(message) {
+      toast(message, {
+        autoClose: 1000,
+        type: "error",
+      });
+    },
+
     success() {
       toast("Add order successfully!", {
         autoClose: 800,
@@ -271,18 +343,18 @@ export default {
       this.orderData.is_Group = false;
       this.orderData.formData = [];
     },
-    updateServiceTime(service_Time) {
+
+    dateSelected(date) {
       var is_Group = this.checkGroupAndDataGroup();
       if (is_Group) {
         this.orderData.formData.forEach((data) => {
-          data.service_Time = service_Time;
+          data.service_Time = date;
         });
       }
     },
 
     updateAirport(airport) {
       var is_Group = this.checkGroupAndDataGroup();
-      console.log(is_Group);
       if (is_Group) {
         this.orderData.formData.forEach((data) => {
           data.airport = airport;
@@ -326,6 +398,8 @@ export default {
     },
 
 
+
+
     updateFormCount() {
       var guestCount = parseInt(this.orderData.guest_number);
       if (this.orderData.guest_number <= 0 || isNaN(this.orderData.guest_number)) {
@@ -359,10 +433,14 @@ export default {
         for (let i = 0; i < this.orderData.guest_number; i++) {
           ordersToSend.push(this.orderData.formData[i]);
         }
-        var serviceTimeFirst = this.orderData.formData[0].service_Time;
-        ordersToSend.forEach(v => {
-          v.service_Time = serviceTimeFirst
-        })
+
+        var is_Group = this.checkGroupAndDataGroup();
+        if (is_Group) {
+          var serviceTimeFirst = this.orderData.formData[0].service_Time;
+          ordersToSend.forEach(v => {
+            v.service_Time = serviceTimeFirst
+          })
+        }
 
         const dataToSend = {
           is_group_order: this.orderData.is_Group ? 1 : 0,
@@ -371,13 +449,25 @@ export default {
 
         const apiUrl = process.env.VUE_APP_API_URL;
         const response = await axios.post(`${apiUrl}/order/create`, dataToSend);
-        this.success();
-        console.log(response.data);
+
+        // this.success();
+        if (response.status === 200) {
+          this.isLoading = false;
+
+          // Hiển thị swal modal
+          await Swal.fire({
+            icon: 'success',
+            title: 'Đã thêm booking mới thành công',
+            text: 'Vui lòng chờ xác nhận.'
+          });
+        }
       } catch (error) {
         console.error("Error submitting order:", error);
-      } finally {
         this.isLoading = false;
       }
+      // finally {
+      //   this.isLoading = false;
+      // }
     },
 
     async convertFileToBase64(file) {
@@ -693,6 +783,37 @@ input[type="file"] {
 
 #name ::placeholder {
   font-size: 8px;
+}
+
+span.input-option-content {
+  font-size: 15px;
+}
+
+.option-note-input {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.input-option {
+  flex: 0 0 calc(33.333% - 10px);
+  /* 33.333% để hiển thị 3 cột, -10px để tạo khoảng cách giữa các cột */
+  margin-right: 10px;
+  /* Khoảng cách giữa các cột */
+  margin-bottom: 10px;
+  /* Khoảng cách giữa các hàng */
+  display: flex;
+  align-items: center;
+  /* Căn chỉnh nội dung theo chiều dọc */
+}
+
+.input-option input[type="checkbox"] {
+  margin-right: 5px;
+  /* Khoảng cách giữa checkbox và nội dung */
+}
+
+.input-option-content {
+  flex: 1;
+  /* Nội dung sẽ chiếm phần còn lại của cột */
 }
 
 @media (max-width: 768px) {

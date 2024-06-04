@@ -5,7 +5,7 @@
         <span>Order List</span>
         <PopupWrapper>
           <template #header>
-            <div class="popover">Add new +</div>
+            <!-- <div class="popover">Add new +</div> -->
           </template>
           <template #content>
             <div class="popover-content">
@@ -18,8 +18,8 @@
       <div class="order-search">
         <div class="menu-search">
           <div class="search-filter">
-            <select id="airport" class="form-select" v-model="airport" placeholder="Select Cities">
-              <option selected>Airport</option>
+            <select id="airport" class="form-select" placeholder="Select Cities">
+              <option value="" disabled selected>Airport</option>
               <option value="Da Nang">Da Nang</option>
               <option value="Tan Son Nhat">Tan Son Nhat</option>
               <option value="Noi Bai">Noi Bai</option>
@@ -29,7 +29,7 @@
           </div>
           <div class="search-filter">
             <select id="status-filter" v-model="status">
-              <option value="status" disabled selected hidden>Status</option>
+              <option value="" disabled selected>Status</option>
               <option v-for="(status, index) in statuses" :key="index" :value="status.id">
                 {{ status.name }}
               </option>
@@ -43,6 +43,13 @@
             <VueDatePicker v-model="toDate" :config="datePickerConfig" placeholder="To">
             </VueDatePicker>
           </div>
+          <div class="search-filter">
+            <select id="status-filter" v-model="Is_ServiceTime">
+              <option value="" disabled selected>Type</option>
+              <option value="true">Service-Time</option>
+              <option value="false">Booking-Time</option>ư
+            </select>
+          </div>
           <div>
             <input type="text" name="search" id="search" v-model="searchTerm" placeholder="Search"
               @keyup.enter="search" />
@@ -50,9 +57,9 @@
           <button class="btn-search-primary">
             <i class="pi pi-search" style="font-size: 1rem" @click="search"></i>
           </button>
-          <button class="btn-export-primary">
+          <!-- <button class="btn-export-primary">
             <i class="pi pi-download" style="font-size: 1rem" @click="handleExport"></i>
-          </button>
+          </button> -->
         </div>
         <button @click="refreshOrders" class="btn-reset-primary">
           <i class="pi pi-refresh" style="font-size: 1rem"></i>
@@ -115,7 +122,7 @@
                   </div>
                   <div class="item" :data-id="item.id">
                     <envelope-icon class="primary-icon" />
-                    Created By: {{ item.createdName ? item.createdName : "INDIVIDUAL" }}
+                    Created By: {{ item.createBy ? item.createBy : "INDIVIDUAL" }}
                   </div>
                 </div>
               </td>
@@ -164,7 +171,8 @@
                   <div class="item" :data-id="item.id">
                     {{ item.passport_Number }}
                   </div>
-                  <div class="item" :data-id="item.id">
+                  <div class="item" :data-id="item.id"
+                    style="overflow-wrap: break-word;width: 200px;text-align: justify;">
                     {{ item.nationality }}
                   </div>
                 </div>
@@ -173,7 +181,7 @@
                 <div class="item" :data-id="item.id">{{ item.airPort }}</div>
               </td>
               <td>
-                <span class="item" :data-id="item.id">{{
+                <span class="item" :data-id="item.id" style="width: 200px;overflow-wrap:break-word">{{
                   item.note
                 }}</span>
               </td>
@@ -210,6 +218,8 @@
       </div>
     </div>
   </div>
+  <Loading :loading="isLoading" />
+
 </template>
 
 <script>
@@ -230,6 +240,7 @@ import ImagePopup from "@/views/admin/order/ImagePopup.vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { saveAs } from 'file-saver';
+import Loading from '@/views/LoadingPage.vue';
 
 
 export default {
@@ -247,14 +258,18 @@ export default {
     EditOrder,
     ImagePopup,
     VueDatePicker,
+    Loading
   },
   data() {
     return {
-      status: null,
+      isLoading: false,
+      airport: "",
+      status: "",
+      Is_ServiceTime: "",
       toDate: null,
       fromDate: null,
       currentPage: 1,
-      pageSize: 6,
+      pageSize: 3,
       totalItems: 0,
       items: [],
       services: [],
@@ -317,11 +332,12 @@ export default {
 
     async search() {
       try {
+        this.isLoading = true;
         const apiUrl = process.env.VUE_APP_API_URL;
         const user_id = localStorage.getItem("user_id");
 
         const requestData = {
-          status: this.status,
+          status: this.status || 0,
           airport: document.getElementById("airport").value,
           toDate: this.toDate,
           fromDate: this.fromDate,
@@ -329,7 +345,10 @@ export default {
           index: this.currentPage,
           pageSize: this.pageSize,
           agency_Id: user_id,
+          Is_ServiceTime: this.Is_ServiceTime || true,
         };
+        console.log(requestData)
+
 
         const response = await axios.post(
           `${apiUrl}/order/search`,
@@ -348,6 +367,8 @@ export default {
         }
       } catch (error) {
         console.error("There was a problem with the delete operation:", error);
+      } finally {
+        this.isLoading = false;
       }
     },
 
@@ -365,7 +386,6 @@ export default {
         };
 
 
-        console.log(requestData)
         const response = await axios.post(
           `${apiUrl}/order/export`,
           requestData,
@@ -400,10 +420,11 @@ export default {
     },
 
     resetFilters() {
-      this.status = null;
+      this.status = 0;
       this.toDate = null;
       this.fromDate = null;
-      this.airport = "";
+      this.airport = 0;
+      this.Is_ServiceTime = false;
       this.searchTerm = "";
       this.currentPage = 1;
       this.pageSize = 6;
@@ -412,7 +433,7 @@ export default {
     fetchStatus() {
       const apiUrl = process.env.VUE_APP_API_URL;
       axios
-        .get(`${apiUrl}/status`)
+        .get(`${apiUrl}/status/`)
         .then((response) => {
           this.statuses = response.data;
         })
@@ -536,6 +557,7 @@ export default {
 <style scoped>
 .order {
   gap: 30px;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -595,7 +617,7 @@ export default {
 
 #airport,
 #status-filter {
-  border-radius: 7px;
+  border-radius: 5px;
   padding: 10px;
   border: none;
   background: none;
@@ -652,9 +674,10 @@ select {
 
 /* order-container */
 .order-container {
-  padding: 15px;
+  padding: 0px 15px 0 15px;
   overflow-y: auto;
   border-radius: 10px;
+  height: 100%;
   background: #fff;
   box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
 }

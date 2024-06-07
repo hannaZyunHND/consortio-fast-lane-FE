@@ -8,16 +8,32 @@
                 <div class="search-filter">
                     <select id="airport" class="form-select" placeholder="Select Cities" v-model="filter.airportId"
                         v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Agency'])">
-                        <option value="0" selected>ALL</option>
+                        <option value="0" selected>ALL AIRPORT</option>
                         <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}</option>
                     </select>
                 </div>
                 <div class="search-filter">
                     <select id="status-filter" v-model="filter.bookingStatusId"
                         v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Operator_Ref', 'Agency'])">
-                        <option value="0">ALL</option>
+                        <option value="0">ALL STATUS</option>
                         <option v-for="(status, index) in maintainBookingStatus" :key="index" :value="status.Key">
                             {{ status.Value }}
+                        </option>
+                    </select>
+                </div>
+                <div class="search-filter">
+                    <select id="status-filter" v-model="filter.serviceId"
+                        v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Operator_Ref', 'Agency'])">
+                        <option value="0">ALL SERVICES</option>
+                        <option v-for="(s, index) in maintainServices" :key="index" :value="s.id">{{ s.name }}</option>
+                    </select>
+                </div>
+                <div class="search-filter">
+                    <select id="status-filter" v-model="filter.createdBy"
+                        v-if="roleChecker(['Admin'])">
+                        <option value="0">ALL USERS</option>
+                        <option v-for="(user, index) in users" :key="index" :value="user.id">
+                            {{ user.name }}
                         </option>
                     </select>
                 </div>
@@ -51,7 +67,7 @@
             <span class="total-data">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
-                    {{ totalYear.total }} Bookings
+                    {{ items.length }} Bookings
                 </div>
                 <span class="report-title-data">
                     Total orders
@@ -60,7 +76,7 @@
             <span class="total-data">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
-                    {{ totalYear.pendingCount }} Bookings
+                    {{ itemPending.length }} Bookings
                 </div>
                 <span class="report-title-data">
                     Total pending orders
@@ -70,7 +86,7 @@
             <span class="total-data">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
-                    {{ totalYear.confirmCount }} Bookings
+                    {{ itemConfirm.length }} Bookings
                 </div>
                 <span class="report-title-data">
                     Total confirmed orders
@@ -79,7 +95,7 @@
             <span class="total-data">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
-                    {{ totalYear.completedCount }} Bookings
+                    {{ itemComplete.length }} Bookings
                 </div>
                 <span class="report-title-data">
                     Total completed orders
@@ -88,26 +104,41 @@
             <span class="total-data">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
-                    {{ totalYear.uncompletedCount }} Bookings
+                    {{ itemUnComplete.length }} Bookings
                 </div>
                 <span class="report-title-data">
                     Total uncompleted orders
                 </span>
             </span>
         </div>
-        <div class="report-chart">
-            <canvas id="dimensions" style="width: fit-content;height: 700px"></canvas>
+        <div class="report-chart" style="display: none">
+            <div class="report-item-wrapper" style="width: 50%;">
+                <h3>Service Counting</h3>
+                <div class="report-item">
+                    <!-- <h3>Service Counting Chart</h3> -->
+                    <Pie id="service-chart" :options="{ responsive: true, maintainAspectRatio: false }"
+                        :data="serviceChart" v-if="serviceChart" />
+                </div>
+            </div>
+
         </div><br />
     </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
-import Chart from 'chart.js/auto';
+// import { ref, onMounted } from 'vue';
+// import Chart from 'chart.js/auto';
+import { Pie } from 'vue-chartjs'
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement } from 'chart.js'
+
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement)
+
+
 import axios from "axios";
 import Swal from 'sweetalert2';
 
 export default {
+    components: { Pie },
     data() {
         return {
             dataMonthly: [],
@@ -125,122 +156,65 @@ export default {
             roles: "",
             maintainAirports: [],
             maintainBookingStatus: [],
+            maintainServices: [],
             filter: {
                 airportId: 0,
                 bookingStatusId: 0,
                 fromDate: null,
+                serviceId: 0,
                 toDate: null,
                 keyword: "",
                 orderBy: "booking-time",
                 createdBy: 0,
                 employeeId: 0,
                 pageIndex: 1,
-                pageSize: 10
-            }
+                pageSize: 1000000
+            },
+            filterUser: {
+                airportId: 0,
+                role: "",
+                keyword: "",
+                pageIndex: 1,
+                pageSize: 1000000
+            },
+            items: [],
+            itemPending: [],
+            itemConfirm: [],
+            itemComplete: [],
+            itemCancel: [],
+            itemUnComplete: [],
+            users: [],
+            serviceChart: null,
+            lineChart: null,
+            softColors: [
+                '#B0E0E6', // Powder Blue
+                '#AFEEEE', // Pale Turquoise
+                '#98FB98', // Pale Green
+                '#E6E6FA', // Lavender
+                '#FFFACD', // Lemon Chiffon
+                '#D8BFD8', // Thistle
+                '#FFE4E1', // Misty Rose
+                '#F5DEB3', // Wheat
+                '#F0E68C', // Khaki
+                '#E0FFFF', // Light Cyan
+                '#F0FFF0', // Honeydew
+                '#F5F5DC', // Beige
+                '#E6E6FA', // Lavender
+                '#FFF5EE', // Seashell
+                '#FAFAD2', // Light Goldenrod Yellow
+                '#D3D3D3', // Light Gray
+                '#FFEFD5', // Papaya Whip
+                '#F0F8FF', // Alice Blue
+                '#FFFAF0', // Floral White
+                '#FAEBD7', // Antique White
+            ],
+            minDate: '',
+            maxDate: '',
+            lineChartPicking: 'year'
+
         };
     },
-    setup() {
-        const chartInstance = ref(null);
-        const chartInitialized = ref(false);
 
-        onMounted(async () => {
-            const agency_Id = localStorage.getItem('user_id');
-            const currentYear = new Date().getFullYear();
-            const baseUri = process.env.VUE_APP_API_URL;
-            const response = await axios.get(`${baseUri}/order/report/agency/month?agency_Id=${agency_Id}&year=${currentYear}`);
-            const dataMonthly = response.data.monthlyData;
-            console.log(dataMonthly);
-
-            const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            const dataPoints = new Array(12).fill(0);
-            const dataPoints1 = new Array(12).fill(0);
-            const dataPoints2 = new Array(12).fill(0);
-            const dataPoints3 = new Array(12).fill(0);
-            const dataPoints4 = new Array(12).fill(0);
-
-            dataMonthly.forEach(monthData => {
-                const monthIndex = monthData.month - 1;
-                dataPoints[monthIndex] = monthData.total;
-                dataPoints1[monthIndex] = monthData.pendingCount;
-                dataPoints2[monthIndex] = monthData.confirmCount;
-                dataPoints3[monthIndex] = monthData.completedCount;
-                dataPoints4[monthIndex] = monthData.uncompletedCount;
-            });
-
-            const ctx = document.getElementById('dimensions').getContext('2d');
-
-            // Destroy the previous chart instance if it has been initialized
-            if (chartInitialized.value) {
-                chartInstance.value.destroy();
-            }
-
-            chartInstance.value = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Total',
-                            data: dataPoints,
-                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                            borderColor: 'rgb(255, 99, 132)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Pending',
-                            backgroundColor: 'rgba(255, 206, 86, 0.2)', // Thay đổi màu nền
-                            borderColor: 'rgb(255, 206, 86)', // Thay đổi màu viền
-                            borderWidth: 1,
-                            data: dataPoints1
-                        },
-                        {
-                            label: 'Confimed',
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            borderColor: 'rgb(54, 162, 235)',
-                            borderWidth: 1,
-                            data: dataPoints2,
-                        },
-                        {
-                            label: 'Completed',
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderColor: 'rgb(75, 192, 192)', // Màu viền xanh lá đậm
-                            borderWidth: 1,
-                            data: dataPoints3,
-                        },
-                        {
-                            label: 'Uncompleted',
-                            backgroundColor: 'rgba(153, 102, 255, 0.2)', // Màu nền của dòng mới khác
-                            borderColor: 'rgb(153, 102, 255)', // Màu viền của dòng mới khác
-                            borderWidth: 1,
-                            data: dataPoints4 // Thêm dữ liệu cho dòng mới khác
-                        }
-                    ],
-
-                },
-                options: {
-                    responsive: true,
-                    // scales: {
-                    //     y: {
-                    //         stacked: true,
-                    //         grid: {
-                    //             display: true,
-                    //             color: "rgba(255,99,132,0.2)"
-                    //         }
-                    //     },
-                    //     x: {
-                    //         grid: {
-                    //             display: false
-                    //         }
-                    //     }
-                    // }
-                }
-            });
-            // Set chartInitialized to true after the chart has been initialized
-            chartInitialized.value = true;
-        });
-
-        return { chartInstance };
-    },
     mounted() {
         // this.fetchTotalYear();
         // this.fetchData();
@@ -260,9 +234,12 @@ export default {
 
         this.maintainGetAllAirport();
         this.maintainGetAllStatus();
-
+        this.maintainFetchUser();
+        this.maintainGetServices();
         //Kiem tra cac dieu kien va set tim kiem mac dinh
         this.maintainFetchOrders();
+        console.log(this.generateDateRange('2024-06-01', '2024-07-01', 'Tuần'))
+
     },
     methods: {
         //#StartMaintainRegion
@@ -321,14 +298,25 @@ export default {
             this.selectedOrderTask = id;
         },
         maintainFetchOrders() {
+            
             axios.post(`${process.env.VUE_APP_API_URL}/MaintainOrderDetails/FilterOrder`, this.filter).then((response) => {
-                console.log(response.data);
+                // console.log(response.data);
 
                 this.items = response.data.orders;
-                this.totalItems = response.data.totalCount;
-                this.totalPages = Math.ceil(this.totalItems / this.filter.pageSize);
+                this.itemPending = this.items.filter(r => r.status == "B_Pending");
+                this.itemConfirm = this.items.filter(r => r.status == "B_Confirm");
+                this.itemComplete = this.items.filter(r => r.status == "B_Complete");
+                this.itemCancel = this.items.filter(r => r.status == "B_Cancel");
+                this.itemUnComplete = this.items.filter(r => r.status == "B_UnComplete");
+                this.onLoadServiceChart()
+                // this.findMinMaxDates()
+
+
+
             })
         },
+
+
 
         maintainGetAllStatus() {
             axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/StatusBookingType`).then((response) => {
@@ -341,19 +329,19 @@ export default {
                 this.maintainAirports = response.data;
             })
         },
-        //#EndMaintainRegion
-        // async fetchData() {
-        //     try {
-        //         const agency_Id = localStorage.getItem('user_id');
-        //         const currentYear = new Date().getFullYear();
-        //         const baseUri = process.env.VUE_APP_API_URL;
-        //         const response = await axios.get(`${baseUri}/order/report/agency/month?agency_Id=${agency_Id}&year=${currentYear}`);
-        //         const dataMonthly = response.data.monthlyData;
-        //         this.updateChartData(dataMonthly);
-        //     } catch (error) {
-        //         console.error("Error fetching data:", error);
-        //     }
-        // },
+
+        //region maintaine
+        maintainFetchUser() {
+            axios.post(`${process.env.VUE_APP_API_URL}/MaintainUsers/FilterUsers`, this.filterUser).then((response) => {
+                console.log(response.data);
+
+                this.users = response.data.users;
+                this.users = this.users.filter(r => r.role == "Admin" || r.role == "Sale_Admin" || r.role == "Agency")
+                this.totalPage = response.data.totalPage;
+
+            })
+
+        },
 
         updateChartData(monthlyData) {
             this.chartData.datasets[0].data = [];
@@ -363,22 +351,150 @@ export default {
 
             console.log('this is a label', this.chartData);
         },
+        search() {
+            this.maintainFetchOrders();
+        },
+        maintainGetServices() {
+            const apiUrl = process.env.VUE_APP_API_URL;
+            axios
+                .get(`${apiUrl}/MaintainCommons/GetServices`)
+                .then((response) => {
+                    this.maintainServices = response.data;
+                })
+                .catch((error) => {
+                    console.error("Error fetching data:", error);
+                });
+
+        },
+        onLoadServiceChart() {
+            /* serviceChart : {
+                datasets: [{
+                    label: 'Year Order Data',
+                    backgroundColor: '#f87979',
+                    data: []
+                }],
+                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            } */
+
+
+            //dung label
+            let chartLabels = [];
+            for (let i = 0; i < this.maintainServices.length; i++) {
+                chartLabels.push(this.maintainServices[i].name);
+            }
+
+            let chartDataSetOption = {};
+            chartDataSetOption.label = 'Services';
+            chartDataSetOption.data = [];
+            chartDataSetOption.backgroundColor = [];
+            for (let i = 0; i < this.maintainServices.length; i++) {
+                const _serviceName = this.maintainServices[i].name;
+                const orders = this.items.filter(r => r.service === _serviceName)
+                chartDataSetOption.data.push(orders.length);
+                chartDataSetOption.backgroundColor.push(this.softColors[i])
+            }
+
+            this.serviceChart = {
+                datasets: [chartDataSetOption],
+                labels: chartLabels
+            }
+
+
+        },
+        generateDateRange(fromDate, toDate, picking) {
+            const result = [];
+            const startDate = new Date(fromDate);
+            const endDate = new Date(toDate);
+
+            if (picking === 'Ngày') {
+                // Load all days
+                let currentDate = new Date(startDate);
+                while (currentDate <= endDate) {
+                    result.push(currentDate.toISOString().split('T')[0]); // Format as YYYY-MM-DD
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+            } else if (picking === 'Tuần') {
+                // Load all weeks
+                let currentDate = new Date(startDate);
+                while (currentDate <= endDate) {
+                    const startOfWeek = new Date(currentDate);
+                    startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+                    result.push(startOfWeek.toISOString().split('T')[0]); // Format as YYYY-MM-DD
+                    currentDate.setDate(currentDate.getDate() + 7);
+                }
+            } else if (picking === 'Tháng') {
+                // Load all months in the current year
+                const currentYear = new Date().getFullYear();
+                for (let month = 0; month < 12; month++) {
+                    const monthDate = new Date(currentYear, month, 1);
+                    result.push(monthDate.toISOString().split('T')[0]); // Format as YYYY-MM-DD
+                }
+            }
+
+            return result;
+        },
+        findMinMaxDates() {
+            console.log(this.items)
+            if (this.items.length === 0) {
+                this.minDate = '';
+                this.maxDate = '';
+                return;
+            }
+
+
+            const dates = this.items.map(item => new Date(item.created_at));
+            const minDate = new Date(Math.min(...dates));
+            const maxDate = new Date(Math.max(...dates));
+
+            this.minDate = minDate.toISOString().split('T')[0];
+            this.maxDate = maxDate.toISOString().split('T')[0];
 
 
 
-        // fetchTotalYear() {
-        //     const apiUrl = process.env.VUE_APP_API_URL;
-        //     const user_id = localStorage.getItem("user_id");
-        //     const year = new Date().getFullYear();
-        //     axios
-        //         .get(`${apiUrl}/order/report/agency?agency_Id=${user_id}&year=${year}`)
-        //         .then((response) => {
-        //             this.totalYear = response.data;
-        //         })
-        //         .catch((error) => {
-        //             console.error("Error fetching data:", error);
-        //         });
-        // },
+        },
+        filterItemsInDate(from, to) {
+            let itemFromDate = this.items.filter(item => {
+                const service_Time = new Date(item.service_Time);
+                const startDate = new Date(from);
+                const endDate = new Date(to);
+                return service_Time >= startDate && service_Time <= endDate;
+            });
+            return itemFromDate;
+        },
+        onLoadLineChart(){
+            //Lay ra label
+            this.lineChart = {}
+            this.lineChart.labels = this.generateDateRange(this.filter.fromDate, this.filter.toDate, this.year);
+            this.lineChart.datasets = []
+            // Lay ra data
+            let chartDataSetOption = {};
+            chartDataSetOption.label = 'Service Time ';
+            chartDataSetOption.data = [];
+            chartDataSetOption.backgroundColor = [];
+
+            for (let i = 0; i < this.maintainServices.length; i++) {
+                const _serviceName = this.maintainServices[i].name;
+                const orders = this.items.filter(r => r.service === _serviceName)
+                chartDataSetOption.data.push(orders.length);
+                chartDataSetOption.backgroundColor.push(this.softColors[i])
+            }
+
+
+
+        }
+
+
+
+    },
+    watch: {
+        filter: {
+            handler(newVal) {
+                console.log('Filter object changed:', newVal);
+                // Thực hiện hành động khi đối tượng filter thay đổi
+                this.maintainFetchOrders();
+            },
+            deep: true
+        }
     },
 };
 </script>
@@ -401,11 +517,15 @@ export default {
 }
 
 .report-chart {
-    width: 100%;
-    height: 610px;
+    /* width: 100%;
+    height: 610px; */
+    height: 90vh;
     border-radius: 10px;
     background: #fff;
     box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
+    /* display: grid;
+    grid-template-columns: auto auto;
+    gap: 10px */
 }
 
 .total-data {

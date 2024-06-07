@@ -19,13 +19,13 @@
         <div class="menu-search">
           <div class="search-filter">
             <select id="airport" class="form-select" placeholder="Select Cities" v-model="filter.airportId" v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Agency'])">
-              <option value="0" selected>ALL</option>
+              <option value="0" selected>ALL AIRPORT</option>
               <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}</option>
             </select>
           </div>
           <div class="search-filter">
             <select id="status-filter" v-model="filter.bookingStatusId" v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin','Operator_Ref', 'Agency'])">
-              <option value="0">ALL</option>
+              <option value="0">ALL STATUS</option>
               <option v-for="(status, index) in maintainBookingStatus" :key="index" :value="status.Key">
                 {{ status.Value }}
               </option>

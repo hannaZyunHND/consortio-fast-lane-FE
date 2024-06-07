@@ -3,6 +3,50 @@
         <span class="report-title">
             Order Statistics
         </span>
+        <div class="order-search">
+            <div class="menu-search">
+                <div class="search-filter">
+                    <select id="airport" class="form-select" placeholder="Select Cities" v-model="filter.airportId"
+                        v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Agency'])">
+                        <option value="0" selected>ALL</option>
+                        <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}</option>
+                    </select>
+                </div>
+                <div class="search-filter">
+                    <select id="status-filter" v-model="filter.bookingStatusId"
+                        v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Operator_Ref', 'Agency'])">
+                        <option value="0">ALL</option>
+                        <option v-for="(status, index) in maintainBookingStatus" :key="index" :value="status.Key">
+                            {{ status.Value }}
+                        </option>
+                    </select>
+                </div>
+                <div class="search-filter">
+                    <VueDatePicker v-model="filter.fromDate" :config="datePickerConfig" placeholder="From">
+                    </VueDatePicker>
+                </div>
+                <div class="search-filter">
+                    <VueDatePicker v-model="filter.toDate" :config="datePickerConfig" placeholder="To">
+                    </VueDatePicker>
+                </div>
+                <div class="search-filter">
+                    <select id="status-filter" v-model="filter.orderBy">
+                        <option value="service-time">Sort by Service-Time</option>
+                        <option value="booking-time">Sort by Booking-Time</option>
+                    </select>
+                </div>
+                <div>
+                    <input type="text" name="search" id="search" v-model="filter.keyword" placeholder="Search"
+                        @keyup.enter="search" />
+                </div>
+                <button class="btn-search-primary">
+                    <i class="pi pi-search" style="font-size: 1rem" @click="search"></i>
+                </button>
+            </div>
+            <button @click="refreshOrders" class="btn-reset-primary">
+                <i class="pi pi-refresh" style="font-size: 1rem"></i>
+            </button>
+        </div>
         <div class="data-report-month">
             <span class="total-data">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
@@ -61,6 +105,7 @@
 import { ref, onMounted } from 'vue';
 import Chart from 'chart.js/auto';
 import axios from "axios";
+import Swal from 'sweetalert2';
 
 export default {
     data() {
@@ -76,6 +121,21 @@ export default {
                     data: []
                 }],
                 labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            },
+            roles: "",
+            maintainAirports: [],
+            maintainBookingStatus: [],
+            filter: {
+                airportId: 0,
+                bookingStatusId: 0,
+                fromDate: null,
+                toDate: null,
+                keyword: "",
+                orderBy: "booking-time",
+                createdBy: 0,
+                employeeId: 0,
+                pageIndex: 1,
+                pageSize: 10
             }
         };
     },
@@ -182,22 +242,118 @@ export default {
         return { chartInstance };
     },
     mounted() {
-        this.fetchTotalYear();
-        this.fetchData();
+        // this.fetchTotalYear();
+        // this.fetchData();
+        let airportId = localStorage.getItem('airportId');
+        if (airportId) {
+            this.filter.airportId = airportId;
+        }
+        //Chi role agency nhin thay data cua no
+        let roles = localStorage.getItem('roles');
+        let userId = localStorage.getItem('user_id');
+        if (roles == "Agency") {
+            this.filter.createdBy = userId
+        }
+        this.roles = localStorage.getItem('roles');
+
+        //Chi role Operator chi nhin thay cac tour ma no duoc phan quyen
+
+        this.maintainGetAllAirport();
+        this.maintainGetAllStatus();
+
+        //Kiem tra cac dieu kien va set tim kiem mac dinh
+        this.maintainFetchOrders();
     },
     methods: {
-        async fetchData() {
-            try {
-                const agency_Id = localStorage.getItem('user_id');
-                const currentYear = new Date().getFullYear();
-                const baseUri = process.env.VUE_APP_API_URL;
-                const response = await axios.get(`${baseUri}/order/report/agency/month?agency_Id=${agency_Id}&year=${currentYear}`);
-                const dataMonthly = response.data.monthlyData;
-                this.updateChartData(dataMonthly);
-            } catch (error) {
-                console.error("Error fetching data:", error);
+        //#StartMaintainRegion
+        roleChecker(accepedRoles) {
+            let checker = false;
+
+            let role = localStorage.getItem('roles');
+            if (role == "Admin") {
+                checker = true;
+            }
+            accepedRoles.forEach((element) => {
+                if (element == role) {
+                    checker = true;
+                }
+            })
+            return checker;
+        },
+        async maintainChangeBookingStatus(orderId) {
+            const confirmResult = await Swal.fire({
+                title: 'Complete Booking',
+                text: 'Do you want to complete this booking?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No'
+            });
+            if (confirmResult.isConfirmed) {
+                axios.get(`${process.env.VUE_APP_API_URL}/MaintainOrderDetails/GetById/${orderId}`).then((response) => {
+                    let _detail = response.data;
+                    if (_detail) {
+                        _detail.status_Operator_ID = 3;
+                        this.isLoading = true;
+                        const user_Id = localStorage.getItem("user_id");
+                        const apiUrl = process.env.VUE_APP_API_URL;
+                        _detail.updatedBy = user_Id;
+
+                        axios.post(`${apiUrl}/MaintainOrderDetails/Update`, _detail)
+                            .then(() => {
+                                this.maintainFetchOrders();
+                            })
+                            .catch(error => {
+                                console.error('Error updating Order:', error);
+                            })
+                            .finally(() => {
+                                this.isLoading = false;
+                            });
+                    }
+
+                })
+            }
+            else {
+                this.scheduleData.status_Operator_ID = 8;
             }
         },
+        openEditTask(id) {
+            this.selectedOrderTask = id;
+        },
+        maintainFetchOrders() {
+            axios.post(`${process.env.VUE_APP_API_URL}/MaintainOrderDetails/FilterOrder`, this.filter).then((response) => {
+                console.log(response.data);
+
+                this.items = response.data.orders;
+                this.totalItems = response.data.totalCount;
+                this.totalPages = Math.ceil(this.totalItems / this.filter.pageSize);
+            })
+        },
+
+        maintainGetAllStatus() {
+            axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/StatusBookingType`).then((response) => {
+                this.maintainBookingStatus = response.data;
+            })
+        },
+
+        maintainGetAllAirport() {
+            axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/GetAirports`).then((response) => {
+                this.maintainAirports = response.data;
+            })
+        },
+        //#EndMaintainRegion
+        // async fetchData() {
+        //     try {
+        //         const agency_Id = localStorage.getItem('user_id');
+        //         const currentYear = new Date().getFullYear();
+        //         const baseUri = process.env.VUE_APP_API_URL;
+        //         const response = await axios.get(`${baseUri}/order/report/agency/month?agency_Id=${agency_Id}&year=${currentYear}`);
+        //         const dataMonthly = response.data.monthlyData;
+        //         this.updateChartData(dataMonthly);
+        //     } catch (error) {
+        //         console.error("Error fetching data:", error);
+        //     }
+        // },
 
         updateChartData(monthlyData) {
             this.chartData.datasets[0].data = [];
@@ -210,19 +366,19 @@ export default {
 
 
 
-        fetchTotalYear() {
-            const apiUrl = process.env.VUE_APP_API_URL;
-            const user_id = localStorage.getItem("user_id");
-            const year = new Date().getFullYear();
-            axios
-                .get(`${apiUrl}/order/report/agency?agency_Id=${user_id}&year=${year}`)
-                .then((response) => {
-                    this.totalYear = response.data;
-                })
-                .catch((error) => {
-                    console.error("Error fetching data:", error);
-                });
-        },
+        // fetchTotalYear() {
+        //     const apiUrl = process.env.VUE_APP_API_URL;
+        //     const user_id = localStorage.getItem("user_id");
+        //     const year = new Date().getFullYear();
+        //     axios
+        //         .get(`${apiUrl}/order/report/agency?agency_Id=${user_id}&year=${year}`)
+        //         .then((response) => {
+        //             this.totalYear = response.data;
+        //         })
+        //         .catch((error) => {
+        //             console.error("Error fetching data:", error);
+        //         });
+        // },
     },
 };
 </script>
@@ -262,5 +418,85 @@ export default {
     box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
     flex-direction: column;
     justify-content: center;
+}
+
+.menu-search select {
+    border: 2px solid #cbd5e1;
+    padding: 5px;
+    border-radius: 7px;
+}
+
+.search-filter {
+    gap: 5px;
+    display: flex;
+    align-items: center;
+}
+
+#search {
+    border: none;
+    width: 185px;
+    padding: 10px;
+    background: none;
+    border-radius: 8px;
+    box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
+}
+
+#search:focus {
+    outline: none;
+    border: none;
+    background: none;
+}
+
+#airport,
+#status-filter {
+    border-radius: 5px;
+    padding: 10px;
+    border: none;
+    background: none;
+    box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
+}
+
+.order-search {
+    gap: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menu-search {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.search-filter {
+    gap: 5px;
+    display: flex;
+    align-items: center;
+}
+
+select {
+    border: 1px solid #e6eae9;
+    margin: 10px 0px;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.btn-export-primary,
+.btn-search-primary {
+    border-radius: 7px;
+    padding: 10px;
+    border: none;
+    background: none;
+    box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
+}
+
+.btn-reset-primary {
+    height: 38px;
+    border-radius: 7px;
+    padding: 10px;
+    border: none;
+    background: none;
+    box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
 }
 </style>

@@ -63,7 +63,7 @@
                 <div class="item" data-id="{{item.id}}">{{ item.email }}</div>
               </td>
               <td>
-                <div class="item" data-id="{{item.id}}">{{ item.role }}</div>
+                <div class="item" data-id="{{item.id}}">{{ $t(`role.`+item.role) }}</div>
               </td>
               <td>
                 <div class="item" data-id="{{item.id}}">

@@ -60,7 +60,7 @@
               </div>
               <div class="row">
                 <label for="airport">{{ $t('home.airport') }}*</label>
-                <select id="airport" v-model="formData.airport" @change="updateAirport(orderData.formData[0].airport)"
+                <select id="airport" v-model="formData.airport" :disable="formData.disableAirport" @change="updateAirport(orderData.formData[0].airport)"
                   required>
                   <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}</option>
 
@@ -97,35 +97,35 @@
         </div>
         <div class="option-note-input">
           <div class="input-option">
-            <input type="checkbox" v-model="isChecked[0]" @change="handleCheckboxChange(0, formData)">
+            <input type="checkbox" v-model="formData.isChecked[0]" @change="handleCheckboxChange(0, formData)">
             <span class="input-option-content" id="0">{{ $t('options.change_visa') }}</span>
           </div>
           <div class="input-option">
-            <input type="checkbox" v-model="isChecked[1]" @change="handleCheckboxChange(1, formData)">
+            <input type="checkbox" v-model="formData.isChecked[1]" @change="handleCheckboxChange(1, formData)">
             <span class="input-option-content" id="1">{{ $t('options.exchange_currency') }}</span>
           </div>
           <div class="input-option">
-            <input type="checkbox" v-model="isChecked[2]" @change="handleCheckboxChange(2, formData)">
+            <input type="checkbox" v-model="formData.isChecked[2]" @change="handleCheckboxChange(2, formData)">
             <span class="input-option-content" id="2">{{ $t('options.buy_sim_card') }}</span>
           </div>
           <div class="input-option">
-            <input type="checkbox" v-model="isChecked[3]" @change="handleCheckboxChange(3, formData)">
+            <input type="checkbox" v-model="formData.isChecked[3]" @change="handleCheckboxChange(3, formData)">
             <span class="input-option-content" id="3">{{ $t('options.wheelchair_service') }}</span>
           </div>
           <div class="input-option">
-            <input type="checkbox" v-model="isChecked[4]" @change="handleCheckboxChange(4, formData)">
+            <input type="checkbox" v-model="formData.isChecked[4]" @change="handleCheckboxChange(4, formData)">
             <span class="input-option-content" id="4">{{ $t('options.poor_health_support') }}</span>
           </div>
           <div class="input-option">
-            <input type="checkbox" v-model="isChecked[5]" @change="handleCheckboxChange(5, formData)">
+            <input type="checkbox" v-model="formData.isChecked[5]" @change="handleCheckboxChange(5, formData)">
             <span class="input-option-content" id="5">{{ $t('options.customs_declaration_support') }}</span>
           </div>
           <div class="input-option">
-            <input type="checkbox" v-model="isChecked[6]" @change="handleCheckboxChange(6, formData)">
+            <input type="checkbox" v-model="formData.isChecked[6]" @change="handleCheckboxChange(6, formData)">
             <span class="input-option-content" id="6">{{ $t('options.luggage_assistance') }}</span>
           </div>
           <div class="input-option">
-            <input type="checkbox" v-model="isChecked[7]" @change="handleCheckboxChange(7, formData)">
+            <input type="checkbox" v-model="formData.isChecked[7]" @change="handleCheckboxChange(7, formData)">
             <span class="input-option-content" id="7">{{ $t('options.see_off_choose_staff') }}</span>
           </div>
         </div>
@@ -216,6 +216,7 @@ export default {
       selectedServices: [],
       services: [],
       dateTime: moment.utc(),
+      selectedFightNumber: [],
       datePickerConfig: {
         format: "YYYY-MM-DD HH:mm:ss",
         formatter: (date) => moment(date).format("YYYY-MM-DD HH:mm:ss"),
@@ -240,6 +241,35 @@ export default {
   },
 
   methods: {
+    onSelectFlightNumber() {
+      let flights = [];
+      this.orderData.formData.forEach(f => {
+        let sFlight = {
+          flight_Number: f.flight_Number,
+          airPortId: f.airport
+        }
+        flights.push(sFlight)
+      })
+      //Group by
+      const uniqueFlights = [];
+      const seenFlightNumbers = new Set();
+
+      for (const flight of flights) {
+        if (!seenFlightNumbers.has(flight.flight_number)) {
+          uniqueFlights.push(flight);
+          seenFlightNumbers.add(flight.flight_number);
+        }
+      }
+      console.log(uniqueFlights)
+      this.orderData.formData.forEach(f => {
+        let filterd = uniqueFlights.find(r => r.flight_Number === f.flight_Number)
+        if(filterd){
+          f.airport = filterd.airPortId
+          f.disableAirport = true
+        }
+      })
+      this.selectedFightNumber = uniqueFlights;
+    },
     maintainGetAllAirport() {
       axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/GetAirports`).then((response) => {
         this.maintainAirports = response.data;
@@ -247,7 +277,7 @@ export default {
     },
     handleCheckboxChange(index, fd) {
       const value = document.getElementById(index).innerHTML;
-      if (this.isChecked[index]) {
+      if (fd.isChecked[index]) {
         if (!fd.note) {
           fd.note = value + ', ';
         } else {
@@ -364,6 +394,9 @@ export default {
           data.airport = airport;
         });
       }
+      else {
+        this.onSelectFlightNumber()
+      }
     },
     updateService(service) {
       if (this.checkGroupAndDataGroup()) {
@@ -379,6 +412,10 @@ export default {
           data.flight_Number = number;
         });
       }
+      else{
+        this.onSelectFlightNumber()
+      }
+      
     },
 
     updateEmail(email) {
@@ -425,6 +462,7 @@ export default {
           portrait_File: "",
           service_ID: null,
           createBy: null,
+          isChecked: [false, false, false, false, false, false, false, false],
         }));
       }
     },
@@ -468,8 +506,10 @@ export default {
           // Hiển thị swal modal
           await Swal.fire({
             icon: 'success',
-            title: 'Đã thêm booking mới thành công',
-            text: 'Vui lòng chờ xác nhận.'
+            title: 'Booking Successful!',
+
+          }).then(() => {
+            this.$router.go(0);
           });
         }
       } catch (error) {

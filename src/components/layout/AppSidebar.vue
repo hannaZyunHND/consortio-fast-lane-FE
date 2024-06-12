@@ -12,22 +12,22 @@
         </router-link>
       </li>
 
-      <li v-if="roleChecker(['Operator', 'Operator_Ref'])">
+      <!-- <li v-if="roleChecker(['Operator', 'Operator_Ref'])">
         <router-link class="nav-link" to="/dashboard/calendar">
           <div class="item-content">
             <squares-2X2-icon class="navbar-icon" />
             <span>Calendar</span>
           </div>
         </router-link>
-      </li>
+      </li> -->
 
       <!-- Sales -->
       <li>
-        <div class="layout-menuitem-root-text">Sales</div>
+        <div class="layout-menuitem-root-text">Booking</div>
         <router-link class="nav-link" to="/dashboard/order">
           <div class="item-content">
             <wallet-icon class="navbar-icon" />
-            <span>Booking</span>
+            <span>Booking Lead</span>
           </div>
         </router-link>
       </li>

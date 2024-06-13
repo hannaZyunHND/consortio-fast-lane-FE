@@ -138,7 +138,7 @@
                     <PopupWrapper>
                       <template #header>
                         <div class="popover">
-                          <i class="pi pi-image" style="font-size: 1rem" @click="openEditOrder(item.id)"></i>
+                          <i class="pi pi-image" style="font-size: 1rem" @click="openEditOrder(item)"></i>
                         </div>
                       </template>
                       <template #content>
@@ -338,7 +338,7 @@ export default {
       users: [],
       services: [],
       statuses: [],
-      selectedOrderId: "",
+      selectedOrderId: 0,
       isPopupVisible: false,
       datePickerConfig: {
         format: "yyyy-MM-dd HH:mm",

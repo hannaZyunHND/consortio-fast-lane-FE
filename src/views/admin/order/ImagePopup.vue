@@ -49,6 +49,7 @@ export default {
         };
     },
     mounted() {
+        console.log(this.orderId)
         this.maintainFetchOrder();
     },
 

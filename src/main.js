@@ -9,12 +9,13 @@ import '@vuepic/vue-datepicker/dist/main.css';
 import 'primevue/resources/themes/lara-light-green/theme.css';
 import 'primevue/resources/primevue.min.css'; // Import PrimeVue CSS
 import 'primeicons/primeicons.css'; // Import PrimeIcons CSS
-
+import VueCountdown from '@chenfengyuan/vue-countdown';
 import Select2 from 'vue3-select2-component';
 
 const app = createApp(App);
 app.component('VueDatePicker', VueDatePicker);
 app.component('Select2', Select2)
+app.component(VueCountdown.name, VueCountdown);
 app.use(router);
 app.mount('#app');
 app.use(i18n);

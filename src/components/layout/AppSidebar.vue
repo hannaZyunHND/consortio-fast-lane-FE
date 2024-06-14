@@ -27,7 +27,7 @@
         <router-link class="nav-link" to="/dashboard/order">
           <div class="item-content">
             <wallet-icon class="navbar-icon" />
-            <span>Booking Lead</span>
+            <span>Booking List</span>
           </div>
         </router-link>
       </li>

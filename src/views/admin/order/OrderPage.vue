@@ -84,6 +84,7 @@
               <th v-if="roleCheckerReverse(['Agency'])">OPS.STAT</th>
               <th>Ser.Type</th>
               <th>Ser.Time</th>
+              <th>Book.Time</th>
               <th>Ref.</th>
               <th>Flight</th>
               <th>Passport</th>
@@ -178,6 +179,22 @@
                   <div class="item" :data-id="item.id">
                     {{ formatDate(item.service_Time) }}
                   </div>
+                  <div class="item">
+                    <vue-countdown :time="item.countdownMaterial" v-slot="{ days, hours, minutes, seconds }">
+                      <span v-if="item.countdownMaterial > 0">Remain: {{ days }}d, {{ hours }}h, {{ minutes }}m, {{ seconds }}s.</span>
+                      <span v-else style="color:red">Expired</span>
+                    </vue-countdown>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="order_time">
+                  <div class="item" :data-id="item.id">
+                    {{ formatTime(item.created_at) }}
+                  </div>
+                  <div class="item" :data-id="item.id">
+                    {{ formatDate(item.created_at) }}
+                  </div>
                 </div>
               </td>
               <td>
@@ -269,6 +286,9 @@
       <FullCalendar :options="calendarOptions" />
     </div>
   </div>
+  <!-- <div class="noti-wrapper">
+    <Notification></Notification>
+  </div> -->
   <Loading :loading="isLoading" />
 
 </template>
@@ -295,6 +315,7 @@ import { saveAs } from 'file-saver';
 import Loading from '@/views/LoadingPage.vue';
 import EditTask from "../task/EditTask.vue";
 import Swal from 'sweetalert2';
+import Notification from '@/components/Notification.vue'
 
 
 import FullCalendar from '@fullcalendar/vue3'
@@ -321,7 +342,8 @@ export default {
     Loading,
     EditTask,
     ChatBubbleBottomCenterIcon,
-    FullCalendar
+    FullCalendar,
+    Notification
   },
   data() {
     return {
@@ -463,12 +485,12 @@ export default {
         this.users = response.data.users;
         let roles = localStorage.getItem('roles');
         let userId = localStorage.getItem('user_id');
-        if(roles == "Agency"){
-          this.users = this.users.filter(r => r.parentId == userId)  
-        }else{
+        if (roles == "Agency") {
+          this.users = this.users.filter(r => r.parentId == userId)
+        } else {
           this.users = this.users.filter(r => r.role == "Admin" || r.role == "Sale_Admin" || r.role == "Agency")
         }
-        
+
         this.totalPage = response.data.totalPage;
 
       })
@@ -569,6 +591,7 @@ export default {
 
           const differenceInMilliseconds = serviceDate - currentDate;
           const differenceInHours = differenceInMilliseconds / (1000 * 60 * 60);
+          // const diffInSecond = Math.floor(differenceInMilliseconds / 1000);
 
           if (differenceInHours >= 12) {
             v.moreThan12Hour = true
@@ -591,6 +614,8 @@ export default {
               }
             }
           }
+          //timeimg
+          v.countdownMaterial = differenceInMilliseconds
 
         })
 

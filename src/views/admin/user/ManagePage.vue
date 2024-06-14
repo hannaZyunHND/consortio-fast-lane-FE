@@ -2,7 +2,7 @@
   <div class="user">
     <div class="user-body">
       <div class="user-header">
-        <h3>Team Member</h3>
+        <h3>Account</h3>
         <PopupWrapper>
           <template #header>
             <span class="popover" @click="onAddNew()">Add new +</span>
@@ -10,7 +10,7 @@
           <template #content>
             <div class="popover-content">
               <EditUser :userId="selectedUserId" @reloadPage="maintainFetchUser()" />
-            </div>
+            </div> 
           </template>
         </PopupWrapper>
       </div>

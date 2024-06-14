@@ -461,6 +461,7 @@ export default {
 }
 
 .order-body {
+
   padding: 0px 15px;
   display: flex;
   background: #fff;

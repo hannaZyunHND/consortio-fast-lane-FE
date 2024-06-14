@@ -27,7 +27,7 @@
         <router-link class="nav-link" to="/dashboard/order">
           <div class="item-content">
             <wallet-icon class="navbar-icon" />
-            <span>Booking Lead</span>
+            <span>Booking List</span>
           </div>
         </router-link>
       </li>
@@ -79,7 +79,7 @@
               <template #header>
                 <div class="popover">
                   <pencil-square-icon class="user-icon" />
-                  <span>Change password (Processing)</span>
+                  <span>Change password</span>
                 </div>
               </template>
               <template #content>
@@ -267,17 +267,18 @@ export default {
 .navbar {
   /* position: fixed; */
   width: 300px;
+ background: #1f416c;
   height: 100%;
+  color: white;
   /* z-index: 999; */
   overflow-y: auto;
   user-select: none;
   top: 7rem;
   left: 2rem;
   transition: transform 0.2s, left 0.2s;
-  background-color: #ffffff;
-  border-radius: 12px;
   padding: 0.5rem 1.5rem;
   box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
+  border-right: 3px solid white;
 }
 
 /* menu-page */
@@ -288,16 +289,18 @@ export default {
 
 .menu-page li {
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-  margin: 20px 0px;
+  margin: 11px 0px;
   cursor: pointer;
   color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .layout-menuitem-root-text {
   font-size: 0.857rem;
   text-transform: uppercase;
   font-weight: 700;
-  color: #0f172a;
   margin: 0.75rem 0;
 }
 
@@ -322,7 +325,14 @@ span {
   display: flex;
   align-items: center;
 }
+.item-content span{
+  color: white;
 
+}
+.item-content svg{
+  color: white;
+
+}
 .navbar-icon {
   width: 24px;
   height: 24px;

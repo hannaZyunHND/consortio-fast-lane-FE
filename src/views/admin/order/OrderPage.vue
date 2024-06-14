@@ -1,8 +1,8 @@
 <template>
-  <div class="order">
+  <div class="order order-booking">
     <div class="order-body">
       <div class="order-header">
-        <span>Order List</span>
+        <h3><span>Booking List</span></h3>
         <PopupWrapper>
           <template #header>
             <!-- <div class="popover">Add new +</div> -->
@@ -42,7 +42,7 @@
             </select>
           </div>
           <div class="search-filter">
-            <VueDatePicker v-model="filter.fromDate" :config="datePickerConfig" placeholder="From">
+            <VueDatePicker v-model="filter.fromDate" :config="datePickerConfig" class="lich" placeholder="From">
             </VueDatePicker>
           </div>
           <div class="search-filter">
@@ -87,29 +87,29 @@
               <th>Book.Time</th>
               <th>Ref.</th>
               <th>Flight</th>
-              <th>Passport</th>
+              <th class="pass">Passport</th>
               <th>Airport</th>
               <th>Note</th>
               <th v-if="roleCheckerReverse(['Agency'])">Remark</th>
               <th v-if="roleCheckerReverse(['Agency'])">Employee</th>
-              <th v-if="roleChecker(['Admin'])">UpdatedBy</th>
+              <th v-if="roleChecker(['Admin'])">Updated By</th>
               <th class="order-actions">Actions</th>
             </tr>
           </thead>
           <tbody class="order-info">
-            <tr v-for="item in items" :key="item.id" class="order-information" :style="item.cssColor">
-              <td v-if="roleChecker(['Operator_Ref', 'Operator'])">
+            <tr v-for="item in items" :key="item.id" class="order-information bao" :style="item.cssColor">
+              <td v-if="roleChecker(['Operator_Ref', 'Operator'])" class="bao">
                 <!-- <input type="checkbox" name="" :id="'check-complete-status-' + item.id"
                   @change="maintainChangeBookingStatus(item.id)" v-if="(item.status == 'B_Pending')"> -->
                 <div class=""
                   v-if="((item.status == 'B_Confirm' || roleChecker(['Admin']))) && item.listEmployees.length > 0">
                   <div class="">
-                    <button class="btn btn-success" @click="maintainChangeBookingStatus(item.id)">Complete</button>
+                    <button class="btn btn-success compoted" @click="maintainChangeBookingStatus(item.id)">Completed</button>
                   </div>
                   <br>
                   <div class="">
-                    <button class="btn btn-danger"
-                      @click="maintainChangeBookingStatusUncomplete(item.id)">Uncomplete</button>
+                    <button class="btn btn-danger un"
+                      @click="maintainChangeBookingStatusUncomplete(item.id)">Uncompleted</button>
                   </div>
                 </div>
 
@@ -139,7 +139,7 @@
                     <PopupWrapper>
                       <template #header>
                         <div class="popover">
-                          <i class="pi pi-image" style="font-size: 1rem" @click="openEditOrder(item)"></i>
+                          <i class="pi pi-image" style="font-size: 1rem" @click="openEditOrder(item.id)"></i>
                         </div>
                       </template>
                       <template #content>
@@ -152,17 +152,17 @@
                 </div>
               </td>
               <td>
-                <span class="item" :data-id="item.id" id="status" :style="getStatusStyle(item.status)">
+                <span class="item item1" :data-id="item.id" id="status" :style="getStatusStyle(item.status)">
                   {{ $t(`cms.${item.status}`) }}
                 </span>
               </td>
               <td v-if="roleCheckerReverse(['Agency'])">
-                <span class="item" :data-id="item.id" id="status" :style="getStatusStyle(item.status_Sales)">
+                <span class="item item1" :data-id="item.id" id="status" :style="getStatusStyle(item.status_Sales)">
                   {{ $t(`cms.${item.status_Sales}`) }}
                 </span>
               </td>
               <td v-if="roleCheckerReverse(['Agency'])">
-                <span class="item" :data-id="item.id" id="status" :style="getStatusStyle(item.status_Operator)">
+                <span class="item item1" :data-id="item.id" id="status" :style="getStatusStyle(item.status_Operator)">
                   {{ $t(`cms.${item.status_Operator}`) }}
                 </span>
               </td>
@@ -360,7 +360,7 @@ export default {
       users: [],
       services: [],
       statuses: [],
-      selectedOrderId: 0,
+      selectedOrderId: "",
       isPopupVisible: false,
       datePickerConfig: {
         format: "yyyy-MM-dd HH:mm",
@@ -604,7 +604,7 @@ export default {
             if (v.listEmployees.length <= 0) {
               v.cssColor = {
 
-                backgroundColor: '#eceaea'
+                backgroundColor: '#d9e6fb'
 
               }
             }
@@ -864,13 +864,13 @@ export default {
         if (status.includes('Pending')) {
           return { backgroundColor: "#ADD8E6", color: "black" }; // blue
         } else if (status.includes('Confirm')) {
-          return { backgroundColor: "#90EE90", color: "black" }; // green
+          return { backgroundColor: "#9de889", color: "black" }; // green
         } else if (status.includes('Complete') && !status.includes('Un')) {
-          return { backgroundColor: "#FFFFE0", color: "black" }; // yellow
+          return { backgroundColor: "#e6e651", color: "black" }; // yellow
         } else if (status.includes('UnComplete')) {
-          return { backgroundColor: "#D3D3D3", color: "black" }; // gray
+          return { backgroundColor: "#b7b5bd", color: "black" }; // gray
         } else if (status.includes('Cancel')) {
-          return { backgroundColor: "#FFC0CB", color: "black" }; // red
+          return { backgroundColor: "#ea7171", color: "black" }; // red
         }
       }
     }
@@ -907,6 +907,8 @@ export default {
 }
 
 .order-body {
+  margin-top: 10px;
+
   padding: 0px 15px;
   display: flex;
   height: 140px;
@@ -942,6 +944,8 @@ export default {
   gap: 5px;
   display: flex;
   align-items: center;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 #search {
@@ -963,11 +967,15 @@ export default {
 #status-filter {
   border-radius: 5px;
   padding: 10px;
+  font-size: 12px;
+  font-weight: 600;
   border: none;
   background: none;
   box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
 }
-
+#search::placeholder{
+  font-size: 12px;
+}
 .space-line {
   border: 1px solid #e6eae9;
 }
@@ -978,7 +986,9 @@ export default {
   justify-content: space-between;
   align-items: center;
 }
-
+#status{
+  font-size: 13px;
+}
 .menu-search {
   display: flex;
   gap: 10px;
@@ -1006,7 +1016,11 @@ select {
   background: none;
   box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
 }
+.order-information tr:nth-child(1),
+.order-information tr:nth-child(2){
+  background-color: rgb(203, 204, 222) !important;
 
+}
 .btn-reset-primary {
   height: 38px;
   border-radius: 7px;
@@ -1044,6 +1058,7 @@ select {
 
 .data-table-tilte {
   text-transform: uppercase;
+  font-size: 13px;
 }
 
 .item {
@@ -1062,7 +1077,13 @@ select {
   color: #222;
   margin-left: 12px;
 }
-
+.un{
+  border: 4px;
+  padding: 10px;
+  background-color: #b7b5bd;;
+  font-weight: 600;
+  border-radius: 4px;
+}
 .customer-infomation {
   gap: 10px;
   display: flex;
@@ -1080,7 +1101,14 @@ select {
   display: flex;
   justify-content: space-evenly;
 }
-
+.compoted{
+  border: 4px;
+  padding: 10px;
+  background-color:#e6e651;
+  font-weight: 600;
+  border-radius: 4px;
+  width: 100%;
+}
 .btn-delete-primary {
   border: none;
   background: none;
@@ -1094,5 +1122,25 @@ select {
 
 .order-information {
   border-bottom: 1px solid black;
+
+}
+
+.item{
+  font-size: 12px;
+}
+.order-info span.item{
+  font-size: 13px !important;
+
+}
+.pass{
+  width: 300px;
+}
+.item1{
+  /* background-color: rgb(131 210 131) !important; */
+
+}
+.order-booking{
+  padding: 20px;
+  background: #1f416c;
 }
 </style>

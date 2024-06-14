@@ -1,6 +1,6 @@
 <template>
   <div class="popup-content">
-    <span class="title-header">Updated Order</span>
+    <span class="title-header">Update Booking</span>
     <form enctype="multipart/form-data" @submit.prevent="submitOrder" id="edit-order-form">
       <div class="form-col" id="form-file">
         <div class="file-input">

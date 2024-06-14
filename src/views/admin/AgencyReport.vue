@@ -1,7 +1,7 @@
 <template>
     <div class="report-container">
         <span class="report-title">
-            Order Statistics
+            Statistics
         </span>
         <div class="order-search">
             <div class="menu-search">
@@ -62,54 +62,54 @@
             <span class="total-data">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
-                    {{ items.length }} Bookings
+                    {{ items.length }}
                 </div>
                 <span class="report-title-data">
-                    Total orders
+                    Total Booking
                 </span>
             </span>
             <span class="total-data">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
-                    {{ itemPending.length }} Bookings
+                    {{ itemPending.length }}
                 </div>
                 <span class="report-title-data">
-                    Total pending orders
+                    Total Pending Booking
                 </span>
             </span>
             <!-- <span class="total-data">Canceled: {{ totalYear.cancelCount }}</span> -->
             <span class="total-data">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
-                    {{ itemConfirm.length }} Bookings
+                    {{ itemConfirm.length }} 
                 </div>
                 <span class="report-title-data">
-                    Total confirmed orders
+                    Total Confirmed Booking
                 </span>
             </span>
             <span class="total-data">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
-                    {{ itemComplete.length }} Bookings
+                    {{ itemComplete.length }} 
                 </div>
                 <span class="report-title-data">
-                    Total completed orders
+                    Total Completed Booking
                 </span>
             </span>
             <span class="total-data">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
-                    {{ itemUnComplete.length }} Bookings
+                    {{ itemUnComplete.length }}
                 </div>
                 <span class="report-title-data">
-                    Total uncompleted orders
+                    Total Uncompleted Booking
                 </span>
             </span>
         </div>
         <div class="report-chart-combine">
 
 
-            <h3>Combine Search</h3>
+            <div class="chart-title">Chart</div>
             <div class="report-item-wrapper" style="display: grid; grid-template-columns: auto auto; gap: 20px;">
 
                 <div class="report-item" v-for="c in compareBarChart">
@@ -726,9 +726,12 @@ export default {
     margin: 20px 0px;
     justify-content: space-between;
 }
-
+.search-filter select{
+    font-size: 12px;
+}
 .number-of-booking {
     font-weight: bold;
+    font-size: 21px;
 }
 
 .report-title {
@@ -821,7 +824,10 @@ select {
     border-radius: 5px;
     padding: 10px;
 }
-
+.chart-title{
+    font-size: 18px;
+    font-weight: 600;
+}
 .btn-export-primary,
 .btn-search-primary {
     border-radius: 7px;
@@ -848,5 +854,8 @@ select {
 .menu-search-combine {
     display: grid;
     grid-template-columns: auto auto auto;
+}
+.report-chart-combine{
+    margin-top: 60px;
 }
 </style>

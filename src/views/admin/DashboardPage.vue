@@ -3,7 +3,7 @@
         <!-- <AppTopbar /> -->
         <div class="dashboard-body">
             <AppSidebar />
-            <div class="content">
+            <div class="content content1">
                 <router-view></router-view>
             </div>
         </div>
@@ -29,8 +29,8 @@ export default {
 .content {
     flex: 1;
     overflow-y: scroll;
-    width: 80%;
-    padding: 20px 20px 0px 20px;
+    /* width: 80%; */
+    /* padding: 20px 20px 0px 20px; */
     font-size: 14px;
     font-family: "Inter var", sans-serif;
     color: #334155;

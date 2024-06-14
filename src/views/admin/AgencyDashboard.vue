@@ -19,7 +19,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .dashboard-body {
     height: 100vh;
     display: flex;
@@ -27,11 +27,13 @@ export default {
 
 .content {
     flex: 1;
-    width: 80%;
+    /* width: 80%; */
     padding: 0px 20px 0px 20px;
     font-size: 14px;
     font-family: "Inter var", sans-serif;
     color: #334155;
+    /* background: #494c77; */
+
 }
 
 .data-table-tilte {

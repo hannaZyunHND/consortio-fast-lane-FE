@@ -1,6 +1,6 @@
     <template>
         <div class="popup-content" v-if="orderDetail">
-            <span class="title-header">Updated Order</span>
+            <span class="title-header title-uploadd" style="margin-bottom: 20px;">Update Booking</span>
             <form enctype="multipart/form-data" @submit.prevent="submitOrder" id="edit-order-form">
                 <div class="form-col" id="form-file">
                     <div class="file-input">
@@ -506,7 +506,9 @@ select {
     border-radius: 5px;
     padding: 9px;
 }
-
+.title-uploadd{
+    margin-bottom: 10px;
+}
 textarea {
     border: 1px solid #e6eae9;
     margin-top: 5px;

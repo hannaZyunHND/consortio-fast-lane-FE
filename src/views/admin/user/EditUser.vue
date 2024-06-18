@@ -181,9 +181,10 @@ export default {
 </script>
 <style scoped>
 .popup-content {
-  width: 350px;
-  position: absolute;
+  width: 50%;
+  position: fixed;
   top: 50%;
+  z-index: 999;
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: #fff;
@@ -191,7 +192,12 @@ export default {
   border-radius: 15px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
-
+@media (max-width:768px){
+  .popup-content {
+  width: 90% !important;
+ 
+}
+}
 #edit-service-form {
   display: flex;
   flex-direction: column;

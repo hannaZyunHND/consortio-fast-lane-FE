@@ -66,10 +66,9 @@
             </div>
         </div>
 
-
-        <div class="row row-cols-md-5 row-cols-xs-1 ">
+        <div class="row justify-content-around">
             <!-- Total Booking -->
-            <div class="col m-1 total-data">
+            <div class="col-sm-6 col-xl-2 total-data">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
                     {{ items.length }}
@@ -80,7 +79,7 @@
             </div>
 
             <!-- Total Pending Booking -->
-            <div class="col m-1 total-data ">
+            <div class="col-sm-6 col-xl-2 total-data">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
                     {{ itemPending.length }}
@@ -91,7 +90,7 @@
             </div>
 
             <!-- Total Confirmed Booking -->
-            <div class="col m-1 total-data ">
+            <div class="col-sm-6 col-xl-2 total-data">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
                     {{ itemConfirm.length }}
@@ -102,7 +101,7 @@
             </div>
 
             <!-- Total Completed Booking -->
-            <div class="col m-1 total-data ">
+            <div class="col-sm-6 col-xl-2 total-data">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
                     {{ itemComplete.length }}
@@ -113,7 +112,7 @@
             </div>
 
             <!-- Total Uncompleted Booking -->
-            <div class="col m-1 total-data ">
+            <div class="col-sm-6 col-xl-2 total-data">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
                     {{ itemUnComplete.length }}
@@ -123,6 +122,7 @@
                 </span>
             </div>
         </div>
+
 
 
         <div class="report-chart-combine">
@@ -831,6 +831,7 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 20px;
 }
 
 .menu-search {
@@ -880,11 +881,11 @@ select {
     height: 100% !important;
 }
 
-#status-filter{
+#status-filter {
     width: 100%;
 }
 
 .report-chart-combine {
-    margin-top: 60px;
+    margin-top: 20px;
 }
 </style>

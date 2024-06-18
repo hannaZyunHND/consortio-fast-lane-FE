@@ -15,17 +15,18 @@
         </PopupWrapper>
       </div>
       <div class="space-line"></div>
-      <div class="order-search">
-        <div class="menu-search">
-          <div class="search-filter">
+      <div class="order-search container">
+        <div class="menu-search row col-12">
+          <!-- First row -->
+          <div class="search-filter col-md-3 mb-3">
             <select id="airport" class="form-select" placeholder="Select Cities" v-model="filter.airportId"
               v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Agency'])">
               <option value="0" selected>ALL AIRPORT</option>
               <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}</option>
             </select>
           </div>
-          <div class="search-filter">
-            <select id="status-filter" v-model="filter.bookingStatusId"
+          <div class="search-filter col-md-3 mb-3">
+            <select id="status-filter" class="form-select" v-model="filter.bookingStatusId"
               v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Operator_Ref', 'Agency'])">
               <option value="0">ALL STATUS</option>
               <option v-for="(status, index) in maintainBookingStatus" :key="index" :value="status.Key">
@@ -33,44 +34,48 @@
               </option>
             </select>
           </div>
-          <div class="search-filter">
-            <select id="status-filter" v-model="filter.createdBy" v-if="roleChecker(['Admin', 'Sale_Admin', 'Agency'])">
+
+          <div class="search-filter col-md-3 mb-3">
+            <VueDatePicker v-model="filter.fromDate" :config="datePickerConfig" class="form-control" placeholder="From">
+            </VueDatePicker>
+          </div>
+          <div class="search-filter col-md-3 mb-3">
+            <VueDatePicker v-model="filter.toDate" :config="datePickerConfig" class="form-control" placeholder="To">
+            </VueDatePicker>
+          </div>
+        </div>
+
+        <div class="menu-search row col-12">
+          <!-- Second row -->
+          <div class="search-filter col-md-3 mb-3">
+            <select id="status-filter" class="form-select" v-model="filter.createdBy"
+              v-if="roleChecker(['Admin', 'Sale_Admin', 'Agency'])">
               <option :value="defaultUserId">ALL USERS</option>
               <option v-for="(user, index) in users" :key="index" :value="user.id">
                 {{ user.name }}
               </option>
             </select>
           </div>
-          <div class="search-filter">
-            <VueDatePicker v-model="filter.fromDate" :config="datePickerConfig" class="lich" placeholder="From">
-            </VueDatePicker>
-          </div>
-          <div class="search-filter">
-            <VueDatePicker v-model="filter.toDate" :config="datePickerConfig" placeholder="To">
-            </VueDatePicker>
-          </div>
-          <div class="search-filter">
-            <select id="status-filter" v-model="filter.orderBy">
+          <div class="search-filter col-md-3 mb-3">
+            <select id="status-filter" class="form-select" v-model="filter.orderBy">
               <option value="service-time">Sort by Service-Time</option>
               <option value="booking-time">Sort by Booking-Time</option>
             </select>
           </div>
-          <div class="search-filter">
-            <input type="text" name="search" id="search" v-model="filter.keyword" placeholder="Search"
-              @keyup.enter="search" />
+          <div class="search-filter col-md-3 mb-3">
+            <input type="text" name="search" id="search" class="form-control" v-model="filter.keyword"
+              placeholder="Search" @keyup.enter="search" />
           </div>
-          <div class="search-filter">
-            <button class="btn-search-primary">
-              <i class="fa-solid fa-download" @click="exportOrder()"></i>
+          <div class="search-filter col-md-3 mb-3">
+            <button class="btn btn-primary" @click="exportOrder()">
+              <i class="fa-solid fa-download"></i>
             </button>
           </div>
-
-          <!-- <button class="btn-export-primary">
-            <i class="pi pi-download" style="font-size: 1rem" @click="handleExport"></i>
-          </button> -->
         </div>
-
       </div>
+
+
+
     </div>
     <div class="order-container" v-if="contentViewer == 'table'">
       <div class="list-order">
@@ -103,7 +108,8 @@
                 <div class=""
                   v-if="((item.status == 'B_Confirm' || roleChecker(['Admin']))) && item.listEmployees.length > 0">
                   <div class="">
-                    <button class="btn btn-success compoted" @click="maintainChangeBookingStatus(item.id)">Completed</button>
+                    <button class="btn btn-success compoted"
+                      @click="maintainChangeBookingStatus(item.id)">Completed</button>
                   </div>
                   <br>
                   <div class="">
@@ -137,7 +143,7 @@
                   <div class="item">
                     <PopupWrapper>
                       <template #header>
-                        <div class="popover">
+                        <div class="popover1">
                           <i class="pi pi-image" style="font-size: 1rem" @click="openEditOrder(item.id)"></i>
                         </div>
                       </template>
@@ -231,8 +237,8 @@
                 <div class="action-buttons">
                   <PopupWrapper v-if="roleChecker(['Sale_Admin']) || (item.moreThan12Hour && roleChecker(['Agency']))">
                     <template #header>
-                      <div class="popover">
-                        <pencil-square-icon class="order-icon" @click="openEditOrder(item)" />
+                      <div class="popover1">
+                        <pencil-square-icon class="order-icon " @click="openEditOrder(item)" />
                       </div>
                     </template>
                     <template #content>
@@ -243,7 +249,7 @@
                   </PopupWrapper>
                   <PopupWrapper v-if="roleChecker(['Operator_Ref'])">
                     <template #header>
-                      <div class="popover">
+                      <div class="popover1">
                         <chat-bubble-bottom-center-icon class="order-icon" @click="openEditTask(item.id)" />
                       </div>
                     </template>
@@ -261,8 +267,7 @@
             </tr>
           </tbody>
         </table>
-        <Pagination :currentPage="filter.pageIndex" :totalPages="totalPages" @nextPage="nextPage" @prevPage="prevPage"
-          @goToPage="goToPage" />
+       
       </div>
     </div>
     <div class="order-container order-calendar-viewer" v-if="contentViewer == 'calendar'">
@@ -270,7 +275,8 @@
     </div>
   </div>
   <Loading :loading="isLoading" />
-
+  <Pagination :currentPage="filter.pageIndex" :totalPages="totalPages" @nextPage="nextPage" @prevPage="prevPage"
+  @goToPage="goToPage" />
 </template>
 
 <script>
@@ -463,12 +469,12 @@ export default {
         this.users = response.data.users;
         let roles = localStorage.getItem('roles');
         let userId = localStorage.getItem('user_id');
-        if(roles == "Agency"){
-          this.users = this.users.filter(r => r.parentId == userId)  
-        }else{
+        if (roles == "Agency") {
+          this.users = this.users.filter(r => r.parentId == userId)
+        } else {
           this.users = this.users.filter(r => r.role == "Admin" || r.role == "Sale_Admin" || r.role == "Agency")
         }
-        
+
         this.totalPage = response.data.totalPage;
 
       })
@@ -886,7 +892,6 @@ export default {
 
   padding: 0px 15px;
   display: flex;
-  height: 140px;
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
@@ -897,6 +902,7 @@ export default {
 .order-header {
   display: flex;
   align-items: center;
+  padding: 15px 10px 10px;
   justify-content: space-between;
 }
 
@@ -916,7 +922,6 @@ export default {
 }
 
 .search-filter {
-  gap: 5px;
   display: flex;
   align-items: center;
   font-size: 12px;
@@ -925,7 +930,6 @@ export default {
 
 #search {
   border: none;
-  width: 185px;
   padding: 10px;
   background: none;
   border-radius: 8px;
@@ -948,30 +952,30 @@ export default {
   background: none;
   box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
 }
-#search::placeholder{
+
+#search::placeholder {
   font-size: 12px;
 }
+
 .space-line {
   border: 1px solid #e6eae9;
 }
 
 .order-search {
-  gap: 10px;
-  display: flex;
-  justify-content: space-between;
+  padding: 20px 0;
   align-items: center;
 }
-#status{
+
+#status {
   font-size: 13px;
 }
+
 .menu-search {
   display: flex;
-  gap: 10px;
   align-items: center;
 }
 
 .search-filter {
-  gap: 5px;
   display: flex;
   align-items: center;
 }
@@ -991,11 +995,13 @@ select {
   background: none;
   box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
 }
+
 .order-information tr:nth-child(1),
-.order-information tr:nth-child(2){
+.order-information tr:nth-child(2) {
   background-color: rgb(203, 204, 222) !important;
 
 }
+
 .btn-reset-primary {
   height: 38px;
   border-radius: 7px;
@@ -1052,12 +1058,17 @@ select {
   color: #222;
   margin-left: 12px;
 }
-.un{
+
+.un {
   border: 4px;
   padding: 10px;
-  background-color: #b7b5bd;;
+  background-color: #b7b5bd;
+  ;
   font-weight: 600;
   border-radius: 4px;
+}
+ul{
+    margin-bottom: 0 !important;
 }
 .customer-infomation {
   gap: 10px;
@@ -1076,14 +1087,16 @@ select {
   display: flex;
   justify-content: space-evenly;
 }
-.compoted{
+
+.compoted {
   border: 4px;
   padding: 10px;
-  background-color:#e6e651;
+  background-color: #e6e651;
   font-weight: 600;
   border-radius: 4px;
   width: 100%;
 }
+
 .btn-delete-primary {
   border: none;
   background: none;
@@ -1100,22 +1113,26 @@ select {
 
 }
 
-.item{
+.item {
   font-size: 12px;
 }
-.order-info span.item{
+
+.order-info span.item {
   font-size: 13px !important;
 
 }
-.pass{
+
+.pass {
   width: 300px;
 }
-.item1{
+
+.item1 {
   /* background-color: rgb(131 210 131) !important; */
 
 }
-.order-booking{
+
+.order-booking {
   padding: 20px;
-  background: #1f416c;
+  /* background: #1f416c; */
 }
 </style>

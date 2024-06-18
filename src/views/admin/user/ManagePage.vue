@@ -323,7 +323,7 @@ export default {
 }
 
 .user-body {
-  border: 2px solid #e6eae9;
+  /* border: 2px solid #e6eae9; */
   padding: 0px 15px;
   display: flex;
   height: 140px;

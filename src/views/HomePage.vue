@@ -4,7 +4,7 @@
       <div class=" title-info">
         <div class="home-content">
           <h2 class="home-slogan">{{ $t('home.slogan') }}</h2>
-          <div class="home-input-number" style="margin-left: 15px">
+          <div class="home-input-number">
             <label>{{ $t('home.enter_guests') }}</label>
             <input type="number" v-model="orderData.guest_number" id="guest_number" @input="updateFormCount()"
               required />
@@ -572,6 +572,19 @@ export default {
 }
 </script>
 <style scoped>
+@media (max-width:768px){
+  .btn-submit-primary{
+    right: 0px;
+    top: 95%;
+    position: fixed;
+    padding: 11px 42px !important;
+    color: black;
+    border: none;
+    font-size: 12px !important;
+    border-radius: 7px;
+    background: #d3ecf0;
+  }
+}
 @font-face {
   font-family: "Avenir Next Ultra Light";
   src: url("@/assets/font/Avenir Next.ttc") format("truetype");
@@ -605,15 +618,17 @@ export default {
 
 .home-content {
   color: #fff;
-  width: 650px;
-  margin-left: 21%;
+  text-align: center;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
 }
-
 .home-input-number {
   gap: 6px;
   display: flex;
-  margin-left: 15px;
   flex-direction: column;
+  margin:auto;
 }
 
 .row-content {
@@ -655,7 +670,7 @@ h2 {
 .container {
   color: #000066;
   font-family: "Avenir Next Meidum", sans-serif;
-  width: 60%;
+  width: 100%;
   margin: 0 auto;
   margin-bottom: 20px;
   height: 100%;

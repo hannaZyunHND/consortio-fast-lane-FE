@@ -21,14 +21,13 @@ export default {
 </script>
 
 <style>
-.dashboard-body {
+/* .dashboard-body {
     height: 100vh;
     display: flex;
-}
+} */
 
 .content {
     flex: 1;
-    overflow-y: scroll;
     /* width: 80%; */
     /* padding: 20px 20px 0px 20px; */
     font-size: 14px;

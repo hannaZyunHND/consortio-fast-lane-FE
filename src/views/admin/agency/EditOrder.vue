@@ -1,117 +1,102 @@
 <template>
-  <div class="popup-content">
-    <span class="title-header">Update Booking</span>
-    <form enctype="multipart/form-data" @submit.prevent="submitOrder" id="edit-order-form">
-      <div class="form-col" id="form-file">
-        <div class="file-input">
-          <label :for="`passport ${numberKey}`" class="file-upload-label">
-            <div class="body-file">
-              <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
-              <span class="title-header">Upload passport at here*</span>
-            </div>
-            <img :src="orderData.passport_Image" alt="Uploaded Image" class="uploaded-image" />
-          </label>
-          <input :id="`passport ${numberKey}`" type="file" @change="handlePassportUpload" />
+<div class="popup-content container">
+  <span class="title-header">Update Booking</span>
+  <form enctype="multipart/form-data" @submit.prevent="submitOrder" id="edit-order-form">
+    <div class="form-col" id="form-file">
+      <div class="file-input mb-3">
+        <label :for="`passport ${numberKey}`" class="file-upload-label">
+          <div class="body-file">
+            <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
+            <span class="title-header">Upload passport at here*</span>
+          </div>
+          <img :src="orderData.passport_Image" alt="Uploaded Image" class="uploaded-image" />
+        </label>
+        <input :id="`passport ${numberKey}`" type="file" @change="handlePassportUpload" />
+      </div>
+      <div class="file-input mb-3">
+        <label :for="`visa ${numberKey}`" class="file-upload-label">
+          <div class="body-file">
+            <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
+            <span class="title-header">Upload visa at here</span>
+          </div>
+          <img :src="orderData.visa_Image" alt="Uploaded Image" class="uploaded-image" />
+        </label>
+        <input :id="`visa ${numberKey}`" type="file" @change="handleVisaUpload" />
+      </div>
+      <div class="file-input mb-3">
+        <label :for="`portrait ${numberKey}`" class="file-upload-label">
+          <div class="body-file">
+            <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
+            <span class="title-header">Upload portrait at here</span>
+          </div>
+          <img :src="orderData.portrait_Image" alt="Uploaded Image" class="uploaded-image" />
+        </label>
+        <input :id="`portrait ${numberKey}`" type="file" @change="handlePortraitUpload($event)" />
+      </div>
+    </div>
+    <div class="form-info row">
+      <div class="form-col col-md-4">
+        <div class="row mb-3">
+          <label for="name">Name</label>
+          <input type="text" v-model="orderData.name" required placeholder="Your name" class="form-control">
         </div>
-        <div class="file-input">
-          <label :for="`visa ${numberKey}`" class="file-upload-label">
-            <div class="body-file">
-              <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
-              <span class="title-header">Upload visa at here</span>
-            </div>
-            <img :src="orderData.visa_Image" alt="Uploaded Image" class="uploaded-image" />
-          </label>
-          <input :id="`visa ${numberKey}`" type="file" @change="handleVisaUpload" />
+        <div class="row mb-3">
+          <label for="email">Email</label>
+          <input type="email" v-model="orderData.email" placeholder="you@gmail.com" required class="form-control">
         </div>
-        <div class="file-input">
-          <label :for="`portrait ${numberKey}`" class="file-upload-label">
-            <div class="body-file">
-              <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
-              <span class="title-header">Upload portrait at here</span>
-            </div>
-            <img :src="orderData.portrait_Image" alt="Uploaded Image" class="uploaded-image" />
-          </label>
-          <input :id="`portrait ${numberKey}`" type="file" @change="handlePortraitUpload($event)" />
+        <div class="row mb-3">
+          <label for="phone">Phone Number</label>
+          <input type="text" v-model="orderData.phone" placeholder="phone" required class="form-control">
+        </div>
+        <div class="row mb-3">
+          <label for="passport_number">Passport Number</label>
+          <input type="text" v-model="orderData.passport_Number" required placeholder="your passport" class="form-control">
         </div>
       </div>
-      <div class="form-info">
-        <div class="form-col">
-          <div class="row">
-            <label for="name">Name</label>
-            <input type="text" v-model="orderData.name" required placeholder="Your name">
-          </div>
-          <div class="row">
-            <label for="email">Email</label>
-            <input type="email" v-model="orderData.email" placeholder="you@gmail.com" required>
-          </div>
-          <div class="row">
-            <label for="phone">Phone Number</label>
-            <input type="text" v-model="orderData.phone" placeholder="phone" required>
-          </div>
-          <div class="row">
-            <label for="passport_number">Passport Number</label>
-            <input type="text" v-model="orderData.passport_Number" required placeholder="your passport">
-          </div>
+      <div class="form-col col-md-4">
+        <div class="row mb-3">
+          <label for="nationality">Nationality</label>
+          <input type="text" v-model="orderData.nationality" placeholder="nationality" required class="form-control">
         </div>
-        <div class="form-col">
-          <div class="row">
-            <label for="nationality">Nationality</label>
-            <input type="text" v-model="orderData.nationality" placeholder="nationality" required>
-          </div>
-          <div class="row">
-            <label for="flight_number">Flight Number</label>
-            <input type="text" v-model="orderData.flight_Number" required>
-          </div>
-          <div class="row" style="display: flex;flex-direction: column">
-            <label for="airPort">Airport</label>
-            <select id="airPort" v-model="orderData.airPort" required>
-              <option value="" disabled selected hidden>Select Airport</option>
-              <option value="Noi Bai">Noi Bai International Airport, Ha Noi</option>
-              <option value="Da Nang">Da Nang International Airport, Da Nang</option>
-              <option value="Cam Ranh">Cam Ranh International Airport, Khanh Hoa</option>
-              <option value="Tan Son Nhat">Tan Son Nhat International Airport, HCMC</option>
-              <option value="Phu Quoc">Phu Quoc International Airport, Kien Giang</option>
-            </select>
-          </div>
-          <div class="row">
-            <label for="departure_time">Order Time</label>
-            <input type="text" v-model="orderData.service_Time" required>
-          </div>
+        <div class="row mb-3">
+          <label for="flight_number">Flight Number</label>
+          <input type="text" v-model="orderData.flight_Number" required class="form-control">
         </div>
-        <div class="form-col">
-          <!-- <div class="row">
-            <label for="status_sales">Sales Status</label>
-            <select v-model="orderData.status_Sales_Id" id="status">
-              <option v-for="(status, index) in statuses" :key="index" :value="status.id">{{
-                status.name
-              }}
-              </option>
-            </select>
-          </div> -->
-          <div class="row">
-            <label>Service</label>
-            <select v-model="orderData.service_ID" id="service">
-              <option value="" disabled selected hidden>Select Service</option>
-              <option v-for="(service, index) in services" :key="index" :value="service.id">{{
-                service.name }}
-              </option>
-            </select>
-          </div>
-          <div class="row">
-            <label for="note">Note</label>
-            <textarea type="text" v-model="orderData.note"></textarea>
-          </div>
-          <!-- <div class="row">
-            <label for="operator_note">Remark to Operation</label>
-            <textarea type="text" v-model="orderData.operator_Note"></textarea>
-          </div> -->
+        <div class="row mb-3">
+          <label for="airPort">Airport</label>
+          <select id="airPort" v-model="orderData.airPort" required class="form-select">
+            <option value="" disabled selected hidden>Select Airport</option>
+            <option value="Noi Bai">Noi Bai International Airport, Ha Noi</option>
+            <option value="Da Nang">Da Nang International Airport, Da Nang</option>
+            <option value="Cam Ranh">Cam Ranh International Airport, Khanh Hoa</option>
+            <option value="Tan Son Nhat">Tan Son Nhat International Airport, HCMC</option>
+            <option value="Phu Quoc">Phu Quoc International Airport, Kien Giang</option>
+          </select>
+        </div>
+        <div class="row mb-3">
+          <label for="departure_time">Order Time</label>
+          <input type="text" v-model="orderData.service_Time" required class="form-control">
         </div>
       </div>
-      <button type="submit" class="btn-update-primary"><i class="pi pi-span pi-slack" style="color: white"></i>
-        Save</button>
-    </form>
-    <Loading :loading="isLoading" />
-  </div>
+      <div class="form-col col-md-4">
+        <div class="row mb-3">
+          <label>Service</label>
+          <select v-model="orderData.service_ID" id="service" class="form-select">
+            <option value="" disabled selected hidden>Select Service</option>
+            <option v-for="(service, index) in services" :key="index" :value="service.id">{{ service.name }}</option>
+          </select>
+        </div>
+        <div class="row mb-3">
+          <label for="note">Note</label>
+          <textarea v-model="orderData.note" class="form-control"></textarea>
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary"><i class="pi pi-span pi-slack" style="color: white"></i> Save</button>
+  </form>
+  <Loading :loading="isLoading" />
+</div>
+
 </template>
 
 <script>
@@ -376,7 +361,6 @@ export default {
   z-index: 9999;
   width: fit-content;
   position: absolute;
-  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: #fff;

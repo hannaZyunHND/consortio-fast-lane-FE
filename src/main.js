@@ -12,11 +12,22 @@ import 'primeicons/primeicons.css'; // Import PrimeIcons CSS
 import VueCountdown from '@chenfengyuan/vue-countdown';
 import Select2 from 'vue3-select2-component';
 
+import { VueSignalR } from '@dreamonkey/vue-signalr';
+import { HubConnectionBuilder } from '@microsoft/signalr';
+
+
+// Create your connection
+// See https://docs.microsoft.com/en-us/javascript/api/@microsoft/signalr/hubconnectionbuilder
+const connection = new HubConnectionBuilder()
+  .withUrl(process.env.VUE_APP_FETCH_ORDER_HUB, { withCredentials: false })
+  .build();
+
 const app = createApp(App);
 app.component('VueDatePicker', VueDatePicker);
 app.component('Select2', Select2)
 app.component(VueCountdown.name, VueCountdown);
 app.use(router);
-app.mount('#app');
+app.use(VueSignalR, {connection})
 app.use(i18n);
 app.use(ElementPlus);
+app.mount('#app');

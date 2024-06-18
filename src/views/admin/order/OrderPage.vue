@@ -145,7 +145,7 @@
                     <PopupWrapper>
                       <template #header>
                         <div class="popover1">
-                          <i class="pi pi-image" style="font-size: 1rem" @click="openEditOrder(item.id)"></i>
+                          <i class="pi pi-image" style="font-size: 1rem" @click="openEditOrder(item)"></i>
                         </div>
                       </template>
                       <template #content>
@@ -328,6 +328,8 @@ import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import timeGridPlugin from '@fullcalendar/timegrid';
+import { useSignalR } from '@dreamonkey/vue-signalr';
+
 
 
 export default {
@@ -410,8 +412,17 @@ export default {
           { title: 'event 1', date: '2019-04-01' },
           { title: 'event 2', date: '2019-04-02' }
         ]
-      }
+      },
+      signalr: null,
     };
+  },
+  created(){
+    this.signalr = useSignalR();
+    this.signalr.on('RefetchOrders', this.handlerOnRefetchOrders);
+    // this.signalr
+    //     .start()
+    //     .then(() => console.log('SignalR connected'))
+    //     .catch(err => console.error('SignalR connection error:', err));
   },
   mounted() {
     // this.fetchOrder();
@@ -455,6 +466,9 @@ export default {
   },
   methods: {
     //#region maintain
+    handlerOnRefetchOrders(message){
+      this.maintainFetchOrders();
+    },
     roleCheckerReverse(decinedRoles) {
       let checker = true;
       let role = localStorage.getItem('roles');
@@ -535,9 +549,7 @@ export default {
 
         })
       }
-      else {
-        this.scheduleData.status_Operator_ID = 8;
-      }
+      
     },
     async maintainChangeBookingStatusUncomplete(orderId) {
       const confirmResult = await Swal.fire({
@@ -572,9 +584,7 @@ export default {
 
         })
       }
-      else {
-        this.scheduleData.status_Operator_ID = 8;
-      }
+      
     },
     openEditTask(id) {
       this.selectedOrderTask = id;

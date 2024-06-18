@@ -67,9 +67,9 @@
         </div>
 
 
-        <div class=" data-report-month row">
+        <div class="row row-cols-md-5 row-cols-xs-1 ">
             <!-- Total Booking -->
-            <div class="col-md-4 col-lg-5 total-data m-3">
+            <div class="col m-1 total-data">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
                     {{ items.length }}
@@ -80,7 +80,7 @@
             </div>
 
             <!-- Total Pending Booking -->
-            <div class="col-md-4 col-lg-5 total-data m-3">
+            <div class="col m-1 total-data ">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
                     {{ itemPending.length }}
@@ -91,7 +91,7 @@
             </div>
 
             <!-- Total Confirmed Booking -->
-            <div class="col-md-4 col-lg-3 total-data m-3">
+            <div class="col m-1 total-data ">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
                     {{ itemConfirm.length }}
@@ -102,7 +102,7 @@
             </div>
 
             <!-- Total Completed Booking -->
-            <div class="col-md-4 col-lg-3 total-data m-3">
+            <div class="col m-1 total-data ">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
                     {{ itemComplete.length }}
@@ -113,7 +113,7 @@
             </div>
 
             <!-- Total Uncompleted Booking -->
-            <div class="col-md-4 col-lg-3 total-data m-3">
+            <div class="col m-1 total-data ">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
                     {{ itemUnComplete.length }}

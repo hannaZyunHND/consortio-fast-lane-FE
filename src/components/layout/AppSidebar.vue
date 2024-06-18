@@ -96,14 +96,14 @@
                   <user-icon class="navbar-icon"></user-icon>
                   <PopupWrapper>
                     <template #header>
-                      <div class="">
+                      <div class="" @click="onClickChangePassword">
                         <pencil-square-icon class="user-icon"></pencil-square-icon>
                         <span>Change password</span>
                       </div>
                     </template>
                     <template #content>
                       <div class="popover-content">
-                        <Change_Password></Change_Password>
+                        <Change_Password :userId="userId"></Change_Password>
                       </div>
                     </template>
                   </PopupWrapper>
@@ -188,13 +188,14 @@ export default {
       showStatisticsAgencyMenu: false,
       showNewBookingMenuForSale: false,
       showNewBookingMenu: false,
+      userId: 0,
 
     };
   },
 
   mounted() {
     const roles = localStorage.getItem("roles");
-
+    this.userId = localStorage.getItem("user_id");
     //Authorize permission for each role
     this.showBookingsMenu =
       roles == "Admin" ||
@@ -253,6 +254,9 @@ export default {
   },
   methods: {
     //#region maintain
+    onClickChangePassword(){
+      this.userId = parseInt(localStorage.getItem("user_id"));
+    },
     roleChecker(accepedRoles) {
       let checker = false;
 

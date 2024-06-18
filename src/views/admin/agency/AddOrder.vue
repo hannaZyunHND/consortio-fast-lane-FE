@@ -1,50 +1,52 @@
 <template>
   <form @submit.prevent="submitOrder" class="popup-content">
-    <div class="form-right-col">
-      <div class="row" style="margin-bottom: ">
-        <div class="form-col-service">
+    <div class="form-right-col container">
+      <div class="row mb-3">
+        <div class="form-col-service col-md-12">
           <label for="service">Service*</label>
-          <select v-model="formData.service_Id" id="service">
+          <select v-model="formData.service_Id" id="service" class="form-select">
             <option v-for="(service, index) in services" :key="index" :value="service.id">
               {{ service.name }}
             </option>
           </select>
         </div>
       </div>
-      <div class="form-row-body">
-        <div class="form-col">
-          <div class="row">
+      <div class="form-row-body row">
+        <div class="form-col col-md-4">
+          <div class="row mb-3">
             <label for="name">Name*</label>
-            <input type="text" v-model="formData.name" required id="name" placeholder="Full name" />
+            <input type="text" v-model="formData.name" required id="name" placeholder="Full name"
+              class="form-control" />
             <span class="title-notification">* Autofill if providing the passport photo</span>
           </div>
-          <div class="row">
+          <div class="row mb-3">
             <label for="passport_number">Passport Number*</label>
-            <input type="text" v-model="formData.passport_number" id="passport_number" required />
+            <input type="text" v-model="formData.passport_number" id="passport_number" required class="form-control" />
             <span class="title-notification">* Autofill if providing the passport photo</span>
           </div>
-          <div class="row">
+          <div class="row mb-3">
             <label for="nationality">Nationality*</label>
-            <input type="text" v-model="formData.nationality" id="nationality" required />
+            <input type="text" v-model="formData.nationality" id="nationality" required class="form-control" />
             <span class="title-notification">* Autofill if providing the passport photo</span>
           </div>
         </div>
-
-        <div class="form-col">
-          <div class="row">
+        <div class="form-col col-md-4">
+          <div class="row mb-3">
             <label for="departure_time">Service Time*</label>
-            <VueDatePicker v-model="formData.service_time" :config="datePickerConfig" :min-date="minDate" required>
+            <VueDatePicker v-model="formData.service_time" :config="datePickerConfig" :min-date="minDate" required
+              class="form-control">
             </VueDatePicker>
             <span class="title-notification" style="visibility: hidden">*</span>
           </div>
-          <div class="row">
+          <div class="row mb-3">
             <label for="flight_number">Flight Number*</label>
-            <input type="text" v-model="formData.flight_number" @input="checkFormCompletion" required />
+            <input type="text" v-model="formData.flight_number" @input="checkFormCompletion" required
+              class="form-control" />
             <span class="title-notification" style="visibility: hidden">*</span>
           </div>
-          <div class="row">
+          <div class="row mb-3">
             <label for="airport">Airport*</label>
-            <select id="airport" v-model="formData.airport" required>
+            <select id="airport" v-model="formData.airport" required class="form-select">
               <option value="" disabled selected hidden>Select Airport</option>
               <option value="Noi Bai">Noi Bai International Airport, Ha Noi</option>
               <option value="Da Nang">Da Nang International Airport, Da Nang</option>
@@ -55,29 +57,29 @@
             <span class="title-notification" style="visibility: hidden">*</span>
           </div>
         </div>
-        <div class="form-col">
-          <div class="row">
+        <div class="form-col col-md-4">
+          <div class="row mb-3">
             <label for="email">Email*</label>
-            <input type="email" v-model="formData.email" required />
+            <input type="email" v-model="formData.email" required class="form-control" />
             <span class="title-notification" style="visibility: hidden">*</span>
           </div>
-          <div class="row">
+          <div class="row mb-3">
             <label for="phone">Phone Number*</label>
-            <input type="text" v-model="formData.phone" required />
+            <input type="text" v-model="formData.phone" required class="form-control" />
             <span class="title-notification" style="visibility: hidden">*</span>
           </div>
-          <div class="row">
+          <div class="row mb-3">
             <label for="note">Note</label>
-            <textarea type="text" v-model="formData.note" id="note"></textarea>
+            <textarea v-model="formData.note" id="note" class="form-control"></textarea>
           </div>
           <span class="title-notification" style="visibility: hidden">*</span>
         </div>
       </div>
     </div>
-    <div class="form-col" id="form-file">
+    <div class="form-col container" id="form-file">
       <span>Upload Documents:</span>
-      <div class="form-file-container">
-        <div class="file-input">
+      <div class="form-file-container row">
+        <div class="file-input col-md-4">
           <label :for="`passport ${numberKey}`" class="file-upload-label">
             <div class="body-file">
               <i class="pi pi-plus-circle" style="font-size: 1rem; color: #334155"></i>
@@ -87,7 +89,7 @@
           </label>
           <input :id="`passport ${numberKey}`" type="file" @change="handlePassportUpload" />
         </div>
-        <div class="file-input">
+        <div class="file-input col-md-4">
           <label :for="`visa ${numberKey}`" class="file-upload-label">
             <div class="body-file">
               <i class="pi pi-plus-circle" style="font-size: 1rem; color: #334155"></i>
@@ -97,7 +99,7 @@
           </label>
           <input :id="`visa ${numberKey}`" type="file" @change="handleVisaUpload" />
         </div>
-        <div class="file-input">
+        <div class="file-input col-md-4">
           <label :for="`portrait ${numberKey}`" class="file-upload-label">
             <div class="body-file">
               <i class="pi pi-plus-circle" style="font-size: 1rem; color: #334155"></i>
@@ -111,10 +113,11 @@
     </div>
     <div class="footer-form">
       <span class="title-footer">(*) Marks field are mandatory to fill up</span>
-      <button type="submit" class="btn-submit-primary">Submit</button>
+      <button type="submit" class="btn btn-primary">Submit</button>
     </div>
     <Loading :loading="isLoading" />
   </form>
+
 </template>
 <script>
 import axios from "axios";
@@ -366,7 +369,7 @@ export default {
   align-items: center;
   width: fit-content;
   position: absolute;
-  top: 50%;
+  /* top: 50%; */
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: #fff;

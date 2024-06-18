@@ -1,15 +1,21 @@
 <template>
   <header class="header-container">
-    <div id="header">
-      <img src="@/assets/logo.png" alt="logo" class="header-logo-image" />
-      <div class="header-info">
-        <span class="contact-in"> Support: +84 90 222 7529 </span>
-        <select class="form-select" @change="changeLanguage">
-          <option value="en">English</option>
-          <option value="vi">VietNamese</option>
-          <option value="zh">Chinese /中文</option>
-          <option value="ko">Korea /한국</option>
-        </select>
+    <div class="container-fluid">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <router-link to="/"><img src="@/assets/logo.png" alt="logo" class="header-logo-image img-fluid logo12" /></router-link>
+        </div>
+        <div class="col-md-6">
+          <div class="header-info d-flex justify-content-end align-items-center">
+            <div class="contact-in me-3"> Support: <a class="tel" href="tel:+84902227529">+84 90 222 7529</a> </div>
+            <select class="form-select ngonngu" @change="changeLanguage">
+              <option value="en">English</option>
+              <option value="vi">VietNamese</option>
+              <option value="zh">Chinese /中文</option>
+              <option value="ko">Korean /한국</option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -32,27 +38,39 @@ export default {
   src: url("@/assets/font/Avenir Next.ttc") format("truetype");
 }
 
-#header {
+.header-container {
+  background-color: #ffffff;
   color: #000066;
-  gap: 60%;
+  padding: 20px 0;
+}
+
+.header-logo-image {
+  height: auto;
+  max-height: 65px;
+}
+
+.contact-in {
   display: flex;
-  font-family: "Avenir Next Medium", sans-serif;
-  align-items: center;
-  justify-content: space-around;
-  padding: 20px;
+  gap: 5px;
 }
 
-.header-container #header .header-logo-image {
-  height: 65px;
+.tel {
+  text-decoration: none;
+  color: #000066;
+  width: 140px;
 }
-
+.ngonngu{
+  width: 120px;
+}
+.logo12{
+  padding-bottom: 10px;
+}
 .form-select {
   padding: 3px 5px;
   font-size: 16px;
   border: none;
   border-radius: 4px;
   background-color: #fff;
-  width: 120px;
   color: #000066;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }

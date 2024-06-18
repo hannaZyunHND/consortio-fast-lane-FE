@@ -1,8 +1,8 @@
 <template>
-    <div class="signup">
-        <div class="signup-image">
-        </div>
-        <div class="signup-form">
+    <div class="signup row">
+        <img src="~@/assets/logo1.jpg" class="signup-image col-md-6"/>
+       
+        <div class="signup-form col-md-6">
             <h2>Sign up</h2>
             <form enctype="multipart/form-data" @submit.prevent="submitForm">
                 <label for="username">UserName:</label>
@@ -83,7 +83,6 @@ body {
     border-radius: 10px;
     background: white;
     display: flex;
-    width: 800px;
     max-width: 1000px;
 }
 
@@ -91,10 +90,10 @@ body {
     border-bottom-left-radius: 10px;
     border-top-left-radius: 10px;
     flex: 1;
-    background-image: url("~@/assets/logo1.jpg");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
+    padding: 0 !important;
 }
 
 .signup-form {
@@ -105,8 +104,8 @@ body {
 input[type="text"],
 input[type="email"],
 input[type="password"] {
-    margin: 10px 0px;
-    width: 95%;
+    margin: 8px 0 15px;
+    width: 100%;
     border: 2px solid #dfe4e9;
     padding: 10px;
     border-radius: 5px;

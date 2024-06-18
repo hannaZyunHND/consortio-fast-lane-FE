@@ -5,61 +5,71 @@
         </span>
         <div class="order-search">
             <div class="menu-search">
-                <div class="search-filter">
-                    <select id="airport" class="form-select" placeholder="Select Cities" v-model="filter.airportId"
+                <div class="row">
+                    <!-- Airport Filter -->
+                    <div class="col-md-4 col-lg-3 search-filter"
                         v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Agency'])">
-                        <option value="0" selected>ALL AIRPORT</option>
-                        <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}</option>
-                    </select>
-                </div>
-                <div class="search-filter">
-                    <select id="status-filter" v-model="filter.bookingStatusId"
+                        <select id="airport" class="form-select" placeholder="Select Cities" v-model="filter.airportId">
+                            <option value="0" selected>ALL AIRPORT</option>
+                            <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}</option>
+                        </select>
+                    </div>
+                    <!-- Status Filter -->
+                    <div class="col-md-4 col-lg-3 search-filter"
                         v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Operator_Ref', 'Agency'])">
-                        <option value="0">ALL STATUS</option>
-                        <option v-for="(status, index) in maintainBookingStatus" :key="index" :value="status.Key">
-                            {{ status.Value }}
-                        </option>
-                    </select>
-                </div>
-                <div class="search-filter">
-                    <select id="status-filter" v-model="filter.serviceId"
+                        <select id="status-filter" class="form-select" v-model="filter.bookingStatusId">
+                            <option value="0">ALL STATUS</option>
+                            <option v-for="(status, index) in maintainBookingStatus" :key="index" :value="status.Key">{{
+                                status.Value }}</option>
+                        </select>
+                    </div>
+                    <!-- Services Filter -->
+                    <div class="col-md-4 col-lg-3 search-filter"
                         v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Operator_Ref', 'Agency'])">
-                        <option value="0">ALL SERVICES</option>
-                        <option v-for="(s, index) in maintainServices" :key="index" :value="s.id">{{ s.name }}</option>
-                    </select>
+                        <select id="status-filter" class="form-select" v-model="filter.serviceId">
+                            <option value="0">ALL SERVICES</option>
+                            <option v-for="(s, index) in maintainServices" :key="index" :value="s.id">{{ s.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <!-- Users Filter -->
+                    <div class="col-md-4 col-lg-3 search-filter" v-if="roleChecker(['Admin'])">
+                        <select id="status-filter" class="form-select" v-model="filter.createdBy">
+                            <option :value="defaultUserId">ALL USERS</option>
+                            <option v-for="(user, index) in users" :key="index" :value="user.id">{{ user.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <!-- From Date Picker -->
+                    <div class="col-md-4 col-lg-3 search-filter">
+                        <VueDatePicker v-model="filter.fromDate" :config="datePickerConfig" placeholder="From">
+                        </VueDatePicker>
+                    </div>
+                    <!-- To Date Picker -->
+                    <div class="col-md-4 col-lg-3 search-filter">
+                        <VueDatePicker v-model="filter.toDate" :config="datePickerConfig" placeholder="To">
+                        </VueDatePicker>
+                    </div>
+                    <!-- Order By Filter -->
+                    <div class="col-md-4 col-lg-3 search-filter">
+                        <select id="status-filter" class="form-select" v-model="filter.orderBy">
+                            <option value="service-time">Sort by Service-Time</option>
+                            <option value="booking-time">Sort by Booking-Time</option>
+                        </select>
+                    </div>
+                    <!-- Hidden Search Input -->
+                    <div class="col-md-4 col-lg-3 search-filter" style="display: none;">
+                        <input type="text" name="search" id="search" class="form-control" v-model="filter.keyword"
+                            placeholder="Search" @keyup.enter="search" />
+                    </div>
                 </div>
-                <div class="search-filter">
-                    <select id="status-filter" v-model="filter.createdBy" v-if="roleChecker(['Admin'])">
-                        <option :value="defaultUserId">ALL USERS</option>
-                        <option v-for="(user, index) in users" :key="index" :value="user.id">
-                            {{ user.name }}
-                        </option>
-                    </select>
-                </div>
-                <div class="search-filter">
-                    <VueDatePicker v-model="filter.fromDate" :config="datePickerConfig" placeholder="From">
-                    </VueDatePicker>
-                </div>
-                <div class="search-filter">
-                    <VueDatePicker v-model="filter.toDate" :config="datePickerConfig" placeholder="To">
-                    </VueDatePicker>
-                </div>
-                <div class="search-filter">
-                    <select id="status-filter" v-model="filter.orderBy">
-                        <option value="service-time">Sort by Service-Time</option>
-                        <option value="booking-time">Sort by Booking-Time</option>
-                    </select>
-                </div>
-                <div style="display: none">
-                    <input type="text" name="search" id="search" v-model="filter.keyword" placeholder="Search"
-                        @keyup.enter="search" />
-                </div>
-
             </div>
-
         </div>
-        <div class="data-report-month">
-            <span class="total-data">
+
+
+        <div class=" data-report-month row">
+            <!-- Total Booking -->
+            <div class="col-md-4 col-lg-5 total-data m-3">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
                     {{ items.length }}
@@ -67,8 +77,10 @@
                 <span class="report-title-data">
                     Total Booking
                 </span>
-            </span>
-            <span class="total-data">
+            </div>
+
+            <!-- Total Pending Booking -->
+            <div class="col-md-4 col-lg-5 total-data m-3">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
                     {{ itemPending.length }}
@@ -76,27 +88,32 @@
                 <span class="report-title-data">
                     Total Pending Booking
                 </span>
-            </span>
-            <!-- <span class="total-data">Canceled: {{ totalYear.cancelCount }}</span> -->
-            <span class="total-data">
+            </div>
+
+            <!-- Total Confirmed Booking -->
+            <div class="col-md-4 col-lg-3 total-data m-3">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
-                    {{ itemConfirm.length }} 
+                    {{ itemConfirm.length }}
                 </div>
                 <span class="report-title-data">
                     Total Confirmed Booking
                 </span>
-            </span>
-            <span class="total-data">
+            </div>
+
+            <!-- Total Completed Booking -->
+            <div class="col-md-4 col-lg-3 total-data m-3">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
-                    {{ itemComplete.length }} 
+                    {{ itemComplete.length }}
                 </div>
                 <span class="report-title-data">
                     Total Completed Booking
                 </span>
-            </span>
-            <span class="total-data">
+            </div>
+
+            <!-- Total Uncompleted Booking -->
+            <div class="col-md-4 col-lg-3 total-data m-3">
                 <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
                 <div class="number-of-booking">
                     {{ itemUnComplete.length }}
@@ -104,75 +121,83 @@
                 <span class="report-title-data">
                     Total Uncompleted Booking
                 </span>
-            </span>
+            </div>
         </div>
+
+
         <div class="report-chart-combine">
 
 
             <div class="chart-title">Chart</div>
-            <div class="report-item-wrapper" style="display: grid; grid-template-columns: auto auto; gap: 20px;">
-
-                <div class="report-item" v-for="c in compareBarChart">
-                    <div class="combine-search">
-                        <div class="menu-search-combine">
-                            <div class="search-filter">
-                                <select id="airport" class="form-select" placeholder="Select Cities"
-                                    v-model="c.filterItem.airportId"
-                                    v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Agency'])">
-                                    <option value="0" selected>ALL AIRPORT</option>
-                                    <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="search-filter">
-                                <select id="status-filter" v-model="c.filterItem.serviceId"
-                                    v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Operator_Ref', 'Agency'])">
-                                    <option value="0">ALL SERVICES</option>
-                                    <option v-for="(s, index) in maintainServices" :key="index" :value="s.id">{{ s.name
-                                        }}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="search-filter">
-                                <select id="status-filter" v-model="c.filterItem.createdBy"
-                                    v-if="roleChecker(['Admin'])">
-                                    <option value="0">ALL USERS</option>
-                                    <option v-for="(user, index) in users" :key="index" :value="user.id">
-                                        {{ user.name }}
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="search-filter">
-                                <VueDatePicker v-model="c.filterItem.fromDate" :config="datePickerConfig"
-                                    placeholder="From">
-                                </VueDatePicker>
-                            </div>
-                            <div class="search-filter">
-                                <VueDatePicker v-model="c.filterItem.toDate" :config="datePickerConfig"
-                                    placeholder="To">
-                                </VueDatePicker>
-                            </div>
-                            <div class="search-filter">
-                                <select id="status-filter" v-model="c.filterItem.orderBy">
-                                    <option value="service-time">Sort by Service-Time</option>
-                                    <option value="booking-time">Sort by Booking-Time</option>
-                                </select>
+            <div class="report-item-wrapper row">
+                <div class="col-md-6 mb-3" v-for="c in compareBarChart">
+                    <div class="report-item">
+                        <div class="combine-search">
+                            <!-- Hàng thứ nhất -->
+                            <div class="menu-search-combine row">
+                                <div class="col-md-4 mb-3">
+                                    <select id="airport" class="form-select" placeholder="Select Cities"
+                                        v-model="c.filterItem.airportId"
+                                        v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Agency'])">
+                                        <option value="0" selected>ALL AIRPORT</option>
+                                        <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <select id="status-filter" v-model="c.filterItem.serviceId"
+                                        v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Operator_Ref', 'Agency'])">
+                                        <option value="0">ALL SERVICES</option>
+                                        <option v-for="(s, index) in maintainServices" :key="index" :value="s.id">{{
+                                            s.name }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <select id="status-filter" v-model="c.filterItem.createdBy"
+                                        v-if="roleChecker(['Admin'])">
+                                        <option value="0">ALL USERS</option>
+                                        <option v-for="(user, index) in users" :key="index" :value="user.id">{{
+                                            user.name }}</option>
+                                    </select>
+                                </div>
                             </div>
 
-                            <div class="search-filter">
-                                <button @click="onSearchFilter()" class="btn-reset-primary">
-                                    Search
-                                </button>
+                            <!-- Hàng thứ hai -->
+                            <div class="menu-search-combine row">
+                                <div class="col-md-4 mb-3 mt-2">
+                                    <VueDatePicker v-model="c.filterItem.fromDate" :config="datePickerConfig"
+                                        placeholder="From">
+                                    </VueDatePicker>
+                                </div>
+                                <div class="col-md-4 mb-3 mt-2">
+                                    <VueDatePicker v-model="c.filterItem.toDate" :config="datePickerConfig"
+                                        placeholder="To">
+                                    </VueDatePicker>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <select id="status-filter" v-model="c.filterItem.orderBy">
+                                        <option value="service-time">Sort by Service-Time</option>
+                                        <option value="booking-time">Sort by Booking-Time</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Hàng thứ ba -->
+                            <div class="menu-search-combine row">
+                                <div class="col-md-2 mb-3">
+                                    <button @click="onSearchFilter()" class="btn btn-primary">
+                                        Search
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="chart-item">
-                        <Bar :data="c.chartInfo" v-if="c.chartInfo" />
-                    </div>
 
+                        <div class="chart-item">
+                            <Bar :data="c.chartInfo" v-if="c.chartInfo" />
+                        </div>
+                    </div>
                 </div>
             </div>
-
 
 
         </div><br />
@@ -720,15 +745,17 @@ export default {
 </script>
 <style scoped>
 .data-report-month {
-    min-height: 120px;
     display: flex;
     gap: 20px;
-    margin: 20px 0px;
-    justify-content: space-between;
+    justify-content: center;
+
 }
-.search-filter select{
+
+
+.search-filter select {
     font-size: 12px;
 }
+
 .number-of-booking {
     font-weight: bold;
     font-size: 21px;
@@ -752,10 +779,10 @@ export default {
 }
 
 .total-data {
-    padding-left: 20px;
+    margin-bottom: 20px;
+    padding: 15px;
     display: flex;
     gap: 10px;
-    width: 25%;
     background: #fff;
     border-radius: 7px;
     box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
@@ -824,10 +851,12 @@ select {
     border-radius: 5px;
     padding: 10px;
 }
-.chart-title{
+
+.chart-title {
     font-size: 18px;
     font-weight: 600;
 }
+
 .btn-export-primary,
 .btn-search-primary {
     border-radius: 7px;
@@ -851,11 +880,11 @@ select {
     height: 100% !important;
 }
 
-.menu-search-combine {
-    display: grid;
-    grid-template-columns: auto auto auto;
+#status-filter{
+    width: 100%;
 }
-.report-chart-combine{
+
+.report-chart-combine {
     margin-top: 60px;
 }
 </style>

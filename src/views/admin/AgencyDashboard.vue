@@ -4,6 +4,7 @@
         <div class="dashboard-body">
             <AppSidebar />
             <div class="content">
+
                 <router-view></router-view>
             </div>
         </div>
@@ -20,15 +21,15 @@ export default {
 </script>
 
 <style scoped>
-.dashboard-body {
+/* .dashboard-body {
     height: 100vh;
     display: flex;
-}
+} */
 
 .content {
     flex: 1;
     /* width: 80%; */
-    padding: 0px 20px 0px 20px;
+    padding: 20px 20px 0px 20px;
     font-size: 14px;
     font-family: "Inter var", sans-serif;
     color: #334155;

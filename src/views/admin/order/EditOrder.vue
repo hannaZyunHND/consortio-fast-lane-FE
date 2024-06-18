@@ -1,6 +1,6 @@
     <template>
-        <div class="popup-content" v-if="orderDetail">
-            <span class="title-header title-uploadd" style="margin-bottom: 20px;">Update Booking</span>
+        <div class="popup-content container" v-if="orderDetail">
+            <div class="title-header1 title-uploadd">Update Booking</div>
             <form enctype="multipart/form-data" @submit.prevent="submitOrder" id="edit-order-form">
                 <div class="form-col" id="form-file">
                     <div class="file-input">
@@ -9,7 +9,7 @@
                                 <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
                                 <span class="title-header">Upload passport at here*</span>
                             </div>
-                            <img :src="`${orderDetail.passportImage}`" alt="Uploaded Image" class="uploaded-image" />
+                            <img :src="`${orderDetail.passportImage}`" alt="" class="uploaded-image" />
                         </label>
                         <input :id="`passport ${numberKey}`" type="file" @change="handlePassportUpload" />
                     </div>
@@ -19,7 +19,7 @@
                                 <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
                                 <span class="title-header">Upload visa at here</span>
                             </div>
-                            <img :src="`${orderDetail.visaImage}`" alt="Uploaded Image" class="uploaded-image" />
+                            <img :src="`${orderDetail.visaImage}`" alt="" class="uploaded-image" />
                         </label>
                         <input :id="`visa ${numberKey}`" type="file" @change="handleVisaUpload" />
                     </div>
@@ -29,48 +29,51 @@
                                 <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
                                 <span class="title-header">Upload portrait at here</span>
                             </div>
-                            <img :src="`${orderDetail.portraitImage}`" alt="Uploaded Image" class="uploaded-image" />
+                            <img :src="`${orderDetail.portraitImage}`" alt="" class="uploaded-image" />
                         </label>
                         <input :id="`portrait ${numberKey}`" type="file" @change="handlePortraitUpload($event)" />
                     </div>
                 </div>
-                <div class="form-info">
-                    <div class="form-col">
-                        <div class="row">
+                <div class="form-info row">
+                    <div class="form-col col-md-4">
+                        <div class="row mb-3">
                             <label for="name">Name</label>
-                            <input type="text" v-model="orderDetail.name" required placeholder="Your name">
+                            <input type="text" v-model="orderDetail.name" required placeholder="Your name"
+                                class="form-control">
                         </div>
-                        <div class="row">
+                        <div class="row mb-3">
                             <label for="email">Email</label>
-                            <input type="email" v-model="orderDetail.email" placeholder="you@gmail.com" required>
+                            <input type="email" v-model="orderDetail.email" placeholder="you@gmail.com" required
+                                class="form-control">
                         </div>
-                        <div class="row">
+                        <div class="row mb-3">
                             <label for="phone">Phone Number</label>
-                            <input type="text" v-model="orderDetail.phone" placeholder="phone" required>
+                            <input type="text" v-model="orderDetail.phone" placeholder="phone" required
+                                class="form-control">
                         </div>
-                        <div class="row">
+                        <div class="row mb-3">
                             <label for="passport_number">Passport Number</label>
                             <input type="text" v-model="orderDetail.passport_Number" required
-                                placeholder="your passport">
+                                placeholder="your passport" class="form-control">
                         </div>
                     </div>
-                    <div class="form-col">
-                        <div class="row">
+                    <div class="form-col col-md-4">
+                        <div class="row mb-3">
                             <label for="nationality">Nationality</label>
-                            <input type="text" v-model="orderDetail.nationality" placeholder="nationality" required>
+                            <input type="text" v-model="orderDetail.nationality" placeholder="nationality" required
+                                class="form-control">
                         </div>
-                        <div class="row">
+                        <div class="row mb-3">
                             <label for="flight_number">Flight Number</label>
-                            <input type="text" v-model="orderDetail.flight_Number" required>
+                            <input type="text" v-model="orderDetail.flight_Number" required class="form-control">
                         </div>
-                        <div class="row" style="display: flex;flex-direction: column">
+                        <div class="row mb-3">
                             <label for="airPort">Airport</label>
-                            <select id="airPort" v-model="orderDetail.airportId" required @change="onChangeAirPort()">
+                            <select id="airPort" v-model="orderDetail.airportId" required class="form-select">
                                 <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}</option>
-
                             </select>
                         </div>
-                        <div class="row">
+                        <div class="row mb-3">
                             <label for="departure_time">Order Time</label>
                             <VueDatePicker v-model="orderDetail.service_Time" :min-date="minDate"
                                 :timezone="{ convertModel: false }" @update:model-value="onUpdateDate()" required>
@@ -81,39 +84,37 @@
                     <div class="form-col" >
                         <div class="row" v-if="roleCheckerReverse(['Agency'])">
                             <label for="status_sales">Sales Status</label>
-                            <select v-model="orderDetail.status_Sales_Id" id="status">
+                            <select v-model="orderDetail.status_Sales_Id" id="status" class="form-select">
                                 <option v-for="(status, index) in maintainSaleStatus" :key="index" :value="status.Key">
-                                    {{
-                                        status.Value
-                                    }}
-                                </option>
+                                    {{ status.Value }}</option>
                             </select>
                         </div>
-                        <div class="row">
+                        <div class="row mb-3">
                             <label>Service</label>
-                            <select v-model="orderDetail.service_ID" id="service">
+                            <select v-model="orderDetail.service_ID" id="service" class="form-select">
                                 <option value="" disabled selected hidden>Select Service</option>
                                 <option v-for="(service, index) in maintainServices" :key="index" :value="service.id">{{
-                                    service.name }}
-                                </option>
+                                    service.name }}</option>
                             </select>
                         </div>
-                        <div class="row">
+                        <div class="row mb-3">
                             <label for="note">Note</label>
-                            <textarea type="text" v-model="orderDetail.note"></textarea>
+                            <textarea type="text" v-model="orderDetail.note" class="form-control"></textarea>
                         </div>
-                        <div class="row" v-if="roleCheckerReverse(['Agency'])">
+                        <div class="row mb-3" v-if="roleCheckerReverse(['Agency'])">
                             <label for="operator_note">Remark to Operation</label>
-                            <textarea type="text" v-model="orderDetail.operator_Note"></textarea>
+                            <textarea type="text" v-model="orderDetail.operator_Note" class="form-control"></textarea>
                         </div>
                     </div>
                 </div>
-                <button type="submit" class="btn-update-primary"><i class="pi pi-span pi-slack"
+                <button type="submit" class="btn-update-primary btn btn-primary"><i class="pi pi-span pi-slack"
                         style="color: white"></i>
                     Save</button>
             </form>
             <Loading :loading="isLoading" />
+
         </div>
+
     </template>
 
 <script>
@@ -459,8 +460,8 @@ export default {
 <style scoped>
 .popup-content {
     z-index: 9999;
-    width: fit-content;
-    position: absolute;
+    width: 50%;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -468,19 +469,35 @@ export default {
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    overflow: auto;
+    max-height: 500px;
+}
+
+@media (max-width:768px) {
+    .popup-content {
+        width: 90% !important;
+
+    }
+
+    #form-file {
+        display: flex;
+        gap: 0px !important;
+    }
+    .uploaded-image{
+    width: 100% !important;
+    height: 81% !important;
+   
+}
 }
 
 .title-header {
     text-transform: uppercase;
+    font-size: 11px;
     font-weight: 700;
     margin: 20px 0px;
 }
 
-#edit-order-form {
-    display: flex;
-    gap: 15px;
-    flex-direction: column;
-}
+
 
 .space-line {
     border: 1px solid #e6eae9;
@@ -528,7 +545,6 @@ export default {
 }
 
 .file-upload-label {
-    border: 2px dashed #dfe4e9;
     display: block;
     padding: 50px;
     color: black;
@@ -560,9 +576,12 @@ select {
     border-radius: 5px;
     padding: 9px;
 }
-.title-uploadd{
-    margin-bottom: 10px;
+
+.title-uploadd {
+    font-size: 20px;
+    margin-bottom: 20px;
 }
+
 textarea {
     border: 1px solid #e6eae9;
     margin-top: 5px;

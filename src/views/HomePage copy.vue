@@ -4,7 +4,7 @@
     <div class="title-info">
       <div class="home-content">
         <h2 class="home-slogan">"A different experience at the airport"</h2>
-        <div class="home-input-number" style="margin-left: 15px">
+        <div class="home-input-number">
           <label>Enter number of guest</label>
           <input type="number" v-model="orderData.guest_number" id="guest_number" @input="validateGuestNumber"
             required />
@@ -185,8 +185,8 @@ export default {
 
 .home-content {
   color: #fff;
-  width: 650px;
-  margin-left: 21%;
+  /* width: 650px; */
+  /* margin-left: 21%; */
 }
 
 .home-input-number {
@@ -229,5 +229,18 @@ h2 {
   font-size: 17px;
   border-radius: 7px;
   background: #d3ecf0;
+}
+@media (max-width:768px){
+  .btn-submit-primary{
+    right: 0px;
+    top: 95%;
+    position: fixed;
+    padding: 11px 42px !important;
+    color: black;
+    border: none;
+    font-size: 12px !important;
+    border-radius: 7px;
+    background: #d3ecf0;
+  }
 }
 </style>

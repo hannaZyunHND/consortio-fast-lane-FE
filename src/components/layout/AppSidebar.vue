@@ -1,107 +1,137 @@
 <template>
-  <div class="navbar">
-    <ul class="menu-page">
-      <!-- Home -->
-      <li>
-        <div class="layout-menuitem-root-text">Home</div>
-        <router-link class="nav-link" to="/agency/dashboard">
-          <div class="item-content">
-            <squares-2X2-icon class="navbar-icon" />
-            <span>Dashboard</span>
-          </div>
-        </router-link>
-      </li>
+  <nav class="navbar navbar-expand-lg navbar1">
+    <div class="container-fluid">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <RouterLink to="/agency/dashboard">
+          <img class="logo-header" src="https://cdn.save.moe/e/WPxHVs.png" />
+        </RouterLink>
+        <div class="navbar-nav">
+          <!-- Home -->
+          <div class="bao-haeder">
+            <div class="dropdown">
+              <a class="nav-link dropdown-toggle" href="#" style="color: white;" role="button" id="navbarDropdownHome"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Home
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdownHome">
+                <li>
+                  <router-link class="dropdown-item" to="/agency/dashboard">
+                    <div class="item-content">
+                      <squares-2X2-icon class="navbar-icon"></squares-2X2-icon>
+                      <span>Dashboard</span>
+                    </div>
+                  </router-link>
+                </li>
+                <!-- Add other submenu items here if needed -->
+              </ul>
+            </div>
 
-      <!-- <li v-if="roleChecker(['Operator', 'Operator_Ref'])">
-        <router-link class="nav-link" to="/dashboard/calendar">
-          <div class="item-content">
-            <squares-2X2-icon class="navbar-icon" />
-            <span>Calendar</span>
-          </div>
-        </router-link>
-      </li> -->
+            <!-- Booking -->
+            <div class="dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" id="navbarDropdownBooking"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Booking
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdownBooking">
+                <li>
+                  <router-link class="dropdown-item" to="/dashboard/order">
+                    <div class="item-content">
+                      <wallet-icon class="navbar-icon"></wallet-icon>
+                      <span>Booking List</span>
+                    </div>
+                  </router-link>
+                </li>
+                <li v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Agency'])">
+                  <router-link class="dropdown-item" to="/agency/multiple">
+                    <div class="item-content">
+                      <square-2-stack-icon class="navbar-icon"></square-2-stack-icon>
+                      <span>New Booking</span>
+                    </div>
+                  </router-link>
+                </li>
+                <!-- Add other submenu items here if needed -->
+              </ul>
+            </div>
 
-      <!-- Sales -->
-      <li>
-        <div class="layout-menuitem-root-text">Booking</div>
-        <router-link class="nav-link" to="/dashboard/order">
-          <div class="item-content">
-            <wallet-icon class="navbar-icon" />
-            <span>Booking List</span>
-          </div>
-        </router-link>
-      </li>
-      <li v-if="roleChecker(['Admin','Sale', 'Sale_Admin', 'Agency'])">
-        <router-link class="nav-link" to="/agency/multiple">
-          <div class="item-content">
-            <square-2-stack-icon class="navbar-icon" />
-            <span>New Booking</span>
-          </div>
-        </router-link>
-      </li>
-
-      <!-- Report -->
-      <li v-if="roleChecker(['Admin','Sale','Sale_Admin'])">
-        <router-link class="nav-link" to="/dashboard/allOfAgency">
-          <div class="item-content">
-            <flag-icon class="navbar-icon" />
-            <span>Report</span>
-          </div>
-        </router-link>
-      </li>
-
-      <!-- Account -->
-      <li v-if="roleChecker(['Admin'])">
-        <div class="layout-menuitem-root-text">Account</div>
-        <router-link class="nav-link" to="/dashboard/manage">
-          <div class="item-content">
-            <user-icon class="navbar-icon" />
-            <span>Account</span>
-          </div>
-        </router-link>
-      </li>
-
-      <!-- personal -->
-      <div>
-        <li style="margin-top: 100px">
-          <div class="layout-menuitem-root-text">Information</div>
-          <div class="item-content">
-            <user-icon class="navbar-icon" />
-            <span id="account-information"></span>
-          </div>
-        </li>
-
-        <!-- Logout -->
-        <li>
-          <div class="item-content">
-            <user-icon class="navbar-icon" />
-            <PopupWrapper>
-              <template #header>
-                <div class="popover">
-                  <pencil-square-icon class="user-icon" />
-                  <span>Change password</span>
-                </div>
-              </template>
-              <template #content>
-                <div class="popover-content">
-                  <Change_Password />
-                </div>
-              </template>
-            </PopupWrapper>
-          </div>
-        </li>
-        <li>
-          <div class="nav-link" @click="logout">
-            <div class="item-content">
-              <power-icon class="navbar-icon" />
-              <span>Logout</span>
+            <!-- Report -->
+            <div class="dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" id="navbarDropdownReport"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Report
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdownReport">
+                <li v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin'])">
+                  <router-link class="dropdown-item" to="/dashboard/allOfAgency">
+                    <div class="item-content">
+                      <flag-icon class="navbar-icon"></flag-icon>
+                      <span>Report</span>
+                    </div>
+                  </router-link>
+                </li>
+                <!-- Add other submenu items here if needed -->
+              </ul>
             </div>
           </div>
-        </li>
+
+          <!-- Account -->
+          <div class="dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" id="navbarDropdownAccount"
+              data-bs-toggle="dropdown" aria-expanded="false">
+              Information
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownAccount">
+              <li>
+
+                <div class="item-content content-padding">
+                  <user-icon class="navbar-icon"></user-icon>
+                  <span id="account-information"></span>
+                </div>
+              </li>
+              <li>
+                <div class="item-content content-padding">
+                  <user-icon class="navbar-icon"></user-icon>
+                  <PopupWrapper>
+                    <template #header>
+                      <div class="">
+                        <pencil-square-icon class="user-icon"></pencil-square-icon>
+                        <span>Change password</span>
+                      </div>
+                    </template>
+                    <template #content>
+                      <div class="popover-content">
+                        <Change_Password></Change_Password>
+                      </div>
+                    </template>
+                  </PopupWrapper>
+                </div>
+              </li>
+              <li>
+                <div class="nav-link" @click="logout">
+                  <div class="item-content">
+
+                    <power-icon class="navbar-icon"></power-icon>
+                    <span>Logout</span>
+                  </div>
+                </div>
+              </li>
+           
+            </ul>
+          </div>
+          <div class="dropdown" v-if="roleChecker(['Admin'])">
+            <router-link class="nav-link" to="/dashboard/manage" style="color: white;">
+              Account
+            </router-link>
+          
+          </div>
+        </div>
       </div>
-    </ul>
-    <ul></ul>
-  </div>
+    </div>
+  </nav>
+
 </template>
 
 <script>
@@ -127,7 +157,7 @@ import {
 export default {
   name: "AppSidebar",
   components: {
-    UserIcon, 
+    UserIcon,
     FlagIcon,
     WalletIcon,
     Squares2X2Icon,
@@ -223,15 +253,15 @@ export default {
   },
   methods: {
     //#region maintain
-    roleChecker(accepedRoles){
+    roleChecker(accepedRoles) {
       let checker = false;
-      
+
       let role = localStorage.getItem('roles');
-      if(role == "Admin"){
+      if (role == "Admin") {
         checker = true;
       }
       accepedRoles.forEach((element) => {
-        if(element == role){
+        if (element == role) {
           checker = true;
         }
       })
@@ -249,7 +279,7 @@ export default {
 
     async logout() {
       try {
-        
+
         localStorage.removeItem("token");
         localStorage.removeItem('roles');
         localStorage.removeItem('user_id');
@@ -264,27 +294,51 @@ export default {
 </script>
 
 <style scoped>
+@media (max-width:768px) {
+  .navbar[data-v-7d025640] {
+    background: #1f416c;
+    z-index: 999;
+    border-bottom: unset;
+  }
+
+  .navbar-collapse {
+    padding: 5px 5px !important;
+
+  }
+
+  .bao-haeder {
+    display: unset !important;
+  }
+
+  .logo-header {
+    display: none;
+  }
+
+  .navbar-nav {
+    gap: 0px !important;
+  }
+}
+
 .navbar {
-  /* position: fixed; */
-  width: 300px;
- background: #1f416c;
-  height: 100%;
+  background: #1f416c;
   color: white;
-  /* z-index: 999; */
-  overflow-y: auto;
-  user-select: none;
-  top: 7rem;
-  left: 2rem;
-  transition: transform 0.2s, left 0.2s;
-  padding: 0.5rem 1.5rem;
-  box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
-  border-right: 3px solid white;
+  z-index: 999;
+  border-bottom: 1px solid #776f6f;
+
 }
 
 /* menu-page */
 .menu-page {
   list-style-type: none;
   padding: 0;
+}
+
+.navbar-nav {
+  gap: 100px;
+}
+
+.show {
+  /* width: 175px; */
 }
 
 .menu-page li {
@@ -314,6 +368,11 @@ export default {
   color: inherit;
 }
 
+.nav-link {
+  color: white !important;
+
+}
+
 span {
   font-size: 14px;
   font-family: "Inter var", sans-serif;
@@ -325,18 +384,39 @@ span {
   display: flex;
   align-items: center;
 }
-.item-content span{
-  color: white;
+
+.item-content span {
+  font-size: 12px;
+}
+
+.item-content svg {
+  /* color: white; */
 
 }
-.item-content svg{
-  color: white;
 
-}
 .navbar-icon {
   width: 24px;
   height: 24px;
   color: #334155;
   margin-left: 12px;
+}
+
+.logo-header {
+  width: 100px;
+}
+
+.navbar-collapse {
+  justify-content: space-between;
+  padding: 5px 70px;
+
+}
+
+.bao-haeder {
+  display: flex;
+  gap: 60px;
+}
+
+.content-padding {
+  padding: 8px;
 }
 </style>

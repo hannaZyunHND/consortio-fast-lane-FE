@@ -18,7 +18,7 @@
         <label for="role">Role:</label>
         <select v-model="userItem.role" id="service">
           <option v-for="(role, index) in maintainRoles" :key="index" :value="role.Value">
-            {{ role.Value }}
+            {{ $t(`role.` + role.Value) }}
           </option>
         </select>
       </div>
@@ -30,6 +30,11 @@
             {{ role.name }}
           </option>
         </select>
+      </div>
+      <div class="row">
+        <label for="role">Parent:</label>
+        <Select2 v-model="userItem.parentId" :options="users"
+          :settings="{ width: '100%', multiple: false, placeholder: 'Select Employee', allowClear: true }" />
       </div>
 
       <button type="submit" class="btn-add-primary">Save</button>
@@ -61,7 +66,15 @@ export default {
       roles: [],
       maintainAirports: [],
       maintainRoles: [],
-      userItem : null,
+      users: [],
+      userItem: null,
+      filter: {
+        airportId: 0,
+        role: "",
+        keyword: "",
+        pageIndex: 1,
+        pageSize: 10000
+      }
     };
   },
   setup() {
@@ -77,42 +90,58 @@ export default {
     this.maintainGetAllAirport();
     this.maintainGetAllRole();
     this.maintainGetUserById();
+    this.maintainGetAllUsers();
   },
   methods: {
-    maintainGetUserById(){
+    maintainGetUserById() {
       axios.get(`${process.env.VUE_APP_API_URL}/MaintainUsers/GetById/${this.userId}`).then((response) => {
         this.userItem = response.data;
       })
 
     },
-    maintainGetAllAirport(){
+    maintainGetAllUsers() {
+      axios.post(`${process.env.VUE_APP_API_URL}/MaintainUsers/FilterUsers`, this.filter).then((response) => {
+        console.log(response.data);
+        this.users = response.data.users;
+        this.users.forEach(e => {
+          e.text = e.name
+        })
+
+
+      })
+
+    },
+    maintainGetAllAirport() {
       axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/GetAirports`).then((response) => {
         this.maintainAirports = response.data;
         console.log(response.data)
       })
     },
 
-    maintainGetAllRole(){
+    maintainGetAllRole() {
       axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/RoleType`).then((response) => {
         this.maintainRoles = response.data;
         console.log(response.data)
       })
     },
     submitForm() {
-
+      if(this.userItem.parentId){
+        this.userItem.parentId = parseInt(this.userItem.parentId)
+      }
+      
       axios.post(`${process.env.VUE_APP_API_URL}/MaintainUsers/Update`, this.userItem).then((response) => {
         console.log(response)
         this.success();
-          //-----------
-          const clickEvent = new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            view: window
-          });
+        //-----------
+        const clickEvent = new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true,
+          view: window
+        });
 
-          // Phát ra sự kiện click trên document
-          document.dispatchEvent(clickEvent);
-          this.$emit("reloadPage");
+        // Phát ra sự kiện click trên document
+        document.dispatchEvent(clickEvent);
+        this.$emit("reloadPage");
       })
     },
 

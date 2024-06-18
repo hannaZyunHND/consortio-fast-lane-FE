@@ -1,32 +1,32 @@
 <template>
-    <div class="popup-content">
+    <div class="popup-content" v-if="orderData">
         <span class="title-header">Customer Information Image</span>
         <div class="customer-image">
             <div class="image">
                 <span>Passport image below
-                    <a :href="getCompleteImageUrl(orderData.passport_File)" download="abc.jpg"><i class="pi pi-download"
+                    <a :href="getCompleteImageUrl(orderData.passport_Path)" download="abc.jpg"><i class="pi pi-download"
                             style="font-size: 1rem"></i>
                     </a>
                 </span>
-                <img :src="getCompleteImageUrl(orderData.passport_File)" alt="Passport Image">
+                <img :src="getCompleteImageUrl(orderData.passport_Path)" alt="Passport Image">
             </div>
 
             <div class="image">
                 <span>Visa image below
-                    <a :href="orderData.visa_File" download>
+                    <a :href="orderData.visa_Path" download>
                         <i class="pi pi-download" style="font-size: 1rem"></i>
                     </a>
                 </span>
-                <img :src="getCompleteImageUrl(orderData.visa_File)" alt="Visa Image">
+                <img :src="getCompleteImageUrl(orderData.visa_Path)" alt="Visa Image">
             </div>
 
             <div class="image">
                 <span>Portrait image below
-                    <a :href="orderData.portrait_File" download>
+                    <a :href="orderData.portrait_Path" download>
                         <i class="pi pi-download" style="font-size: 1rem"></i>
                     </a>
                 </span>
-                <img :src="getCompleteImageUrl(orderData.portrait_File)" alt="Portrait Image">
+                <img :src="getCompleteImageUrl(orderData.portrait_Path)" alt="Portrait Image">
             </div>
         </div>
     </div>
@@ -45,29 +45,32 @@ export default {
     },
     data() {
         return {
-            orderData: {
-                visa_File: '',
-                passport_File: '',
-                portrait_File: ''
-            }
+            orderData: null
         };
     },
     mounted() {
-        this.fetchOrder(this.orderId);
+        this.maintainFetchOrder();
     },
 
     methods: {
+        maintainFetchOrder() {
+            axios.get(`${process.env.VUE_APP_API_URL}/MaintainOrderDetails/GetById/${this.orderId}`).then((response) => {
+                console.log(response.data)
+                this.orderData = response.data
+
+            })
+        },
         fetchOrder(item) {
-            console.log('do là item', item)
+
             const apiUrl = process.env.VUE_APP_API_URL;
             axios.get(`${apiUrl}/order/${item}`)
                 .then(response => {
                     const responseData = response.data;
                     console.log(responseData)
                     if (responseData) {
-                        this.orderData.visa_File = responseData.visa_File;
-                        this.orderData.passport_File = responseData.passport_File;
-                        this.orderData.portrait_File = responseData.portrait_File;
+                        this.orderData.visa_File = responseData.visa_Path;
+                        this.orderData.passport_File = responseData.passport_Path;
+                        this.orderData.portrait_File = responseData.portraint_Path;
                     }
                 })
                 .catch(error => {
@@ -75,7 +78,7 @@ export default {
                 });
         },
         getCompleteImageUrl(imagePath) {
-            const apiUrl = process.env.VUE_APP_API_URL;
+            const apiUrl = process.env.VUE_APP_API_URL.replace('/api','');
 
             return `${apiUrl}/${imagePath}`;
         }

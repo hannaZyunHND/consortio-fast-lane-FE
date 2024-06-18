@@ -1,8 +1,8 @@
 <template>
-  <div class="order">
+  <div class="order order-booking">
     <div class="order-body">
       <div class="order-header">
-        <span>Order List</span>
+        <h3><span>Booking List</span></h3>
         <PopupWrapper>
           <template #header>
             <!-- <div class="popover">Add new +</div> -->
@@ -15,53 +15,69 @@
         </PopupWrapper>
       </div>
       <div class="space-line"></div>
-      <div class="order-search">
-        <div class="menu-search">
-          <div class="search-filter">
-            <select id="airport" class="form-select" placeholder="Select Cities" v-model="filter.airportId" v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Agency'])">
+      <div class="order-search container">
+        <div class="menu-search row col-12">
+          <!-- First row -->
+          <div class="search-filter col-md-3 mb-3">
+            <select id="airport" class="form-select" placeholder="Select Cities" v-model="filter.airportId"
+              v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Agency'])">
               <option value="0" selected>ALL AIRPORT</option>
               <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}</option>
             </select>
           </div>
-          <div class="search-filter">
-            <select id="status-filter" v-model="filter.bookingStatusId" v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin','Operator_Ref', 'Agency'])">
+          <div class="search-filter col-md-3 mb-3">
+            <select id="status-filter" class="form-select" v-model="filter.bookingStatusId"
+              v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Operator_Ref', 'Agency'])">
               <option value="0">ALL STATUS</option>
               <option v-for="(status, index) in maintainBookingStatus" :key="index" :value="status.Key">
-                {{ status.Value }}
+                {{ $t(`cms.${status.Value}`) }}
               </option>
             </select>
           </div>
-          <div class="search-filter">
-            <VueDatePicker v-model="filter.fromDate" :config="datePickerConfig" placeholder="From">
+
+          <div class="search-filter col-md-3 mb-3">
+            <VueDatePicker v-model="filter.fromDate" :config="datePickerConfig" class="form-control" placeholder="From">
             </VueDatePicker>
           </div>
-          <div class="search-filter">
-            <VueDatePicker v-model="filter.toDate" :config="datePickerConfig" placeholder="To">
+          <div class="search-filter col-md-3 mb-3">
+            <VueDatePicker v-model="filter.toDate" :config="datePickerConfig" class="form-control" placeholder="To">
             </VueDatePicker>
           </div>
-          <div class="search-filter">
-            <select id="status-filter" v-model="filter.orderBy">
+        </div>
+
+        <div class="menu-search row col-12">
+          <!-- Second row -->
+          <div class="search-filter col-md-3 mb-3">
+            <select id="status-filter" class="form-select" v-model="filter.createdBy"
+              v-if="roleChecker(['Admin', 'Sale_Admin', 'Agency'])">
+              <option :value="defaultUserId">ALL USERS</option>
+              <option v-for="(user, index) in users" :key="index" :value="user.id">
+                {{ user.name }}
+              </option>
+            </select>
+          </div>
+          <div class="search-filter col-md-3 mb-3">
+            <select id="status-filter" class="form-select" v-model="filter.orderBy">
               <option value="service-time">Sort by Service-Time</option>
               <option value="booking-time">Sort by Booking-Time</option>
             </select>
           </div>
-          <div>
-            <input type="text" name="search" id="search" v-model="filter.keyword" placeholder="Search"
-              @keyup.enter="search" />
+          <div class="search-filter col-md-3 mb-3">
+            <input type="text" name="search" id="search" class="form-control" v-model="filter.keyword"
+              placeholder="Search" @keyup.enter="search" />
           </div>
-          <button class="btn-search-primary">
-            <i class="pi pi-search" style="font-size: 1rem" @click="search"></i>
-          </button>
-          <!-- <button class="btn-export-primary">
-            <i class="pi pi-download" style="font-size: 1rem" @click="handleExport"></i>
-          </button> -->
+          <div class="search-filter col-md-3 mb-3">
+            <button class="btn btn-primary" @click="exportOrder()">
+              <i class="fa-solid fa-download"></i>
+            </button>
+          </div>
         </div>
-        <button @click="refreshOrders" class="btn-reset-primary">
-          <i class="pi pi-refresh" style="font-size: 1rem"></i>
-        </button>
       </div>
+
+
+
     </div>
-    <div class="order-container">
+    <div class="order-container" v-if="contentViewer == 'table'">
       <div class="list-order">
         <table>
           <thead>
@@ -69,26 +85,40 @@
               <th v-if="roleChecker(['Operator_Ref', 'Operator'])"><bars-2-icon class="order-icon" /></th>
               <th>Customer</th>
               <th>BK.STAT</th>
-              <th>SLS.STAT</th>
-              <th>OPS.STAT</th>
+              <th v-if="roleCheckerReverse(['Agency'])">SLS.STAT</th>
+              <th v-if="roleCheckerReverse(['Agency'])">OPS.STAT</th>
               <th>Ser.Type</th>
               <th>Ser.Time</th>
+              <th>Book.Time</th>
               <th>Ref.</th>
               <th>Flight</th>
-              <th>Passport</th>
+              <th class="pass">Passport</th>
               <th>Airport</th>
               <th>Note</th>
-              <th>Remark</th>
-              <th>Employee</th>
-              <th v-if="roles === 'Admin'">UpdatedBy</th>
+              <th v-if="roleCheckerReverse(['Agency'])">Remark</th>
+              <th v-if="roleCheckerReverse(['Agency'])">Employee</th>
+              <th v-if="roleChecker(['Admin'])">Updated By</th>
               <th class="order-actions">Actions</th>
             </tr>
           </thead>
           <tbody class="order-info">
-            <tr v-for="item in items" :key="item.id" class="order-information">
-              <td v-if="roleChecker(['Operator_Ref', 'Operator'])">
-                <input type="checkbox" name="" :id="'check-complete-status-' + item.id"
-                  @change="maintainChangeBookingStatus(item.id)" v-if="(item.status == 'B_Pending')">
+            <tr v-for="item in items" :key="item.id" class="order-information bao" :style="item.cssColor">
+              <td v-if="roleChecker(['Operator_Ref', 'Operator'])" class="bao">
+                <!-- <input type="checkbox" name="" :id="'check-complete-status-' + item.id"
+                  @change="maintainChangeBookingStatus(item.id)" v-if="(item.status == 'B_Pending')"> -->
+                <div class=""
+                  v-if="((item.status == 'B_Confirm' || roleChecker(['Admin']))) && item.listEmployees.length > 0">
+                  <div class="">
+                    <button class="btn btn-success compoted"
+                      @click="maintainChangeBookingStatus(item.id)">Completed</button>
+                  </div>
+                  <br>
+                  <div class="">
+                    <button class="btn btn-danger un"
+                      @click="maintainChangeBookingStatusUncomplete(item.id)">Uncompleted</button>
+                  </div>
+                </div>
+
               </td>
 
               <td>
@@ -99,23 +129,23 @@
                       {{ item.name }}
                     </span>
                   </div>
-                  <div class="item" :data-id="item.id">
+                  <div class="item" :data-id="item.id" v-if="roleCheckerReverse(['Operator'])">
                     <phone-icon class="primary-icon" />
                     {{ item.phone }}
                   </div>
-                  <div class="item" :data-id="item.id">
+                  <div class="item" :data-id="item.id" v-if="roleCheckerReverse(['Operator'])">
                     <envelope-icon class="primary-icon" />
                     {{ item.email }}
                   </div>
-                  <div class="item" :data-id="item.id">
+                  <div class="item" :data-id="item.id" v-if="roleCheckerReverse(['Operator'])">
                     <envelope-icon class="primary-icon" />
                     Created By: {{ item.createBy ? item.createBy : "INDIVIDUAL" }}
                   </div>
                   <div class="item">
                     <PopupWrapper>
                       <template #header>
-                        <div class="popover">
-                          <i class="pi pi-image" style="font-size: 1rem" @click="openEditOrder(item.id)"></i>
+                        <div class="popover1">
+                          <i class="pi pi-image" style="font-size: 1rem" @click="openEditOrder(item)"></i>
                         </div>
                       </template>
                       <template #content>
@@ -128,23 +158,23 @@
                 </div>
               </td>
               <td>
-                <span class="item" :data-id="item.id" id="status" :style="getStatusStyle(item.status)">
-                  {{ item.status }}
+                <span class="item item1" :data-id="item.id" id="status" :style="getStatusStyle(item.status)">
+                  {{ $t(`cms.${item.status}`) }}
                 </span>
               </td>
-              <td>
-                <span class="item" :data-id="item.id" id="status" :style="getStatusStyle(item.status_Sales)">
-                  {{ item.status_Sales }}
+              <td v-if="roleCheckerReverse(['Agency'])">
+                <span class="item item1" :data-id="item.id" id="status" :style="getStatusStyle(item.status_Sales)">
+                  {{ $t(`cms.${item.status_Sales}`) }}
                 </span>
               </td>
-              <td>
-                <span class="item" :data-id="item.id" id="status" :style="getStatusStyle(item.status_Operator)">
-                  {{ item.status_Operator }}
+              <td v-if="roleCheckerReverse(['Agency'])">
+                <span class="item item1" :data-id="item.id" id="status" :style="getStatusStyle(item.status_Operator)">
+                  {{ $t(`cms.${item.status_Operator}`) }}
                 </span>
               </td>
               <td>
                 <div class="item" :data-id="item.id">
-                  {{ item.service }}
+                  {{ $t(`services.${item.service}`) }}
                 </div>
               </td>
               <td>
@@ -154,6 +184,22 @@
                   </div>
                   <div class="item" :data-id="item.id">
                     {{ formatDate(item.service_Time) }}
+                  </div>
+                  <div class="item">
+                    <vue-countdown :time="item.countdownMaterial" v-slot="{ days, hours, minutes, seconds }">
+                      <span v-if="item.countdownMaterial > 0">Remain: {{ days }}d, {{ hours }}h, {{ minutes }}m, {{ seconds }}s.</span>
+                      <span v-else style="color:red">Expired</span>
+                    </vue-countdown>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="order_time">
+                  <div class="item" :data-id="item.id">
+                    {{ formatTime(item.created_at) }}
+                  </div>
+                  <div class="item" :data-id="item.id">
+                    {{ formatDate(item.created_at) }}
                   </div>
                 </div>
               </td>
@@ -186,21 +232,30 @@
                   item.note
                 }}</span>
               </td>
-              <td>
+              <td v-if="roleCheckerReverse(['Agency'])">
                 <span class="item" :data-id="item.id">{{ item.operator_Note }}</span>
               </td>
-              <td>
-                <span class="item" :data-id="item.id">{{ item.employee }}</span>
+              <td v-if="roleCheckerReverse(['Agency'])">
+                <div v-if="item.listEmployees.length > 0">
+                  <ul>
+                    <li v-for="e in item.listEmployees">{{ e }}</li>
+                  </ul>
+                </div>
+                <div v-else>
+                  <ul>
+                    <li>Un-assign</li>
+                  </ul>
+                </div>
               </td>
               <td v-if="roleChecker(['Admin'])">
                 <span class="item" :data-id="item.id">{{ item.updatedBy }}</span>
               </td>
               <td>
                 <div class="action-buttons">
-                  <PopupWrapper v-if="roleChecker(['Agency', 'Sale_Admin'])">
+                  <PopupWrapper v-if="roleChecker(['Sale_Admin']) || (item.moreThan12Hour && roleChecker(['Agency']))">
                     <template #header>
-                      <div class="popover">
-                        <pencil-square-icon class="order-icon" @click="openEditOrder(item.id)" />
+                      <div class="popover1">
+                        <pencil-square-icon class="order-icon " @click="openEditOrder(item)" />
                       </div>
                     </template>
                     <template #content>
@@ -211,7 +266,7 @@
                   </PopupWrapper>
                   <PopupWrapper v-if="roleChecker(['Operator_Ref'])">
                     <template #header>
-                      <div class="popover">
+                      <div class="popover1">
                         <chat-bubble-bottom-center-icon class="order-icon" @click="openEditTask(item.id)" />
                       </div>
                     </template>
@@ -229,13 +284,19 @@
             </tr>
           </tbody>
         </table>
-        <Pagination :currentPage="filter.pageIndex" :totalPages="totalPages" @nextPage="nextPage" @prevPage="prevPage"
-          @goToPage="goToPage" />
+       
       </div>
     </div>
+    <div class="order-container order-calendar-viewer" v-if="contentViewer == 'calendar'">
+      <FullCalendar :options="calendarOptions" />
+    </div>
   </div>
+  <!-- <div class="noti-wrapper">
+    <Notification></Notification>
+  </div> -->
   <Loading :loading="isLoading" />
-
+  <Pagination :currentPage="filter.pageIndex" :totalPages="totalPages" @nextPage="nextPage" @prevPage="prevPage"
+  @goToPage="goToPage" />
 </template>
 
 <script>
@@ -260,6 +321,16 @@ import { saveAs } from 'file-saver';
 import Loading from '@/views/LoadingPage.vue';
 import EditTask from "../task/EditTask.vue";
 import Swal from 'sweetalert2';
+import Notification from '@/components/Notification.vue'
+
+
+import FullCalendar from '@fullcalendar/vue3'
+import dayGridPlugin from '@fullcalendar/daygrid'
+import interactionPlugin from '@fullcalendar/interaction'
+import timeGridPlugin from '@fullcalendar/timegrid';
+import { useSignalR } from '@dreamonkey/vue-signalr';
+
+
 
 export default {
   name: "OrderPage",
@@ -278,7 +349,9 @@ export default {
     VueDatePicker,
     Loading,
     EditTask,
-    ChatBubbleBottomCenterIcon
+    ChatBubbleBottomCenterIcon,
+    FullCalendar,
+    Notification
   },
   data() {
     return {
@@ -292,6 +365,7 @@ export default {
       pageSize: 3,
       totalItems: 0,
       items: [],
+      users: [],
       services: [],
       statuses: [],
       selectedOrderId: "",
@@ -315,48 +389,132 @@ export default {
         pageIndex: 1,
         pageSize: 10
       },
-      selectedOrderTask: 0
+      filterUser: {
+        airportId: 0,
+        role: "",
+        keyword: "",
+        pageIndex: 1,
+        pageSize: 1000000
+      },
+      selectedOrderTask: 0,
+      defaultUserId: 0,
+      contentViewer: 'table',
+      calendarOptions: {
+        plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+          left: 'prev,next',
+          center: 'title',
+          right: 'timeGridWeek,timeGridDay,dayGridMonth'
+        },
+        dateClick: this.handleDateClick,
+        events: [
+          { title: 'event 1', date: '2019-04-01' },
+          { title: 'event 2', date: '2019-04-02' }
+        ]
+      },
+      signalr: null,
     };
+  },
+  created(){
+    this.signalr = useSignalR();
+    this.signalr.on('RefetchOrders', this.handlerOnRefetchOrders);
+    // this.signalr
+    //     .start()
+    //     .then(() => console.log('SignalR connected'))
+    //     .catch(err => console.error('SignalR connection error:', err));
   },
   mounted() {
     // this.fetchOrder();
     // this.fetchStatus();
     let airportId = localStorage.getItem('airportId');
-    if(airportId){
+    if (airportId) {
       this.filter.airportId = airportId;
     }
     //Chi role agency nhin thay data cua no
     let roles = localStorage.getItem('roles');
-    let userId = localStorage.getItem('user_id');
-    if(roles == "Agency"){
-      this.filter.createdBy = userId
-    }
     this.roles = localStorage.getItem('roles');
+    let userId = localStorage.getItem('user_id');
+    if (roles == "Agency") {
+      this.filter.createdBy = userId
+      this.defaultUserId = userId
+    }
+    if (roles == "Operator") {
+      this.filter.employeeId = userId
+    }
 
     //Chi role Operator chi nhin thay cac tour ma no duoc phan quyen
+    // //Set ngày tìm kiếm mặc định
+    // const today = new Date();
+
+    // // Thiết lập thời gian 00:00 cho fromDate
+    // const fromDate = new Date(today.setHours(0, 0, 0, 0));
+
+    // // Thiết lập thời gian 23:59 cho toDate
+    // const toDate = new Date(today.setHours(23, 59, 59, 999));
+
+    // this.filter.fromDate = fromDate;
+    // this.filter.toDate = toDate;
+
 
     this.maintainGetAllAirport();
     this.maintainGetAllStatus();
-
+    this.maintainFetchUser();
     //Kiem tra cac dieu kien va set tim kiem mac dinh
     this.maintainFetchOrders();
 
   },
   methods: {
     //#region maintain
-    roleChecker(accepedRoles){
-      let checker = false;
-      
+    handlerOnRefetchOrders(message){
+      this.maintainFetchOrders();
+    },
+    roleCheckerReverse(decinedRoles) {
+      let checker = true;
       let role = localStorage.getItem('roles');
-      if(role == "Admin"){
+      decinedRoles.forEach((element) => {
+        if (element == role) {
+          checker = false;
+        }
+      })
+      return checker;
+    },
+    roleChecker(accepedRoles) {
+      let checker = false;
+
+      let role = localStorage.getItem('roles');
+      if (role == "Admin") {
         checker = true;
       }
       accepedRoles.forEach((element) => {
-        if(element == role){
+        if (element == role) {
           checker = true;
         }
       })
       return checker;
+    },
+    handleDateClick(info) {
+      const calendarApi = info.view.calendar;
+      calendarApi.changeView('timeGridDay', info.dateStr);
+    },
+    //region maintaine
+    maintainFetchUser() {
+      axios.post(`${process.env.VUE_APP_API_URL}/MaintainUsers/FilterUsers`, this.filterUser).then((response) => {
+        console.log(response.data);
+
+        this.users = response.data.users;
+        let roles = localStorage.getItem('roles');
+        let userId = localStorage.getItem('user_id');
+        if (roles == "Agency") {
+          this.users = this.users.filter(r => r.parentId == userId)
+        } else {
+          this.users = this.users.filter(r => r.role == "Admin" || r.role == "Sale_Admin" || r.role == "Agency")
+        }
+
+        this.totalPage = response.data.totalPage;
+
+      })
+
     },
     async maintainChangeBookingStatus(orderId) {
       const confirmResult = await Swal.fire({
@@ -391,9 +549,42 @@ export default {
 
         })
       }
-      else {
-        this.scheduleData.status_Operator_ID = 8;
+      
+    },
+    async maintainChangeBookingStatusUncomplete(orderId) {
+      const confirmResult = await Swal.fire({
+        title: 'Un Complete Booking',
+        text: 'Do you want to uncomplete this booking?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'No'
+      });
+      if (confirmResult.isConfirmed) {
+        axios.get(`${process.env.VUE_APP_API_URL}/MaintainOrderDetails/GetById/${orderId}`).then((response) => {
+          let _detail = response.data;
+          if (_detail) {
+            _detail.status_Operator_ID = 4;
+            this.isLoading = true;
+            const user_Id = localStorage.getItem("user_id");
+            const apiUrl = process.env.VUE_APP_API_URL;
+            _detail.updatedBy = user_Id;
+
+            axios.post(`${apiUrl}/MaintainOrderDetails/Update`, _detail)
+              .then(() => {
+                this.maintainFetchOrders();
+              })
+              .catch(error => {
+                console.error('Error updating Order:', error);
+              })
+              .finally(() => {
+                this.isLoading = false;
+              });
+          }
+
+        })
       }
+      
     },
     openEditTask(id) {
       this.selectedOrderTask = id;
@@ -405,6 +596,48 @@ export default {
         this.items = response.data.orders;
         this.totalItems = response.data.totalCount;
         this.totalPages = Math.ceil(this.totalItems / this.filter.pageSize);
+
+        //Xu ly cho calendar o day
+        //Mac dinh suu dung service time
+        //Mac dinh khoang cach startDate cong them 30p
+        this.calendarOptions.events = [];
+        this.items.forEach((v) => {
+          const serviceDate = new Date(v.service_Time);
+          const currentDate = new Date();
+
+          const differenceInMilliseconds = serviceDate - currentDate;
+          const differenceInHours = differenceInMilliseconds / (1000 * 60 * 60);
+          // const diffInSecond = Math.floor(differenceInMilliseconds / 1000);
+
+          if (differenceInHours >= 12) {
+            v.moreThan12Hour = true
+          } else {
+            v.moreThan12Hour = false
+          }
+          //cssColor
+          let roles = localStorage.getItem('roles');
+          if (roles != "Agency") {
+            if (v.listEmployees.length <= 0) {
+              v.cssColor = {
+
+                backgroundColor: '#d9e6fb'
+
+              }
+            }
+            else {
+              v.cssColor = {
+                backgroundColor: 'unset'
+              }
+            }
+          }
+          //timeimg
+          v.countdownMaterial = differenceInMilliseconds
+
+        })
+
+        // Booking chua duoc assign
+
+
       })
     },
 
@@ -418,6 +651,26 @@ export default {
       axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/GetAirports`).then((response) => {
         this.maintainAirports = response.data;
       })
+    },
+
+    async exportOrder() {
+      try {
+        const uri = process.env.VUE_APP_API_URL;
+        const response = await axios.post(`${uri}/MaintainOrderDetails/ExportOrder`, this.filter, {
+          responseType: 'blob' // This is important to handle the binary response
+        });
+
+        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `Orders-${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.xlsx`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        console.error('Error exporting order:', error);
+      }
     },
     //#endregion
 
@@ -447,12 +700,13 @@ export default {
 
     deleteItem(item) {
       const apiUrl = process.env.VUE_APP_API_URL;
+
       if (confirm("Are you sure to delete?")) {
         axios
-          .delete(`${apiUrl}/order/delete/${item}`)
+          .post(`${apiUrl}/MaintainOrderDetails/DeleteOrderDetail/${item}`)
           .then(() => {
-            this.fetchOrder();
-            this.success();
+            this.maintainFetchOrders();
+            alert('DELETE SUCCESSFUL!')
           })
           .catch((error) => {
             console.error(
@@ -556,8 +810,8 @@ export default {
 
       return `${day}/${month}/${year}`;
     },
-    openEditOrder(orderId) {
-      this.selectedOrderId = orderId;
+    openEditOrder(orderItem) {
+      this.selectedOrderId = orderItem.id;
     },
 
     nextPage() {
@@ -622,26 +876,31 @@ export default {
       }
     },
     getStatusStyle(status) {
-      switch (status) {
-        case "Pending":
-          return { backgroundColor: "#FFFBE6", color: "#F9A001" };
-        case "Completed":
-          return { backgroundColor: "#C3EFD9", color: "#173F2D" };
-        case "Canceled":
-          return { backgroundColor: "#F8E3E2", color: "#7B110E" };
-        case "O.Canceled":
-          return { backgroundColor: "#F8E3E2", color: "#7B110E" };
-        case "Confirmed":
-          return { backgroundColor: "#D6E5FF", color: "#3C5289" };
-        case "O.Confirmed":
-          return { backgroundColor: "#D6E5FF", color: "#3C5289" };
-        case "Uncompleted":
-          return { backgroundColor: "#3770C3", color: "#FFFFFF" };
-        default:
-          return { backgroundColor: "#EEF4FE", color: "#9291FB" };
+      if (status) {
+        if (status.includes('Pending')) {
+          return { backgroundColor: "#ADD8E6", color: "black" }; // blue
+        } else if (status.includes('Confirm')) {
+          return { backgroundColor: "#9de889", color: "black" }; // green
+        } else if (status.includes('Complete') && !status.includes('Un')) {
+          return { backgroundColor: "#e6e651", color: "black" }; // yellow
+        } else if (status.includes('UnComplete')) {
+          return { backgroundColor: "#b7b5bd", color: "black" }; // gray
+        } else if (status.includes('Cancel')) {
+          return { backgroundColor: "#ea7171", color: "black" }; // red
+        }
       }
     }
 
+  },
+  watch: {
+    filter: {
+      handler(newVal) {
+        console.log('Filter object changed:', newVal);
+        // Thực hiện hành động khi đối tượng filter thay đổi
+        this.maintainFetchOrders();
+      },
+      deep: true
+    }
   },
   // watch: {
   //   // whenever question changes, this function will run
@@ -664,9 +923,10 @@ export default {
 }
 
 .order-body {
+  margin-top: 10px;
+
   padding: 0px 15px;
   display: flex;
-  height: 140px;
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
@@ -677,6 +937,7 @@ export default {
 .order-header {
   display: flex;
   align-items: center;
+  padding: 15px 10px 10px;
   justify-content: space-between;
 }
 
@@ -696,14 +957,14 @@ export default {
 }
 
 .search-filter {
-  gap: 5px;
   display: flex;
   align-items: center;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 #search {
   border: none;
-  width: 185px;
   padding: 10px;
   background: none;
   border-radius: 8px;
@@ -720,9 +981,15 @@ export default {
 #status-filter {
   border-radius: 5px;
   padding: 10px;
+  font-size: 12px;
+  font-weight: 600;
   border: none;
   background: none;
   box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
+}
+
+#search::placeholder {
+  font-size: 12px;
 }
 
 .space-line {
@@ -730,20 +997,20 @@ export default {
 }
 
 .order-search {
-  gap: 10px;
-  display: flex;
-  justify-content: space-between;
+  padding: 20px 0;
   align-items: center;
+}
+
+#status {
+  font-size: 13px;
 }
 
 .menu-search {
   display: flex;
-  gap: 10px;
   align-items: center;
 }
 
 .search-filter {
-  gap: 5px;
   display: flex;
   align-items: center;
 }
@@ -762,6 +1029,12 @@ select {
   border: none;
   background: none;
   box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
+}
+
+.order-information tr:nth-child(1),
+.order-information tr:nth-child(2) {
+  background-color: rgb(203, 204, 222) !important;
+
 }
 
 .btn-reset-primary {
@@ -801,6 +1074,7 @@ select {
 
 .data-table-tilte {
   text-transform: uppercase;
+  font-size: 13px;
 }
 
 .item {
@@ -820,6 +1094,17 @@ select {
   margin-left: 12px;
 }
 
+.un {
+  border: 4px;
+  padding: 10px;
+  background-color: #b7b5bd;
+  ;
+  font-weight: 600;
+  border-radius: 4px;
+}
+ul{
+    margin-bottom: 0 !important;
+}
 .customer-infomation {
   gap: 10px;
   display: flex;
@@ -838,6 +1123,15 @@ select {
   justify-content: space-evenly;
 }
 
+.compoted {
+  border: 4px;
+  padding: 10px;
+  background-color: #e6e651;
+  font-weight: 600;
+  border-radius: 4px;
+  width: 100%;
+}
+
 .btn-delete-primary {
   border: none;
   background: none;
@@ -847,5 +1141,33 @@ select {
 .passport-visa-tooltip {
   position: relative;
   display: inline-block;
+}
+
+.order-information {
+  border-bottom: 1px solid black;
+
+}
+
+.item {
+  font-size: 12px;
+}
+
+.order-info span.item {
+  font-size: 13px !important;
+
+}
+
+.pass {
+  width: 300px;
+}
+
+.item1 {
+  /* background-color: rgb(131 210 131) !important; */
+
+}
+
+.order-booking {
+  padding: 20px;
+  /* background: #1f416c; */
 }
 </style>

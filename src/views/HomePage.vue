@@ -4,7 +4,7 @@
       <div class=" title-info">
         <div class="home-content">
           <h2 class="home-slogan">{{ $t('home.slogan') }}</h2>
-          <div class="home-input-number" style="margin-left: 15px">
+          <div class="home-input-number">
             <label>{{ $t('home.enter_guests') }}</label>
             <input type="number" v-model="orderData.guest_number" id="guest_number" @input="updateFormCount()"
               required />
@@ -66,7 +66,7 @@
                   <label for="airport">{{ $t('home.airport') }}*</label>
                   <select id="airport" v-model="formData.airport" @change="updateAirport(orderData.formData[0].airport)"
                     required>
-                  <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}</option>
+                    <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}</option>
 
                     <!-- <option value="" disabled selected hidden>{{ $t('home.select_airport') }}</option>
                     <option value="Noi Bai">Noi Bai {{ $t('home.international_airport') }}, Ha Noi</option>
@@ -101,35 +101,35 @@
           </div>
           <div class="option-note-input">
             <div class="input-option">
-              <input type="checkbox" v-model="isChecked[0]" @change="handleCheckboxChange(0, formData)">
+              <input type="checkbox" v-model="formData.isChecked[0]" @change="handleCheckboxChange(0, formData)">
               <span class="input-option-content" id="0">{{ $t('options.change_visa') }}</span>
             </div>
             <div class="input-option">
-              <input type="checkbox" v-model="isChecked[1]" @change="handleCheckboxChange(1, formData)">
+              <input type="checkbox" v-model="formData.isChecked[1]" @change="handleCheckboxChange(1, formData)">
               <span class="input-option-content" id="1">{{ $t('options.exchange_currency') }}</span>
             </div>
             <div class="input-option">
-              <input type="checkbox" v-model="isChecked[2]" @change="handleCheckboxChange(2, formData)">
+              <input type="checkbox" v-model="formData.isChecked[2]" @change="handleCheckboxChange(2, formData)">
               <span class="input-option-content" id="2">{{ $t('options.buy_sim_card') }}</span>
             </div>
             <div class="input-option">
-              <input type="checkbox" v-model="isChecked[3]" @change="handleCheckboxChange(3, formData)">
+              <input type="checkbox" v-model="formData.isChecked[3]" @change="handleCheckboxChange(3, formData)">
               <span class="input-option-content" id="3">{{ $t('options.wheelchair_service') }}</span>
             </div>
             <div class="input-option">
-              <input type="checkbox" v-model="isChecked[4]" @change="handleCheckboxChange(4, formData)">
+              <input type="checkbox" v-model="formData.isChecked[4]" @change="handleCheckboxChange(4, formData)">
               <span class="input-option-content" id="4">{{ $t('options.poor_health_support') }}</span>
             </div>
             <div class="input-option">
-              <input type="checkbox" v-model="isChecked[5]" @change="handleCheckboxChange(5, formData)">
+              <input type="checkbox" v-model="formData.isChecked[5]" @change="handleCheckboxChange(5, formData)">
               <span class="input-option-content" id="5">{{ $t('options.customs_declaration_support') }}</span>
             </div>
             <div class="input-option">
-              <input type="checkbox" v-model="isChecked[6]" @change="handleCheckboxChange(6, formData)">
+              <input type="checkbox" v-model="formData.isChecked[6]" @change="handleCheckboxChange(6, formData)">
               <span class="input-option-content" id="6">{{ $t('options.luggage_assistance') }}</span>
             </div>
             <div class="input-option">
-              <input type="checkbox" v-model="isChecked[7]" @change="handleCheckboxChange(7, formData)">
+              <input type="checkbox" v-model="formData.isChecked[7]" @change="handleCheckboxChange(7, formData)">
               <span class="input-option-content" id="7">{{ $t('options.see_off_choose_staff') }}</span>
             </div>
           </div>
@@ -141,10 +141,15 @@
                   <div class="body-file">
                     <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
                     <span class="title-header">{{ $t('home.upload_passport_here') }}*</span>
+                    <div v-if="!formData.validated">
+                      <small style="background-color: red">{{ $t("home.ERROR_PASSPORT_MISSING") }}</small>
+                    </div>
                   </div>
+
                   <img v-if="formData.passport_File" :src="formData.imagePreview" class="uploaded-image" />
                 </label>
-                <input :id="`passport-${index}`" type="file" @change="handlePassportUpload($event, index, formData)" />
+                <input :id="`passport-${index}`" type="file"
+                  @change="handlePassportUpload($event, index, formData)" />
               </div>
               <div class="file-input">
                 <label :for="`visa-${index}`" class="file-upload-label">
@@ -231,11 +236,11 @@ export default {
       formIndexCounter: 0,
       isLoading: false,
       isChecked: [false, false, false, false, false, false, false, false],
-      maintainAirports: []
+      maintainAirports: [],
     };
   },
   mounted() {
-    
+
   },
   computed: {
     minDate() {
@@ -244,14 +249,14 @@ export default {
   },
 
   methods: {
-    maintainGetAllAirport(){
+    maintainGetAllAirport() {
       axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/GetAirports`).then((response) => {
         this.maintainAirports = response.data;
       })
     },
     handleCheckboxChange(index, fd) {
       const value = document.getElementById(index).innerHTML;
-      if (this.isChecked[index]) {
+      if (fd.isChecked[index]) {
         if (!fd.note) {
           fd.note = value + ', ';
         } else {
@@ -429,13 +434,15 @@ export default {
           portrait_File: "",
           service_ID: null,
           createBy: null,
+          isChecked: [false, false, false, false, false, false, false, false],
+          validated: true
         }));
       }
     },
 
     async submitOrder() {
       try {
-        this.isLoading = true;
+        
 
         const ordersToSend = [];
         for (let i = 0; i < this.orderData.guest_number; i++) {
@@ -454,26 +461,39 @@ export default {
           is_group_order: this.orderData.is_Group ? 1 : 0,
           orders: ordersToSend,
         };
-        console.log(dataToSend);
-        
-        const apiUrl = process.env.VUE_APP_API_URL;
-        const response = await axios.post(`${apiUrl}/MaintainOrderDetails`, dataToSend);
 
-        // this.success();
-        if (response.status === 200) {
-          this.isLoading = false;
+        //validated
+        let checker = true;
+        dataToSend.orders.forEach(v => {
+          console.log(v)
+          if (!v.passport_File) {
+            v.validated = false
+            checker = false;
+            return;
+          }
+        });
+        if (checker) {
+          this.isLoading = true;
+          const apiUrl = process.env.VUE_APP_API_URL;
+          const response = await axios.post(`${apiUrl}/MaintainOrderDetails`, dataToSend);
 
-          // Hiển thị swal modal
-          await Swal.fire({
-            icon: 'success',
-            title: 'Đã thêm booking mới thành công',
-            text: 'Vui lòng chờ xác nhận.'
-          });
+          // this.success();
+          if (response.status === 200) {
+            this.isLoading = false;
+
+            // Hiển thị swal modal
+            await Swal.fire({
+              icon: 'success',
+              title: 'Booking Successful!',
+              // text: 'Vui lòng chờ xác nhận.'
+            });
+          }
         }
       } catch (error) {
         console.error("Error submitting order:", error);
         this.isLoading = false;
       }
+
       // finally {
       //   this.isLoading = false;
       // }
@@ -545,13 +565,26 @@ export default {
 
 
   },
-  created(){
-   this.maintainGetAllAirport();
-   this.fetchServices();
+  created() {
+    this.maintainGetAllAirport();
+    this.fetchServices();
   }
 }
 </script>
 <style scoped>
+@media (max-width:768px){
+  .btn-submit-primary{
+    right: 0px;
+    top: 95%;
+    position: fixed;
+    padding: 11px 42px !important;
+    color: black;
+    border: none;
+    font-size: 12px !important;
+    border-radius: 7px;
+    background: #d3ecf0;
+  }
+}
 @font-face {
   font-family: "Avenir Next Ultra Light";
   src: url("@/assets/font/Avenir Next.ttc") format("truetype");
@@ -585,15 +618,17 @@ export default {
 
 .home-content {
   color: #fff;
-  width: 650px;
-  margin-left: 21%;
+  text-align: center;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
 }
-
 .home-input-number {
   gap: 6px;
   display: flex;
-  margin-left: 15px;
   flex-direction: column;
+  margin:auto;
 }
 
 .row-content {
@@ -635,7 +670,7 @@ h2 {
 .container {
   color: #000066;
   font-family: "Avenir Next Meidum", sans-serif;
-  width: 60%;
+  width: 100%;
   margin: 0 auto;
   margin-bottom: 20px;
   height: 100%;

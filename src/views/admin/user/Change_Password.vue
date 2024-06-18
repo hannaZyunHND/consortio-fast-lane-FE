@@ -66,7 +66,7 @@ export default {
 
             console.log(this.formData);
             axios
-                .post(`${apiUrl}/auth/Change_Password`, this.formData)
+                .post(`${apiUrl}/MaintainUsers/Change_Password`, this.formData)
                 .then(() => {
                     this.success();
                     //-----------

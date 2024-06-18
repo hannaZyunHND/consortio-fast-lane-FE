@@ -2,24 +2,36 @@
     <div class="popup-content" v-if="orderDetail">
         <form enctype="multipart/form-data" @submit.prevent="submitSchedule" id="edit-order-form">
             <div class="form-col">
-                <div class="row">
+                <div class="row" v-if="isAcceptConfirm">
                     <label for="status_sales">Operator_Status</label>
+
                     <select v-model="orderDetail.status_Operator_ID" id="status">
-                        <option v-for="(status, index) in maintainOperatorStatus" :key="index" :value="status.Key">{{ status.Value }}
+                        <option v-for="(status, index) in maintainOperatorStatus.filter(r => r.Key <= 2 || r.Key == 5)" :key="index"
+                            :value="status.Key">{{
+                                status.Value }}
                         </option>
                     </select>
                 </div>
                 <div class="row">
                     <label for="employee">Assign</label>
-                    <select v-model="orderDetail.employee_Id" id="employee">
+                    <br>
+                    <Select2 v-model="orderDetail.employee_Id" :options="maintainEmployee"
+                        :settings="{ width: '100%', multiple: true, placeholder: 'Select Employee', allowClear: true }"
+                        @select="onHandleSelect()" />
+                    <div>
+                        <small v-if="!validated" style="color:red">* You must assign employee</small>
+                    </div>
+                    <!-- <select v-model="orderDetail.employee_Id" id="employee">
                         <option v-for="(employee, index) in maintainEmployee" :key="index" :value="employee.id">{{
                             employee.name }}
                         </option>
-                    </select>
+                    </select> -->
                 </div>
+                <br>
                 <button type="submit" class="btn-add-primary">Save</button>
             </div>
         </form>
+        <Loading :loading="isLoading" />
     </div>
 </template>
 
@@ -27,9 +39,11 @@
 import axios from 'axios';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import Loading from '@/views/LoadingPage.vue';
+
 export default {
     name: 'EditTask',
-    components: {
+    components: { Loading
     },
     props: {
         orderId: {
@@ -74,9 +88,14 @@ export default {
             currentPage: 1,
             maintainOperatorStatus: [],
             maintainEmployee: [],
-            selectedOperatorStatus : 0,
-            selectedEmployeeId : 0,
-            orderDetail: null
+            selectedOperatorStatus: 0,
+            selectedEmployeeId: 0,
+            orderDetail: null,
+            changeStatusDisabled: true,
+            moreThan6Hour: false,
+            validated: true,
+            isAcceptConfirm : true,
+            isLoading: false,
         };
     },
     setup() {
@@ -113,15 +132,27 @@ export default {
     },
 
     methods: {
+        onHandleSelect() {
+            if (this.orderDetail.employee_Id.length <= 0) {
+                this.validated = false;
+            }else{
+                this.validated = true;
+            }
+        },
         maintainGetOperatorStatus() {
             axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/StatusOperatorType`).then((response) => {
                 this.maintainOperatorStatus = response.data;
             })
         },
-        maintainGetEmployeeSameAirport(){
+        maintainGetEmployeeSameAirport() {
             const user_id = parseInt(localStorage.getItem("user_id"));
             axios.get(`${process.env.VUE_APP_API_URL}/MaintainUsers/GetEmployeeSameAirport/userId/${user_id}/orderId/${this.orderId}`).then((response) => {
                 this.maintainEmployee = response.data;
+                this.maintainEmployee = this.maintainEmployee.filter(r => r.role === "Operator")
+                // console.log(this.maintainEmployee)
+                this.maintainEmployee.forEach(v => {
+                    v.text = v.name
+                })
             })
         },
 
@@ -129,34 +160,84 @@ export default {
             axios.get(`${process.env.VUE_APP_API_URL}/MaintainOrderDetails/GetById/${this.orderId}`).then((response) => {
                 console.log(response.data)
                 this.orderDetail = response.data;
-                
+                if (this.orderDetail.employee_Id) {
+                    this.orderDetail.employee_Id = this.orderDetail.employee_Id.split(',')
+                } else {
+                    this.orderDetail.employee_Id = []
+                }
 
+                //
+                const serviceDate = new Date(this.orderDetail.service_Time);
+                const bookingDate = new Date(this.orderDetail.created_at);
+
+                const differenceInMilliseconds = serviceDate - bookingDate;
+                const differenceInHours = differenceInMilliseconds / (1000 * 60 * 60);
+
+                if (differenceInHours >= 6) {
+                    this.moreThan6Hour = true
+                } else {
+                    this.moreThan6Hour = false
+                    
+                }
+
+                let roles = localStorage.getItem('roles');
+                if(roles == "Admin"){
+                    this.isAcceptConfirm = true;
+                }else{
+                    if(this.orderDetail.status_Operator_ID == 1){
+                        this.isAcceptConfirm = true;
+                    }else{
+                        this.isAcceptConfirm = false;
+                    }
+                }
+                
             })
         },
         submitSchedule() {
-            this.isLoading = true;
-            const user_Id = localStorage.getItem("user_id");
-            const apiUrl = process.env.VUE_APP_API_URL;
-            this.orderDetail.updatedBy = user_Id;
+            if (this.orderDetail.employee_Id.length <= 0) {
+                this.validated = false;
+            }
+            if(this.orderDetail.status_Operator_ID == 5){
+                this.validated = true;
+            }
+            if (this.validated) {
+                this.isLoading = true;
+                const user_Id = localStorage.getItem("user_id");
+                const apiUrl = process.env.VUE_APP_API_URL;
+                this.orderDetail.updatedBy = user_Id;
+                if (this.orderDetail.employee_Id.length > 0) {
+                    if (parseInt(this.orderDetail.employee_Id[0]) > 0) {
+                        this.orderDetail.employee_Id.unshift('0')
+                    }
+                    if (parseInt(this.orderDetail.employee_Id[this.orderDetail.employee_Id.length - 1]) > 0) {
+                        this.orderDetail.employee_Id.push('0')
+                    }
+                    this.orderDetail.employee_Id = this.orderDetail.employee_Id.toString()
+                }
+                else {
+                    this.orderDetail.employee_Id = ""
+                }
 
-            axios.post(`${apiUrl}/MaintainOrderDetails/Update`, this.orderDetail)
-                .then(() => {
-                    this.success();
-                    const clickEvent = new MouseEvent('click', {
-                        bubbles: true,
-                        cancelable: true,
-                        view: window
+                axios.post(`${apiUrl}/MaintainOrderDetails/Update`, this.orderDetail)
+                    .then(() => {
+                        this.success();
+                        const clickEvent = new MouseEvent('click', {
+                            bubbles: true,
+                            cancelable: true,
+                            view: window
+                        });
+                        // Phát ra sự kiện click trên document
+                        document.dispatchEvent(clickEvent);
+                        this.$emit("reloadPage");
+                    })
+                    .catch(error => {
+                        console.error('Error updating Order:', error);
+                    })
+                    .finally(() => {
+                        this.isLoading = false;
                     });
-                    // Phát ra sự kiện click trên document
-                    document.dispatchEvent(clickEvent);
-                    this.$emit("reloadPage");
-                })
-                .catch(error => {
-                    console.error('Error updating Order:', error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            }
+
         },
         fetchSchedule(item) {
             console.log('schedule', item)
@@ -259,6 +340,7 @@ export default {
 }
 
 .order-body {
+
     padding: 0px 15px;
     display: flex;
     height: 140px;

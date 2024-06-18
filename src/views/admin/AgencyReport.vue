@@ -1,125 +1,204 @@
 <template>
     <div class="report-container">
         <span class="report-title">
-            Order Statistics
+            Statistics
         </span>
         <div class="order-search">
             <div class="menu-search">
-                <div class="search-filter">
-                    <select id="airport" class="form-select" placeholder="Select Cities" v-model="filter.airportId"
+                <div class="row">
+                    <!-- Airport Filter -->
+                    <div class="col-md-4 col-lg-3 search-filter"
                         v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Agency'])">
-                        <option value="0" selected>ALL AIRPORT</option>
-                        <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}</option>
-                    </select>
-                </div>
-                <div class="search-filter">
-                    <select id="status-filter" v-model="filter.bookingStatusId"
+                        <select id="airport" class="form-select" placeholder="Select Cities" v-model="filter.airportId">
+                            <option value="0" selected>ALL AIRPORT</option>
+                            <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}</option>
+                        </select>
+                    </div>
+                    <!-- Status Filter -->
+                    <div class="col-md-4 col-lg-3 search-filter"
                         v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Operator_Ref', 'Agency'])">
-                        <option value="0">ALL STATUS</option>
-                        <option v-for="(status, index) in maintainBookingStatus" :key="index" :value="status.Key">
-                            {{ status.Value }}
-                        </option>
-                    </select>
-                </div>
-                <div class="search-filter">
-                    <select id="status-filter" v-model="filter.serviceId"
+                        <select id="status-filter" class="form-select" v-model="filter.bookingStatusId">
+                            <option value="0">ALL STATUS</option>
+                            <option v-for="(status, index) in maintainBookingStatus" :key="index" :value="status.Key">{{
+                                status.Value }}</option>
+                        </select>
+                    </div>
+                    <!-- Services Filter -->
+                    <div class="col-md-4 col-lg-3 search-filter"
                         v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Operator_Ref', 'Agency'])">
-                        <option value="0">ALL SERVICES</option>
-                        <option v-for="(s, index) in maintainServices" :key="index" :value="s.id">{{ s.name }}</option>
-                    </select>
-                </div>
-                <div class="search-filter">
-                    <select id="status-filter" v-model="filter.createdBy"
-                        v-if="roleChecker(['Admin'])">
-                        <option value="0">ALL USERS</option>
-                        <option v-for="(user, index) in users" :key="index" :value="user.id">
-                            {{ user.name }}
-                        </option>
-                    </select>
-                </div>
-                <div class="search-filter">
-                    <VueDatePicker v-model="filter.fromDate" :config="datePickerConfig" placeholder="From">
-                    </VueDatePicker>
-                </div>
-                <div class="search-filter">
-                    <VueDatePicker v-model="filter.toDate" :config="datePickerConfig" placeholder="To">
-                    </VueDatePicker>
-                </div>
-                <div class="search-filter">
-                    <select id="status-filter" v-model="filter.orderBy">
-                        <option value="service-time">Sort by Service-Time</option>
-                        <option value="booking-time">Sort by Booking-Time</option>
-                    </select>
-                </div>
-                <div>
-                    <input type="text" name="search" id="search" v-model="filter.keyword" placeholder="Search"
-                        @keyup.enter="search" />
-                </div>
-                <button class="btn-search-primary">
-                    <i class="pi pi-search" style="font-size: 1rem" @click="search"></i>
-                </button>
-            </div>
-            <button @click="refreshOrders" class="btn-reset-primary">
-                <i class="pi pi-refresh" style="font-size: 1rem"></i>
-            </button>
-        </div>
-        <div class="data-report-month">
-            <span class="total-data">
-                <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
-                <div class="number-of-booking">
-                    {{ items.length }} Bookings
-                </div>
-                <span class="report-title-data">
-                    Total orders
-                </span>
-            </span>
-            <span class="total-data">
-                <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
-                <div class="number-of-booking">
-                    {{ itemPending.length }} Bookings
-                </div>
-                <span class="report-title-data">
-                    Total pending orders
-                </span>
-            </span>
-            <!-- <span class="total-data">Canceled: {{ totalYear.cancelCount }}</span> -->
-            <span class="total-data">
-                <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
-                <div class="number-of-booking">
-                    {{ itemConfirm.length }} Bookings
-                </div>
-                <span class="report-title-data">
-                    Total confirmed orders
-                </span>
-            </span>
-            <span class="total-data">
-                <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
-                <div class="number-of-booking">
-                    {{ itemComplete.length }} Bookings
-                </div>
-                <span class="report-title-data">
-                    Total completed orders
-                </span>
-            </span>
-            <span class="total-data">
-                <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
-                <div class="number-of-booking">
-                    {{ itemUnComplete.length }} Bookings
-                </div>
-                <span class="report-title-data">
-                    Total uncompleted orders
-                </span>
-            </span>
-        </div>
-        <div class="report-chart" style="display: none">
-            <div class="report-item-wrapper" style="width: 50%;">
-                <h3>Service Counting</h3>
-                <div class="report-item">
-                    <!-- <h3>Service Counting Chart</h3> -->
-                    <Pie id="service-chart" :options="{ responsive: true, maintainAspectRatio: false }"
-                        :data="serviceChart" v-if="serviceChart" />
+                        <select id="status-filter" class="form-select" v-model="filter.serviceId">
+                            <option value="0">ALL SERVICES</option>
+                            <option v-for="(s, index) in maintainServices" :key="index" :value="s.id">{{ s.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <!-- Users Filter -->
+                    <div class="col-md-4 col-lg-3 search-filter" v-if="roleChecker(['Admin'])">
+                        <select id="status-filter" class="form-select" v-model="filter.createdBy">
+                            <option :value="defaultUserId">ALL USERS</option>
+                            <option v-for="(user, index) in users" :key="index" :value="user.id">{{ user.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <!-- From Date Picker -->
+                    <div class="col-md-4 col-lg-3 search-filter">
+                        <VueDatePicker v-model="filter.fromDate" :config="datePickerConfig" placeholder="From">
+                        </VueDatePicker>
+                    </div>
+                    <!-- To Date Picker -->
+                    <div class="col-md-4 col-lg-3 search-filter">
+                        <VueDatePicker v-model="filter.toDate" :config="datePickerConfig" placeholder="To">
+                        </VueDatePicker>
+                    </div>
+                    <!-- Order By Filter -->
+                    <div class="col-md-4 col-lg-3 search-filter">
+                        <select id="status-filter" class="form-select" v-model="filter.orderBy">
+                            <option value="service-time">Sort by Service-Time</option>
+                            <option value="booking-time">Sort by Booking-Time</option>
+                        </select>
+                    </div>
+                    <!-- Hidden Search Input -->
+                    <div class="col-md-4 col-lg-3 search-filter" style="display: none;">
+                        <input type="text" name="search" id="search" class="form-control" v-model="filter.keyword"
+                            placeholder="Search" @keyup.enter="search" />
+                    </div>
                 </div>
             </div>
+        </div>
+
+
+        <div class="row row-cols-md-5 row-cols-xs-1 ">
+            <!-- Total Booking -->
+            <div class="col m-1 total-data">
+                <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
+                <div class="number-of-booking">
+                    {{ items.length }}
+                </div>
+                <span class="report-title-data">
+                    Total Booking
+                </span>
+            </div>
+
+            <!-- Total Pending Booking -->
+            <div class="col m-1 total-data ">
+                <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
+                <div class="number-of-booking">
+                    {{ itemPending.length }}
+                </div>
+                <span class="report-title-data">
+                    Total Pending Booking
+                </span>
+            </div>
+
+            <!-- Total Confirmed Booking -->
+            <div class="col m-1 total-data ">
+                <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
+                <div class="number-of-booking">
+                    {{ itemConfirm.length }}
+                </div>
+                <span class="report-title-data">
+                    Total Confirmed Booking
+                </span>
+            </div>
+
+            <!-- Total Completed Booking -->
+            <div class="col m-1 total-data ">
+                <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
+                <div class="number-of-booking">
+                    {{ itemComplete.length }}
+                </div>
+                <span class="report-title-data">
+                    Total Completed Booking
+                </span>
+            </div>
+
+            <!-- Total Uncompleted Booking -->
+            <div class="col m-1 total-data ">
+                <i class="pi pi-box" style="font-size: 1rem; color: #3C5289"></i>
+                <div class="number-of-booking">
+                    {{ itemUnComplete.length }}
+                </div>
+                <span class="report-title-data">
+                    Total Uncompleted Booking
+                </span>
+            </div>
+        </div>
+
+
+        <div class="report-chart-combine">
+
+
+            <div class="chart-title">Chart</div>
+            <div class="report-item-wrapper row">
+                <div class="col-md-6 mb-3" v-for="c in compareBarChart">
+                    <div class="report-item">
+                        <div class="combine-search">
+                            <!-- Hàng thứ nhất -->
+                            <div class="menu-search-combine row">
+                                <div class="col-md-4 mb-3">
+                                    <select id="airport" class="form-select" placeholder="Select Cities"
+                                        v-model="c.filterItem.airportId"
+                                        v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Agency'])">
+                                        <option value="0" selected>ALL AIRPORT</option>
+                                        <option v-for="a in maintainAirports" :key="a.id" :value="a.id">{{ a.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <select id="status-filter" v-model="c.filterItem.serviceId"
+                                        v-if="roleChecker(['Admin', 'Sale', 'Sale_Admin', 'Operator_Ref', 'Agency'])">
+                                        <option value="0">ALL SERVICES</option>
+                                        <option v-for="(s, index) in maintainServices" :key="index" :value="s.id">{{
+                                            s.name }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <select id="status-filter" v-model="c.filterItem.createdBy"
+                                        v-if="roleChecker(['Admin'])">
+                                        <option value="0">ALL USERS</option>
+                                        <option v-for="(user, index) in users" :key="index" :value="user.id">{{
+                                            user.name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Hàng thứ hai -->
+                            <div class="menu-search-combine row">
+                                <div class="col-md-4 mb-3 mt-2">
+                                    <VueDatePicker v-model="c.filterItem.fromDate" :config="datePickerConfig"
+                                        placeholder="From">
+                                    </VueDatePicker>
+                                </div>
+                                <div class="col-md-4 mb-3 mt-2">
+                                    <VueDatePicker v-model="c.filterItem.toDate" :config="datePickerConfig"
+                                        placeholder="To">
+                                    </VueDatePicker>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <select id="status-filter" v-model="c.filterItem.orderBy">
+                                        <option value="service-time">Sort by Service-Time</option>
+                                        <option value="booking-time">Sort by Booking-Time</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Hàng thứ ba -->
+                            <div class="menu-search-combine row">
+                                <div class="col-md-2 mb-3">
+                                    <button @click="onSearchFilter()" class="btn btn-primary">
+                                        Search
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-item">
+                            <Bar :data="c.chartInfo" v-if="c.chartInfo" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
 
         </div><br />
     </div>
@@ -128,17 +207,17 @@
 <script>
 // import { ref, onMounted } from 'vue';
 // import Chart from 'chart.js/auto';
-import { Pie } from 'vue-chartjs'
-import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement } from 'chart.js'
+import { Pie, Bar, Line } from 'vue-chartjs'
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement, PointElement, LineElement } from 'chart.js'
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement)
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement, PointElement, LineElement)
 
 
 import axios from "axios";
 import Swal from 'sweetalert2';
 
 export default {
-    components: { Pie },
+    components: { Pie, Bar, Line },
     data() {
         return {
             dataMonthly: [],
@@ -210,7 +289,42 @@ export default {
             ],
             minDate: '',
             maxDate: '',
-            lineChartPicking: 'year'
+            lineChartPicking: 'year',
+            compareBarChart: [
+                {
+                    filterItem: {
+                        airportId: 0,
+                        bookingStatusId: 0,
+                        fromDate: null,
+                        serviceId: 0,
+                        toDate: null,
+                        keyword: "",
+                        orderBy: "booking-time",
+                        createdBy: 0,
+                        employeeId: 0,
+                        pageIndex: 1,
+                        pageSize: 1000000
+                    },
+                    chartInfo: null
+                },
+                {
+                    filterItem: {
+                        airportId: 0,
+                        bookingStatusId: 0,
+                        fromDate: null,
+                        serviceId: 0,
+                        toDate: null,
+                        keyword: "",
+                        orderBy: "booking-time",
+                        createdBy: 0,
+                        employeeId: 0,
+                        pageIndex: 1,
+                        pageSize: 1000000
+                    },
+                    chartInfo: null
+                }
+            ],
+            defaultUserId: 0,
 
         };
     },
@@ -221,16 +335,56 @@ export default {
         let airportId = localStorage.getItem('airportId');
         if (airportId) {
             this.filter.airportId = airportId;
+            this.compareBarChart.forEach(r => {
+                r.filterItem.airportId = airportId
+            })
         }
         //Chi role agency nhin thay data cua no
         let roles = localStorage.getItem('roles');
         let userId = localStorage.getItem('user_id');
         if (roles == "Agency") {
             this.filter.createdBy = userId
+            this.compareBarChart.forEach(r => {
+                r.filterItem.createdBy = userId
+            })
+        }
+        if (roles == "Agency") {
+            this.filter.createdBy = userId
+            this.defaultUserId = userId
         }
         this.roles = localStorage.getItem('roles');
 
+
         //Chi role Operator chi nhin thay cac tour ma no duoc phan quyen
+        //Set ngày tìm kiếm mặc định
+        const today = new Date();
+
+        // Thiết lập thời gian 00:00 cho fromDate
+        const fromDate = new Date(today.setHours(0, 0, 0, 0));
+
+        // Thiết lập thời gian 23:59 cho toDate
+        const toDate = new Date(today.setHours(23, 59, 59, 999));
+
+        // this.filter.fromDate = fromDate;
+        // this.filter.toDate = toDate;
+        this.compareBarChart.forEach((chart) => {
+            // const _today = new Date();
+
+            // // Lấy ngày đầu tháng hiện tại
+            // const _fromDate = new Date(_today.getFullYear(), _today.getMonth(), 1);
+
+            // // Lấy ngày cuối tháng hiện tại
+            // const _toDate = new Date(_today.getFullYear(), _today.getMonth() + 1, 0);
+
+            // // Thiết lập thời gian 00:00 cho fromDate
+            // _fromDate.setHours(0, 0, 0, 0);
+
+            // // Thiết lập thời gian 23:59 cho toDate
+            // _toDate.setHours(23, 59, 59, 999);
+            // chart.filterItem.fromDate = _fromDate;
+            // chart.filterItem.toDate = _toDate;
+        })
+
 
         this.maintainGetAllAirport();
         this.maintainGetAllStatus();
@@ -238,10 +392,15 @@ export default {
         this.maintainGetServices();
         //Kiem tra cac dieu kien va set tim kiem mac dinh
         this.maintainFetchOrders();
-        console.log(this.generateDateRange('2024-06-01', '2024-07-01', 'Tuần'))
+        this.onLoadCompareCharts();
+
+        // console.log(this.generateDateRange('2024-06-01', '2024-07-01', 'Tuần'))
 
     },
     methods: {
+        onSearchFilter() {
+            this.onLoadCompareCharts();
+        },
         //#StartMaintainRegion
         roleChecker(accepedRoles) {
             let checker = false;
@@ -298,7 +457,7 @@ export default {
             this.selectedOrderTask = id;
         },
         maintainFetchOrders() {
-            
+
             axios.post(`${process.env.VUE_APP_API_URL}/MaintainOrderDetails/FilterOrder`, this.filter).then((response) => {
                 // console.log(response.data);
 
@@ -335,8 +494,13 @@ export default {
             axios.post(`${process.env.VUE_APP_API_URL}/MaintainUsers/FilterUsers`, this.filterUser).then((response) => {
                 console.log(response.data);
 
-                this.users = response.data.users;
-                this.users = this.users.filter(r => r.role == "Admin" || r.role == "Sale_Admin" || r.role == "Agency")
+                this.users = response.data.users; let roles = localStorage.getItem('roles');
+                let userId = localStorage.getItem('user_id');
+                if (roles == "Agency") {
+                    this.users = this.users.filter(r => r.parentId == userId)
+                } else {
+                    this.users = this.users.filter(r => r.role == "Admin" || r.role == "Sale_Admin" || r.role == "Agency")
+                }
                 this.totalPage = response.data.totalPage;
 
             })
@@ -461,7 +625,7 @@ export default {
             });
             return itemFromDate;
         },
-        onLoadLineChart(){
+        onLoadLineChart() {
             //Lay ra label
             this.lineChart = {}
             this.lineChart.labels = this.generateDateRange(this.filter.fromDate, this.filter.toDate, this.year);
@@ -481,8 +645,89 @@ export default {
 
 
 
-        }
+        },
+        onLoadCompareCharts() {
+            this.compareBarChart.forEach((chart) => {
+                const apiUrl = process.env.VUE_APP_API_URL;
+                axios.post(`${apiUrl}/MaintainOrderDetails/BarChartByStatus`, chart.filterItem).then((response) => {
+                    console.log(response.data)
+                    /* serviceChart : {
+                        datasets: [{
+                            label: 'Year Order Data',
+                            backgroundColor: '#f87979',
+                            data: []
+                        }],
+                        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                    } */
 
+                    chart.chartInfo = {};
+                    chart.chartInfo.labels = response.data.map(r => r.labelName)
+                    let dataSetTotal = [];
+                    let dataSetPending = [];
+                    let dataSetConfirm = [];
+                    let dataSetComplete = [];
+                    let dataSetUncomplete = [];
+                    let dataSetCancel = [];
+
+                    response.data.forEach(r => {
+                        dataSetTotal.push(r.counting[0])
+                        dataSetPending.push(r.counting[1]);
+                        dataSetConfirm.push(r.counting[2]);
+                        dataSetComplete.push(r.counting[3]);
+                        dataSetUncomplete.push(r.counting[4]);
+                        dataSetCancel.push(r.counting[5]);
+                    })
+                    /*
+                        if (status.includes('Pending')) {
+                            return { backgroundColor: "#ADD8E6", color: "black" }; // blue
+                            } else if (status.includes('Confirm')) {
+                            return { backgroundColor: "#90EE90", color: "black" }; // green
+                            } else if (status.includes('Complete') && !status.includes('Un')) {
+                            return { backgroundColor: "#FFFFE0", color: "black" }; // yellow
+                            } else if (status.includes('UnComplete')) {
+                            return { backgroundColor: "#D3D3D3", color: "black" }; // gray
+                            } else if (status.includes('Cancel')) {
+                            return { backgroundColor: "#FFC0CB", color: "black" }; // red
+                            }
+                    */
+                    chart.chartInfo.datasets = [
+                        {
+                            label: "Total",
+                            backgroundColor: "#ED9121",
+                            data: dataSetTotal
+                        },
+                        {
+                            label: "Pending",
+                            backgroundColor: "#ADD8E6",
+                            data: dataSetPending
+                        },
+                        {
+                            label: "Confirm",
+                            backgroundColor: "#90EE90",
+                            data: dataSetConfirm
+                        },
+                        {
+                            label: "Complete",
+                            backgroundColor: "#FFFFE0",
+                            data: dataSetComplete
+                        },
+                        {
+                            label: "UnComplete",
+                            backgroundColor: "#D3D3D3",
+                            data: dataSetUncomplete
+                        },
+                        {
+                            label: "Cancel",
+                            backgroundColor: "#FFC0CB",
+                            data: dataSetCancel
+                        },
+                    ];
+                    console.log(chart)
+                }).catch(err => {
+                    console.log(err)
+                })
+            })
+        }
 
 
     },
@@ -500,15 +745,20 @@ export default {
 </script>
 <style scoped>
 .data-report-month {
-    min-height: 120px;
     display: flex;
     gap: 20px;
-    margin: 20px 0px;
-    justify-content: space-between;
+    justify-content: center;
+
+}
+
+
+.search-filter select {
+    font-size: 12px;
 }
 
 .number-of-booking {
     font-weight: bold;
+    font-size: 21px;
 }
 
 .report-title {
@@ -529,10 +779,10 @@ export default {
 }
 
 .total-data {
-    padding-left: 20px;
+    margin-bottom: 20px;
+    padding: 15px;
     display: flex;
     gap: 10px;
-    width: 25%;
     background: #fff;
     border-radius: 7px;
     box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
@@ -602,6 +852,11 @@ select {
     padding: 10px;
 }
 
+.chart-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
 .btn-export-primary,
 .btn-search-primary {
     border-radius: 7px;
@@ -618,5 +873,18 @@ select {
     border: none;
     background: none;
     box-shadow: 0 3px 5px #00000005, 0 0 2px #0000000d, 0 1px 4px #00000014;
+}
+
+.report-item canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#status-filter{
+    width: 100%;
+}
+
+.report-chart-combine {
+    margin-top: 60px;
 }
 </style>

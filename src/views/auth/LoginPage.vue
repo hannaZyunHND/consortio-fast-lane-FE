@@ -1,14 +1,14 @@
 <template>
-  <div class="login">
-    <div class="login-form">
+  <div class="login row">
+    <div class="login-form top col-md-6">
       <div class="title-login">Welcome to Fast Lane</div>
       <span class="title-description">Sign in to your account below</span>
       <form @submit.prevent="login" enctype="multipart/form-data">
-        <div class="form-row">
+        <div class="form-row1">
           <label for="email" style="text-align: left;font-size: 16px;">Email</label>
           <input type="email" v-model="formData.email" id="email" placeholder="Email" />
         </div>
-        <div class="form-row">
+        <div class="form-row1">
           <label for="password" style="text-align: left; font-size: 16px">Password</label>
           <input type="password" v-model="formData.password" id="password" placeholder="Password" />
         </div>
@@ -19,7 +19,7 @@
         <router-link to="/register">Register Now</router-link>
       </span>
     </div>
-    <div class="login-image"></div>
+    <img class="col-md-6 img-login" src="~@/assets/logo1.jpeg" />
   </div>
 </template>
 
@@ -130,6 +130,20 @@ export default {
 </script>
 
 <style scoped>
+@media (max-width:768px) {
+  .img-login {
+    order: 1;
+  }
+
+  .top {
+    order: 2;
+  }
+
+}
+.img-login {
+    padding: 0px !important;
+
+  }
 body {
   background: rgb(255, 255, 255);
   padding: 100px 40px;
@@ -138,15 +152,16 @@ body {
   flex-direction: column;
   align-items: center;
 }
+.form-row1{
+  padding-bottom: 15px
+}
 
 .login {
   box-shadow: -2px 1px 12px 4px rgba(0, 0, 0, 0.2);
   margin: 0 auto;
   margin-top: 10%;
-  border-radius: 10px;
   background: white;
   display: flex;
-  width: 800px;
   max-width: 1000px;
 }
 

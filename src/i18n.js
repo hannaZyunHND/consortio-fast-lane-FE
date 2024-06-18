@@ -27,6 +27,7 @@ const localeMessages = {
             upload_portrait_here: "Upload portrait at here",
             mandatory_marks: "Marks field are mandatory to fill up",
             button: "Submit",
+            ERROR_PASSPORT_MISSING: "Please providing passport"
         },
         services: {
             VIP_Pick_up: "VIP Pick-up",
@@ -35,8 +36,8 @@ const localeMessages = {
             Business_See_off: "Business See-off",
             Immigration_Only_Pick_up: "Immigration Only Pick-up",
             Immigration_Only_See_off: "Immigration Only See-off"
-          },
-        options:{
+        },
+        options: {
             change_visa: "Change Visa",
             exchange_currency: "Exchange Currency",
             buy_sim_card: "Buy SIM Card",
@@ -45,9 +46,34 @@ const localeMessages = {
             customs_declaration_support: "Customs Declaration Assistance",
             luggage_assistance: "Excess Baggage",
             see_off_choose_staff: "Choose Staff:"
+        },
+        cms: {
+            B_Pending: "Pending",
+            B_Confirm: "Confirmed",
+            B_Complete: "Completed",
+            B_UnComplete: "Uncomplete",
+            B_Cancel: "Cancel",
+            
+            S_Pending : "S_Pending",
+            S_Confirm : "S_Confirmed",
+            S_Cancel  : "S_Cancel",
+            
+            O_Pending : "O_Pending",
+            O_Confirm : "O_Confirmed",
+            O_Complete : "O_Completed",
+            O_UnComplete : "O_UnCompleted",
+            O_Cancel : "O_Cancel"
+        },
+        role: {
+            Admin: "Admin",
+            Sale_Admin: "Sales Admin",
+            Sale: "Sales",
+            Operator_Ref:"Operator CR",
+            Operator: "Operator",
+            Agency: "Agency"
         }
     },
-          
+
     vi: {
         home: {
             slogan: "Một trải nghiệm khác biệt tại sân bay",
@@ -75,6 +101,7 @@ const localeMessages = {
             upload_portrait_here: "Tải ảnh chân dung lên ở đây",
             mandatory_marks: "Các mục đánh dấu là bắt buộc điền",
             submit: "Gửi",
+            ERROR_PASSPORT_MISSING: "yêu cầu hộ chiếu"
         },
         services: {
             VIP_Pick_up: "Quốc Nội",
@@ -83,7 +110,7 @@ const localeMessages = {
             Business_See_off: "Tiễn Doanh Nhân",
             Immigration_Only_Pick_up: "Đón Chỉ Nhập Cảnh",
             Immigration_Only_See_off: "Tiễn Chỉ Nhập Cảnh"
-          },
+        },
         options: {
             change_visa: "Đổi Visa",
             exchange_currency: "Đổi Tiền",
@@ -93,6 +120,31 @@ const localeMessages = {
             customs_declaration_support: "Hỗ Trợ Khai Báo Hải Quan",
             luggage_assistance: "Nhiều Hành Lý",
             see_off_choose_staff: "Chọn Nhân Viên Đón-Tiễn"
+        },
+        cms: {
+            B_Pending: "Pending",
+            B_Confirm: "Confirmed",
+            B_Complete: "Completed",
+            B_UnComplete: "Uncomplete",
+            B_Cancel: "Cancel",
+            
+            S_Pending : "S_Pending",
+            S_Confirm : "S_Confirmed",
+            S_Cancel  : "S_Cancel",
+            
+            O_Pending : "O_Pending",
+            O_Confirm : "O_Confirmed",
+            O_Complete : "O_Completed",
+            O_UnComplete : "O_UnCompleted",
+            O_Cancel : "O_Cancel"
+        },
+        role: {
+            Admin: "Admin",
+            Sale_Admin: "Sales Admin",
+            Sale: "Sales",
+            Operator_Ref:"Operator CR",
+            Operator: "Operator",
+            Agency: "Agency"
         }
     },
 
@@ -131,8 +183,8 @@ const localeMessages = {
             Business_See_off: "商务送行",
             Immigration_Only_Pick_up: "仅限入境接送",
             Immigration_Only_See_off: "仅限入境送行"
-          },
-          options: {
+        },
+        options: {
             change_visa: "更改签证",
             exchange_currency: "兑换货币",
             buy_sim_card: "购买SIM卡",
@@ -141,6 +193,31 @@ const localeMessages = {
             customs_declaration_support: "海关申报帮助",
             luggage_assistance: "行李超额",
             see_off_choose_staff: "选择员工"
+        },
+        cms: {
+            B_Pending: "Pending",
+            B_Confirm: "Confirmed",
+            B_Complete: "Completed",
+            B_UnComplete: "Uncomplete",
+            B_Cancel: "Cancel",
+            
+            S_Pending : "S_Pending",
+            S_Confirm : "S_Confirmed",
+            S_Cancel  : "S_Cancel",
+            
+            O_Pending : "O_Pending",
+            O_Confirm : "O_Confirmed",
+            O_Complete : "O_Completed",
+            O_UnComplete : "O_UnCompleted",
+            O_Cancel : "O_Cancel"
+        },
+        role: {
+            Admin: "Admin",
+            Sale_Admin: "Sales Admin",
+            Sale: "Sales",
+            Operator_Ref:"Operator CR",
+            Operator: "Operator",
+            Agency: "Agency"
         }
     },
     ko: {
@@ -178,8 +255,8 @@ const localeMessages = {
             Business_See_off: "비즈니스 배웅",
             Immigration_Only_Pick_up: "입국 전용 픽업",
             Immigration_Only_See_off: "입국 전용 배웅"
-          },
-          options: {
+        },
+        options: {
             change_visa: "비자 변경",
             exchange_currency: "화폐 교환",
             buy_sim_card: "SIM 카드 구매",
@@ -188,8 +265,34 @@ const localeMessages = {
             customs_declaration_support: "세관 신고 지원",
             luggage_assistance: "과잉 수하물",
             see_off_choose_staff: "직원 선택"
+        }, 
+        cms: {
+            B_Pending: "Pending",
+            B_Confirm: "Confirmed",
+            B_Complete: "Completed",
+            B_UnComplete: "Uncomplete",
+            B_Cancel: "Cancel",
+            
+            S_Pending : "S_Pending",
+            S_Confirm : "S_Confirmed",
+            S_Cancel  : "S_Cancel",
+            
+            O_Pending : "O_Pending",
+            O_Confirm : "O_Confirmed",
+            O_Complete : "O_Completed",
+            O_UnComplete : "O_UnCompleted",
+            O_Cancel : "O_Cancel"
+        },
+        role: {
+            Admin: "Admin",
+            Sale_Admin: "Sales Admin",
+            Sale: "Sales",
+            Operator_Ref:"Operator CR",
+            Operator: "Operator",
+            Agency: "Agency"
         }
-    }
+    },
+
 };
 
 const i18n = createI18n({

@@ -2,7 +2,7 @@
   <div class="user">
     <div class="user-body">
       <div class="user-header">
-        <h3>Team Member</h3>
+        <h3>Account</h3>
         <PopupWrapper>
           <template #header>
             <span class="popover" @click="onAddNew()">Add new +</span>
@@ -10,7 +10,7 @@
           <template #content>
             <div class="popover-content">
               <EditUser :userId="selectedUserId" @reloadPage="maintainFetchUser()" />
-            </div>
+            </div> 
           </template>
         </PopupWrapper>
       </div>
@@ -63,7 +63,7 @@
                 <div class="item" data-id="{{item.id}}">{{ item.email }}</div>
               </td>
               <td>
-                <div class="item" data-id="{{item.id}}">{{ item.role }}</div>
+                <div class="item" data-id="{{item.id}}">{{ $t(`role.`+item.role) }}</div>
               </td>
               <td>
                 <div class="item" data-id="{{item.id}}">
@@ -323,7 +323,7 @@ export default {
 }
 
 .user-body {
-  border: 2px solid #e6eae9;
+  /* border: 2px solid #e6eae9; */
   padding: 0px 15px;
   display: flex;
   height: 140px;

@@ -197,6 +197,9 @@ export default {
             if (this.orderDetail.employee_Id.length <= 0) {
                 this.validated = false;
             }
+            if(this.orderDetail.status_Operator_ID == 5){
+                this.validated = true;
+            }
             if (this.validated) {
                 this.isLoading = true;
                 const user_Id = localStorage.getItem("user_id");

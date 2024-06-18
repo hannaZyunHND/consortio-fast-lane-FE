@@ -75,11 +75,14 @@
                         </div>
                         <div class="row mb-3">
                             <label for="departure_time">Order Time</label>
-                            <input type="text" v-model="orderDetail.service_Time" required class="form-control">
+                            <VueDatePicker v-model="orderDetail.service_Time" :min-date="minDate"
+                                :timezone="{ convertModel: false }" @update:model-value="onUpdateDate()" required>
+                            </VueDatePicker>
+                            <!-- <input type="text" v-model="orderDetail.service_Time" required> -->
                         </div>
                     </div>
-                    <div class="form-col col-md-4">
-                        <div class="row mb-3">
+                    <div class="form-col" >
+                        <div class="row" v-if="roleCheckerReverse(['Agency'])">
                             <label for="status_sales">Sales Status</label>
                             <select v-model="orderDetail.status_Sales_Id" id="status" class="form-select">
                                 <option v-for="(status, index) in maintainSaleStatus" :key="index" :value="status.Key">
@@ -98,8 +101,8 @@
                             <label for="note">Note</label>
                             <textarea type="text" v-model="orderDetail.note" class="form-control"></textarea>
                         </div>
-                        <div class="row mb-3">
-                            <label for="operator_note">Remark to Operation2768</label>
+                        <div class="row mb-3" v-if="roleCheckerReverse(['Agency'])">
+                            <label for="operator_note">Remark to Operation</label>
                             <textarea type="text" v-model="orderDetail.operator_Note" class="form-control"></textarea>
                         </div>
                     </div>
@@ -119,11 +122,19 @@ import axios from 'axios';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import Loading from '@/views/LoadingPage.vue';
+import VueDatePicker from "@vuepic/vue-datepicker";
+import moment from "moment";
+
 
 export default {
     name: 'EditOrder',
     components: {
-        Loading
+        Loading, VueDatePicker
+    },
+    computed: {
+        minDate() {
+            return new Date();
+        },
     },
     props: {
         orderId: {
@@ -133,6 +144,10 @@ export default {
     },
     data() {
         return {
+            datePickerConfig: {
+                format: "YYYY-MM-DD HH:mm:ss",
+
+            },
             baseImage: process.env.VUE_APP_API_URL.replace('/api', ''),
             orderData: {
                 name: '',
@@ -176,6 +191,7 @@ export default {
             maintainAirports: [],
             maintainServices: [],
             maintainSaleStatus: [],
+            isResetStatus: false
         };
     },
     setup() {
@@ -199,6 +215,37 @@ export default {
     },
 
     methods: {
+        roleCheckerReverse(decinedRoles) {
+            let checker = true;
+            let role = localStorage.getItem('roles');
+            decinedRoles.forEach((element) => {
+                if (element == role) {
+                    checker = false;
+                }
+            })
+            return checker;
+        },
+        roleChecker(accepedRoles) {
+            let checker = false;
+
+            let role = localStorage.getItem('roles');
+            if (role == "Admin") {
+                checker = true;
+            }
+            accepedRoles.forEach((element) => {
+                if (element == role) {
+                    checker = true;
+                }
+            })
+            return checker;
+        },
+        onUpdateDate() {
+            this.isResetStatus = true;
+        },
+        onChangeAirPort() {
+            this.isResetStatus = true;
+        },
+
         maintainGetAllSaleStatus() {
             axios.get(`${process.env.VUE_APP_API_URL}/MaintainCommons/StatusSaleType`).then((response) => {
                 this.maintainSaleStatus = response.data;
@@ -253,7 +300,14 @@ export default {
             const apiUrl = process.env.VUE_APP_API_URL;
             this.orderDetail.updatedBy = user_Id;
 
-            axios.post(`${apiUrl}/MaintainOrderDetails/Update`, this.orderDetail)
+
+            //Tang gio cua vue validate len 7 gio
+
+            let newOrder = JSON.parse(JSON.stringify(this.orderDetail));
+            let newTime = moment(newOrder.service_Time).add(7, 'hours').add(-7, 'hours').format('YYYY-MM-DDTHH:mm:ss');
+            newOrder.service_Time = newTime;
+            newOrder.isResetStatus = this.isResetStatus;
+            axios.post(`${apiUrl}/MaintainOrderDetails/Update`, newOrder)
                 .then(() => {
                     this.success();
                     const clickEvent = new MouseEvent('click', {

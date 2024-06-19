@@ -7,11 +7,11 @@
                 <input type="text" v-model="formData.old_Password" placeholder="Your old password" />
             </div>
             <div class="row">
-                <label for="password" style="color:black">New Password</label>
+                <label for="password" style="color:black">New Password:</label>
                 <input type="text" v-model="formData.new_Password" placeholder="Your new password" />
             </div>
             <div class="row">
-                <label for="password" style="color:black">Confirm Password</label>
+                <label for="password" style="color:black">Confirm Password:</label>
                 <input type="text" v-model="formData.confirm_Password" placeholder="Your confirm password" />
                 <span v-if="!passwordsMatch" style="color: red;">Passwords do not match</span>
             </div>
@@ -90,8 +90,8 @@ export default {
 <style scoped>
 .popup-content {
     z-index: 999;
-    width: 350px;
-    position: absolute;
+    width: 50%;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -99,6 +99,14 @@ export default {
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width:768px) {
+
+    .popup-content {
+        width: 90% !important;
+
+    }
 }
 
 #edit-service-form {

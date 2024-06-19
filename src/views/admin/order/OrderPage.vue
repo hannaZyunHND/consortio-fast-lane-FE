@@ -243,7 +243,7 @@
                 </div>
                 <div v-else>
                   <ul>
-                    <li>Un-assign</li>
+                    <li>N/A</li>
                   </ul>
                 </div>
               </td>
@@ -948,6 +948,7 @@ export default {
   font-size: 14px !important;
   border: 2px solid #cbd5e1 !important;
   border-radius: 7px !important;
+  color: black;
 }
 
 .menu-search select {

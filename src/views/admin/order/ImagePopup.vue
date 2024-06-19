@@ -1,34 +1,37 @@
 <template>
     <div class="popup-content" v-if="orderData">
-        <span class="title-header">Customer Information Image</span>
-        <div class="customer-image">
-            <div class="image">
-                <span>Passport image below
-                    <a :href="getCompleteImageUrl(orderData.passport_Path)" download="abc.jpg"><i class="pi pi-download"
-                            style="font-size: 1rem"></i>
-                    </a>
-                </span>
-                <img :src="getCompleteImageUrl(orderData.passport_Path)" alt="Passport Image">
-            </div>
+        <h4 class="title-header">Customer Information Image</h4>
+        <div class="customer-image row">
+    <div class="image col-md-4 mb-3">
+        <span>
+            Passport image below
+            <a :href="getCompleteImageUrl(orderData.passport_Path)" download="abc.jpg">
+                <i class="pi pi-download" style="font-size: 1rem"></i>
+            </a>
+        </span>
+        <img :src="getCompleteImageUrl(orderData.passport_Path)" alt="Passport Image" class="img-fluid">
+    </div>
 
-            <div class="image">
-                <span>Visa image below
-                    <a :href="orderData.visa_Path" download>
-                        <i class="pi pi-download" style="font-size: 1rem"></i>
-                    </a>
-                </span>
-                <img :src="getCompleteImageUrl(orderData.visa_Path)" alt="Visa Image">
-            </div>
+    <div class="image col-md-4 mb-3">
+        <span>
+            Visa image below
+            <a :href="orderData.visa_Path" download>
+                <i class="pi pi-download" style="font-size: 1rem"></i>
+            </a>
+        </span>
+        <img :src="getCompleteImageUrl(orderData.visa_Path)" alt="Visa Image" class="img-fluid">
+    </div>
 
-            <div class="image">
-                <span>Portrait image below
-                    <a :href="orderData.portrait_Path" download>
-                        <i class="pi pi-download" style="font-size: 1rem"></i>
-                    </a>
-                </span>
-                <img :src="getCompleteImageUrl(orderData.portrait_Path)" alt="Portrait Image">
-            </div>
-        </div>
+    <div class="image col-md-4 mb-3">
+        <span>
+            Portrait image below
+            <a :href="orderData.portrait_Path" download>
+                <i class="pi pi-download" style="font-size: 1rem"></i>
+            </a>
+        </span>
+        <img :src="getCompleteImageUrl(orderData.portrait_Path)" alt="Portrait Image" class="img-fluid">
+    </div>
+</div>
     </div>
 </template>
 
@@ -88,8 +91,7 @@ export default {
 
 <style scoped>
 .popup-content {
-    width: fit-content;
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -100,7 +102,6 @@ export default {
 }
 
 .customer-image {
-    gap: 10px;
     display: flex;
 }
 

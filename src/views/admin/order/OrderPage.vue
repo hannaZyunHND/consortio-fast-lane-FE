@@ -383,7 +383,7 @@ export default {
         fromDate: null,
         toDate: null,
         keyword: "",
-        orderBy: "booking-time",
+        orderBy: "service-time",
         createdBy: 0,
         employeeId: 0,
         pageIndex: 1,

@@ -703,22 +703,22 @@ export default {
                         },
                         {
                             label: "Confirm",
-                            backgroundColor: "#90EE90",
+                            backgroundColor: "#9de889",
                             data: dataSetConfirm
                         },
                         {
-                            label: "Complete",
-                            backgroundColor: "#FFFFE0",
+                            label: "Completed",
+                            backgroundColor: "#e6e651",
                             data: dataSetComplete
                         },
                         {
-                            label: "UnComplete",
-                            backgroundColor: "#D3D3D3",
+                            label: "Uncompleted",
+                            backgroundColor: "#b7b5bd",
                             data: dataSetUncomplete
                         },
                         {
                             label: "Cancel",
-                            backgroundColor: "#FFC0CB",
+                            backgroundColor: "#ea7171",
                             data: dataSetCancel
                         },
                     ];
@@ -877,8 +877,8 @@ select {
 }
 
 .report-item canvas {
-    width: 100% !important;
-    height: 100% !important;
+    /* width: 100% !important;
+    height: 100% !important; */
 }
 
 #status-filter {

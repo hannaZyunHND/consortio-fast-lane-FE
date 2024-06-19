@@ -7,11 +7,11 @@
                 <input type="text" v-model="formData.old_Password" placeholder="Your old password" />
             </div>
             <div class="row">
-                <label for="password" style="color:black">New Password</label>
+                <label for="password" style="color:black">New Password:</label>
                 <input type="text" v-model="formData.new_Password" placeholder="Your new password" />
             </div>
             <div class="row">
-                <label for="password" style="color:black">Confirm Password</label>
+                <label for="password" style="color:black">Confirm Password:</label>
                 <input type="text" v-model="formData.confirm_Password" placeholder="Your confirm password" />
                 <span v-if="!passwordsMatch" style="color: red;">Passwords do not match</span>
             </div>

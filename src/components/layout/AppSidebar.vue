@@ -343,6 +343,7 @@ export default {
 .dropdown12{
   align-items: center;
   display: flex;
+  cursor:pointer  ;
 }
 .show {
   /* width: 175px; */
@@ -379,7 +380,9 @@ export default {
   color: white !important;
 
 }
-
+.dropdown-menu{
+  cursor: pointer;
+}
 span {
   font-size: 14px;
   font-family: "Inter var", sans-serif;

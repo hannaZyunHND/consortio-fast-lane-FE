@@ -51,10 +51,10 @@
               <div class="form-col">
                 <div class="row">
                   <label for="departure_time">{{ $t('home.service_time') }}*</label>
-                  <VueDatePicker v-model="formData.service_Time" :config="datePickerConfig" :min-date="minDate"
+                  <VueDatePicker class="lich-home" v-model="formData.service_Time" :config="datePickerConfig" :min-date="minDate"
                     @date-update="dateSelected" required utc>
                   </VueDatePicker>
-                  <span class="title-notification" style="visibility: hidden">*</span>
+                  <!-- <span class="title-notification" style="visibility: hidden">*</span> -->
                 </div>
                 <div class="row">
                   <label>{{ $t('home.flight_number') }}</label>
@@ -863,7 +863,12 @@ span.input-option-content {
   flex: 1;
   /* Nội dung sẽ chiếm phần còn lại của cột */
 }
-
+.lich-home{
+  height: 69px;
+}
+.lich_home .dp__input_wrap{
+    padding: 4px !important;
+  }
 @media (max-width: 768px) {
   .form-row-body {
     display: flex;

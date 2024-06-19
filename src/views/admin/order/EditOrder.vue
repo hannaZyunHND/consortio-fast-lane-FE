@@ -9,7 +9,7 @@
                                 <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
                                 <span class="title-header">Upload passport at here*</span>
                             </div>
-                            <img :src="`${orderDetail.passportImage}`" alt="" class="uploaded-image" />
+                            <img :src="`${orderDetail.passportImage}`" class="uploaded-image" />
                         </label>
                         <input :id="`passport ${numberKey}`" type="file" @change="handlePassportUpload" />
                     </div>
@@ -19,7 +19,7 @@
                                 <i class="pi pi-plus-circle" style="font-size: 1rem; color: #000066"></i>
                                 <span class="title-header">Upload visa at here</span>
                             </div>
-                            <img :src="`${orderDetail.visaImage}`" alt="" class="uploaded-image" />
+                            <img :src="`${orderDetail.visaImage}`" class="uploaded-image" />
                         </label>
                         <input :id="`visa ${numberKey}`" type="file" @change="handleVisaUpload" />
                     </div>
@@ -81,7 +81,7 @@
                             <!-- <input type="text" v-model="orderDetail.service_Time" required> -->
                         </div>
                     </div>
-                    <div class="form-col" >
+                    <div class="form-col">
                         <div class="row" v-if="roleCheckerReverse(['Agency'])">
                             <label for="status_sales">Sales Status</label>
                             <select v-model="orderDetail.status_Sales_Id" id="status" class="form-select">
@@ -483,11 +483,12 @@ export default {
         display: flex;
         gap: 0px !important;
     }
-    .uploaded-image{
-    width: 100% !important;
-    height: 81% !important;
-   
-}
+
+    .uploaded-image {
+        width: 100% !important;
+        height: 81% !important;
+
+    }
 }
 
 .title-header {

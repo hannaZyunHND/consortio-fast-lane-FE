@@ -187,7 +187,9 @@
                   </div>
                   <div class="item">
                     <vue-countdown :time="item.countdownMaterial" v-slot="{ days, hours, minutes, seconds }">
-                      <span v-if="item.countdownMaterial > 0">Remain: {{ days }}d, {{ hours }}h, {{ minutes }}m, {{ seconds }}s.</span>
+                      <span v-if="item.countdownMaterial > 0">Remain: {{ days }}d, {{ hours }}h, {{ minutes }}m, {{
+                        seconds
+                        }}s.</span>
                       <span v-else style="color:red">Expired</span>
                     </vue-countdown>
                   </div>
@@ -284,7 +286,7 @@
             </tr>
           </tbody>
         </table>
-       
+
       </div>
     </div>
     <div class="order-container order-calendar-viewer" v-if="contentViewer == 'calendar'">
@@ -296,7 +298,7 @@
   </div> -->
   <Loading :loading="isLoading" />
   <Pagination :currentPage="filter.pageIndex" :totalPages="totalPages" @nextPage="nextPage" @prevPage="prevPage"
-  @goToPage="goToPage" />
+    @goToPage="goToPage" />
 </template>
 
 <script>
@@ -416,7 +418,7 @@ export default {
       signalr: null,
     };
   },
-  created(){
+  created() {
     this.signalr = useSignalR();
     this.signalr.on('RefetchOrders', this.handlerOnRefetchOrders);
     // this.signalr
@@ -466,7 +468,7 @@ export default {
   },
   methods: {
     //#region maintain
-    handlerOnRefetchOrders(message){
+    handlerOnRefetchOrders(message) {
       this.maintainFetchOrders();
     },
     roleCheckerReverse(decinedRoles) {
@@ -549,7 +551,7 @@ export default {
 
         })
       }
-      
+
     },
     async maintainChangeBookingStatusUncomplete(orderId) {
       const confirmResult = await Swal.fire({
@@ -584,7 +586,7 @@ export default {
 
         })
       }
-      
+
     },
     openEditTask(id) {
       this.selectedOrderTask = id;
@@ -1102,9 +1104,11 @@ select {
   font-weight: 600;
   border-radius: 4px;
 }
-ul{
-    margin-bottom: 0 !important;
+
+ul {
+  margin-bottom: 0 !important;
 }
+
 .customer-infomation {
   gap: 10px;
   display: flex;

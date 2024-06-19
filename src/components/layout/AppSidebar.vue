@@ -76,7 +76,23 @@
               </ul>
             </div>
           </div>
+          <!-- Change_Password -->
+          <div class="drop-down">
 
+            <PopupWrapper>
+              <template #header>
+                <div class="popover">
+                  <span>pw</span>
+                </div>
+              </template>
+              <template #content>
+                <div class="popover-content">
+                  <Change_Password />
+                </div>
+              </template>
+            </PopupWrapper>
+
+          </div>
           <!-- Account -->
           <div class="dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" id="navbarDropdownAccount"
@@ -85,47 +101,32 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdownAccount">
               <li>
-
                 <div class="item-content content-padding">
                   <user-icon class="navbar-icon"></user-icon>
                   <span id="account-information"></span>
                 </div>
               </li>
-              <li>
+              <!-- <li>
                 <div class="item-content content-padding">
                   <user-icon class="navbar-icon"></user-icon>
-                  <PopupWrapper>
-                    <template #header>
-                      <div class="">
-                        <pencil-square-icon class="user-icon"></pencil-square-icon>
-                        <span>Change password</span>
-                      </div>
-                    </template>
-                    <template #content>
-                      <div class="popover-content">
-                        <Change_Password></Change_Password>
-                      </div>
-                    </template>
-                  </PopupWrapper>
                 </div>
-              </li>
+              </li> -->
               <li>
                 <div class="nav-link" @click="logout">
                   <div class="item-content">
-
                     <power-icon class="navbar-icon"></power-icon>
                     <span>Logout</span>
                   </div>
                 </div>
               </li>
-           
+
             </ul>
           </div>
           <div class="dropdown" v-if="roleChecker(['Admin'])">
             <router-link class="nav-link" to="/dashboard/manage" style="color: white;">
               Account
             </router-link>
-          
+
           </div>
         </div>
       </div>
@@ -151,6 +152,7 @@ import {
   // Bars3Icon, 
   FlagIcon,
   Square2StackIcon,
+  PencilSquareIcon
 } from "@heroicons/vue/24/solid";
 // import axios from "axios";
 
@@ -161,8 +163,7 @@ export default {
     FlagIcon,
     WalletIcon,
     Squares2X2Icon,
-    // SquaresPlusIcon,
-    PowerIcon,
+    PencilSquareIcon, PowerIcon,
     // EllipsisHorizontalCircleIcon,
     // RectangleStackIcon,
     // CalendarDaysIcon,
@@ -294,6 +295,10 @@ export default {
 </script>
 
 <style scoped>
+.popover-content {
+  top: 200px;
+}
+
 @media (max-width:768px) {
   .navbar[data-v-7d025640] {
     background: #1f416c;

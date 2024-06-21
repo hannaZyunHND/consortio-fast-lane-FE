@@ -321,7 +321,7 @@ import { saveAs } from 'file-saver';
 import Loading from '@/views/LoadingPage.vue';
 import EditTask from "../task/EditTask.vue";
 import Swal from 'sweetalert2';
-import Notification from '@/components/Notification.vue'
+// import Notification from '@/components/Notification.vue'
 
 
 import FullCalendar from '@fullcalendar/vue3'
@@ -351,7 +351,7 @@ export default {
     EditTask,
     ChatBubbleBottomCenterIcon,
     FullCalendar,
-    Notification
+    // Notification
   },
   data() {
     return {

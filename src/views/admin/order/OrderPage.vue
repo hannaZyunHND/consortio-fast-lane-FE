@@ -750,7 +750,7 @@ export default {
         console.log(response.data);
 
         // Kiểm tra kiểu dữ liệu của dữ liệu nhận được
-        if (response.data instanceof ArrayBuffer) {
+        if (response.data instanceof ArrayBuffer) {z
           // Nếu dữ liệu nhận được là ArrayBuffer, xử lý tải xuống
           const blob = new Blob([response.data], {
             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

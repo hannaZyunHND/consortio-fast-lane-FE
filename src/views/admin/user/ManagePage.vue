@@ -5,102 +5,105 @@
         <h3>Account</h3>
         <PopupWrapper>
           <template #header>
-            <span class="popover" @click="onAddNew()">Add new +</span>
+            <span class="btn btn-secondary" @click="onAddNew()">Add new +</span>
           </template>
           <template #content>
             <div class="popover-content">
               <EditUser :userId="selectedUserId" @reloadPage="maintainFetchUser()" />
-            </div> 
+            </div>
           </template>
         </PopupWrapper>
       </div>
       <div class="space-line"></div>
-      <div class="user-search">
-        <div class="menu-search">
-          <div class="search-filter">
-            <select id="airport" v-model="filter.airportId">
+      <div class="user-search container-fluid">
+        <div class="menu-search row">
+          <div class="search-filter col-md-3 mb-3">
+            <select id="airport" v-model="filter.airportId" class="form-select">
               <option value="0">ALL Airport</option>
               <option v-for="a in maintainAirports" :value="a.id" :key="a.id">{{ a.name }}</option>
             </select>
           </div>
-          <div class="search-filter">
-            <select required v-model="filter.role">
+          <div class="search-filter col-md-3 mb-3">
+            <select required v-model="filter.role" class="form-select">
               <option value="">ALL Roles</option>
               <option v-for="r in maintainRoles" :key="r.Key" :value="r.Value">{{ r.Value }}</option>
             </select>
           </div>
-          <div>
+          <div class="search-account col-md-5 mb-3 d-flex">
             <input type="text" name="search" id="search" v-model="filter.keyword" placeholder="Search Keyword"
-              @keyup.enter="search" />
+              @keyup.enter="search" class="form-control me-2" />
+            <button class="btn btn-primary" @click="maintainFetchUser()">
+              <i class="pi pi-search" style="font-size: 1rem"></i>
+            </button>
           </div>
         </div>
-        <button class="btn-search-primary">
-          <i class="pi pi-search" style="font-size: 1rem" @click="maintainFetchUser()"></i>
-        </button>
       </div>
     </div>
-    <div class="user-container">
-      <div class="list-user">
-        <table>
-          <thead>
-            <tr class="data-table-tilte">
-              <th><bars-2-icon class="user-icon" /></th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Created_at</th>
-              <th>Updated_at</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody class="user-info">
-            <tr v-for="item in users" :key="item.id" class="user-information">
-              <td><input type="checkbox" /></td>
-              <td>
-                <div class="item" data-id="{{item.id}}">{{ item.name }}</div>
-              </td>
-              <td>
-                <div class="item" data-id="{{item.id}}">{{ item.email }}</div>
-              </td>
-              <td>
-                <div class="item" data-id="{{item.id}}">{{ $t(`role.`+item.role) }}</div>
-              </td>
-              <td>
-                <div class="item" data-id="{{item.id}}">
-                  {{ formatDate(item.created_at) }}
-                </div>
-              </td>
-              <td>
-                <div class="item" data-id="{{item.id}}">
-                  {{ getUserAirport(item) }}
-                </div>
-              </td>
-              <td>
-                <div class="action-buttons">
-                  <PopupWrapper>
-                    <template #header>
-                      <div class="popover">
-                        <pencil-square-icon class="user-icon" @click="openEditUser(item.id)" />
-                      </div>
-                    </template>
-                    <template #content>
-                      <div class="popover-content">
-                        <EditUser :userId="selectedUserId" @reloadPage="maintainFetchUser()" />
-                      </div>
-                    </template>
-                  </PopupWrapper>
-                  <button @click="maintainDeleteUser(item.id)" class="btn-delete-primary">
-                    <trash-icon class="user-icon" />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <div class="user-container container-fluid">
+    <div class="list-user">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr class="data-table-title">
+                        <th scope="col"><bars-2-icon class="user-icon" /></th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Role</th>
+                        <th scope="col">Created_at</th>
+                        <th scope="col">Updated_at</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="user-info">
+                    <tr v-for="item in users" :key="item.id" class="user-information">
+                        <td><input type="checkbox" class="form-check-input" /></td>
+                        <td>
+                            <div class="item" :data-id="item.id">{{ item.name }}</div>
+                        </td>
+                        <td>
+                            <div class="item" :data-id="item.id">{{ item.email }}</div>
+                        </td>
+                        <td>
+                            <div class="item" :data-id="item.id">{{ $t(`role.` + item.role) }}</div>
+                        </td>
+                        <td>
+                            <div class="item" :data-id="item.id">
+                                {{ formatDate(item.created_at) }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="item" :data-id="item.id">
+                                {{ getUserAirport(item) }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <PopupWrapper>
+                                    <template #header>
+                                        <div class="">
+                                            <pencil-square-icon class="user-icon" @click="openEditUser(item.id)" />
+                                        </div>
+                                    </template>
+                                    <template #content>
+                                        <div class="popover-content">
+                                            <EditUser :userId="selectedUserId" @reloadPage="maintainFetchUser()" />
+                                        </div>
+                                    </template>
+                                </PopupWrapper>
+                                <button @click="maintainDeleteUser(item.id)" class="btn btn-danger btn-sm">
+                                    <trash-icon class="user-icon" />
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         <Pagination :currentPage="filter.pageIndex" :totalPages="totalPage" @nextPage="nextPage" @prevPage="prevPage"
-          @goToPage="goToPage" />
-      </div>
+            @goToPage="goToPage" />
     </div>
+</div>
+
   </div>
 </template>
 
@@ -311,6 +314,18 @@ export default {
 </script>
 
 <style scoped>
+  .user-container {
+        padding: 20px;
+    }
+
+    .list-user {
+        margin-top: 20px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
 .user-icon {
   width: 24px;
   height: 24px;
@@ -326,7 +341,6 @@ export default {
   /* border: 2px solid #e6eae9; */
   padding: 0px 15px;
   display: flex;
-  height: 140px;
   background: #fff;
   border-radius: 10px;
   flex-direction: column;
@@ -334,9 +348,20 @@ export default {
 }
 
 .user-header {
+  padding: 20px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.search-account {
+  position: relative;
+}
+
+.btn-search-primary {
+  position: absolute;
+  top: 11px;
+  right: 8px;
 }
 
 .space-line {
@@ -350,10 +375,10 @@ select {
   padding: 10px;
 }
 
-.user-search {
+/* .user-search {
   display: flex;
   justify-content: space-between;
-}
+} */
 
 .menu-search {
   display: flex;
@@ -405,7 +430,9 @@ select {
   border: none;
   background: none;
 }
-
+.form-select option{
+  width: 100% !important;
+}
 #search {
   border: none;
   width: 185px;

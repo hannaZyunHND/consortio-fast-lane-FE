@@ -313,8 +313,7 @@ export default {
 </script>
 <style scoped>
 .popup-content {
-    width: fit-content;
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -392,11 +391,11 @@ input[type="email"] {
 }
 
 select {
-    width: 200px;
     border: 1px solid #e6eae9;
     margin: 10px 0px;
     border-radius: 5px;
     padding: 10px;
+    width: 95%;
 }
 
 .order-icon {

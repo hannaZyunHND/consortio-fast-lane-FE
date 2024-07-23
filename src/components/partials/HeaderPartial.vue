@@ -7,7 +7,7 @@
         </div>
         <div class="col-md-6">
           <div class="header-info d-flex justify-content-end align-items-center">
-            <div class="contact-in me-3"> Support: <a class="tel" href="tel:+84902227529">+84 90 222 7529</a> </div>
+            <div class="contact-in me-3"> Support: <a class="tel" href="tel:0902227529">+84 90 222 7529</a> </div>
             <select class="form-select ngonngu" @change="changeLanguage">
               <option value="en">English</option>
               <option value="vi">VietNamese</option>

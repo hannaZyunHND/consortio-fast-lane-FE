@@ -245,7 +245,7 @@
                 </div>
                 <div v-else>
                   <ul>
-                    <li>Un-assign</li>
+                    <li>N/A</li>
                   </ul>
                 </div>
               </td>
@@ -323,7 +323,7 @@ import { saveAs } from 'file-saver';
 import Loading from '@/views/LoadingPage.vue';
 import EditTask from "../task/EditTask.vue";
 import Swal from 'sweetalert2';
-import Notification from '@/components/Notification.vue'
+// import Notification from '@/components/Notification.vue'
 
 
 import FullCalendar from '@fullcalendar/vue3'
@@ -353,7 +353,7 @@ export default {
     EditTask,
     ChatBubbleBottomCenterIcon,
     FullCalendar,
-    Notification
+    // Notification
   },
   data() {
     return {
@@ -385,7 +385,7 @@ export default {
         fromDate: null,
         toDate: null,
         keyword: "",
-        orderBy: "booking-time",
+        orderBy: "service-time",
         createdBy: 0,
         employeeId: 0,
         pageIndex: 1,
@@ -950,6 +950,7 @@ export default {
   font-size: 14px !important;
   border: 2px solid #cbd5e1 !important;
   border-radius: 7px !important;
+  color: black;
 }
 
 .menu-search select {

@@ -72,27 +72,14 @@
                     </div>
                   </router-link>
                 </li>
+
                 <!-- Add other submenu items here if needed -->
               </ul>
             </div>
           </div>
-          <!-- Change_Password -->
-          <div class="drop-down">
 
-            <PopupWrapper>
-              <template #header>
-                <div class="popover">
-                  <span>pw</span>
-                </div>
-              </template>
-              <template #content>
-                <div class="popover-content">
-                  <Change_Password />
-                </div>
-              </template>
-            </PopupWrapper>
+          <!-- change password -->
 
-          </div>
           <!-- Account -->
           <div class="dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" id="navbarDropdownAccount"
@@ -106,11 +93,24 @@
                   <span id="account-information"></span>
                 </div>
               </li>
-              <!-- <li>
+              <li>
                 <div class="item-content content-padding">
                   <user-icon class="navbar-icon"></user-icon>
+                  <PopupWrapper>
+                    <template #header>
+                      <div class="">
+                        <pencil-square-icon class="user-icon"></pencil-square-icon>
+                        <span>Change password</span>
+                      </div>
+                    </template>
+                    <template #content>
+                      <div class="popover-content">
+                        <Change_Password></Change_Password>
+                      </div>
+                    </template>
+                  </PopupWrapper>
                 </div>
-              </li> -->
+              </li>
               <li>
                 <div class="nav-link" @click="logout">
                   <div class="item-content">
@@ -121,6 +121,18 @@
               </li>
 
             </ul>
+          </div>
+          <div class="dropdown dropdown12">
+            <PopupWrapper>
+              <template #header>
+                <div @click="onClickChangePassword">Change password</div>
+              </template>
+              <template #content>
+                <div class="popover-content">
+                  <Change_Password :userId="userId"></Change_Password>
+                </div>
+              </template>
+            </PopupWrapper>
           </div>
           <div class="dropdown" v-if="roleChecker(['Admin'])">
             <router-link class="nav-link" to="/dashboard/manage" style="color: white;">
@@ -146,6 +158,7 @@ import {
   // SquaresPlusIcon,
   Squares2X2Icon,
   PowerIcon,
+  Cog6ToothIcon,
   // EllipsisHorizontalCircleIcon,
   // RectangleStackIcon,
   // CalendarDaysIcon,
@@ -167,7 +180,8 @@ export default {
     // EllipsisHorizontalCircleIcon,
     // RectangleStackIcon,
     // CalendarDaysIcon,
-    // Bars3Icon,
+    // Bars3Icon,   
+    Cog6ToothIcon,
     Square2StackIcon,
     Change_Password,
     PopupWrapper
@@ -189,13 +203,14 @@ export default {
       showStatisticsAgencyMenu: false,
       showNewBookingMenuForSale: false,
       showNewBookingMenu: false,
+      userId: 0,
 
     };
   },
 
   mounted() {
     const roles = localStorage.getItem("roles");
-
+    this.userId = localStorage.getItem("user_id");
     //Authorize permission for each role
     this.showBookingsMenu =
       roles == "Admin" ||
@@ -254,6 +269,9 @@ export default {
   },
   methods: {
     //#region maintain
+    onClickChangePassword() {
+      this.userId = parseInt(localStorage.getItem("user_id"));
+    },
     roleChecker(accepedRoles) {
       let checker = false;
 
@@ -339,7 +357,13 @@ export default {
 }
 
 .navbar-nav {
-  gap: 100px;
+  gap: 43px;
+}
+
+.dropdown12 {
+  align-items: center;
+  display: flex;
+  cursor: pointer;
 }
 
 .show {
@@ -376,6 +400,10 @@ export default {
 .nav-link {
   color: white !important;
 
+}
+
+.dropdown-menu {
+  cursor: pointer;
 }
 
 span {
